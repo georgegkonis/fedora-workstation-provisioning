@@ -9,6 +9,9 @@
     - name: Install dev tools
       ansible.builtin.import_tasks: tasks/devtools.yml
 
+    - name: Install PowerShell
+      ansible.builtin.import_tasks: tasks/powershell.yml
+
     - name: Configure flatpak
       ansible.builtin.import_tasks: tasks/flatpak.yml
 

@@ -1,0 +1,14 @@
+---
+- name: Register the Microsoft repository
+  become: true
+  ansible.builtin.dnf:
+    name: "https://packages.microsoft.com/config/rhel/9/packages-microsoft-prod.rpm"
+    state: present
+    disable_gpg_check: true
+
+- name: Install PowerShell
+  become: true
+  ansible.builtin.dnf:
+    name: powershell
+    state: present
+    update_cache: true
