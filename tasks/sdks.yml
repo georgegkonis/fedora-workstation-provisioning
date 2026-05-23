@@ -1,7 +1,8 @@
 ---
-- name: Install Development SDKs
+- name: Install .NET SDKs
   ansible.builtin.dnf:
     name:
+      - dotnet-sdk-8.0
       - dotnet-sdk-10.0
     state: present
   become: true
