@@ -1,0 +1,26 @@
+---
+- name: Provision Local Development Workstation
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Ensure system packages are updated to latest versions
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Install essential developer utilities and container tools
+      dnf:
+        name:
+          - git
+          - zsh
+          - podman
+          - tmux
+          - curl
+        state: present
+
+    - name: Enable Flathub repository for graphical applications
+      flatpak_remote:
+        name: flathub
+        state: present
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
