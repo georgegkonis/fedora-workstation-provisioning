@@ -12,6 +12,9 @@
     - name: Configure flatpak
       ansible.builtin.import_tasks: tasks/flatpak.yml
 
+    - name: Install programming languages
+      ansible.builtin.import_tasks: tasks/sdks.yml
+
     - name: Install VS Code
       ansible.builtin.import_tasks: tasks/vscode.yml
 
