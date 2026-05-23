@@ -1,22 +1,44 @@
 ---
+- name: Install Toolbox dependencies
+  ansible.builtin.dnf:
+    name:
+      - fuse
+      - libXi
+      - libXrender
+      - libXtst
+      - fontconfig
+      - gtk3
+      - xcb-util-keysyms
+      - glx-utils
+    state: present
+  become: true
+
+- name: Fetch latest JetBrains Toolbox release data
+  ansible.builtin.uri:
+    url: "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release"
+    return_content: true
+  register: toolbox_api
+  become: false
+
 - name: Download JetBrains Toolbox
   ansible.builtin.get_url:
-    url: "https://download.jetbrains.com/toolbox/jetbrains-toolbox-3.4.3.81140.tar.gz"
+    url: "{{ toolbox_api.json.TBA[0].downloads.linux.link }}"
     dest: /tmp/jetbrains-toolbox.tar.gz
     mode: '0644'
   become: false
 
-- name: Create user bin directory
+- name: Create /opt/jetbrains-toolbox directory
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.local/bin"
+    path: /opt/jetbrains-toolbox
     state: directory
     mode: '0755'
-  become: false
+  become: true
 
-- name: Extract JetBrains Toolbox
+- name: Extract JetBrains Toolbox to /opt
   ansible.builtin.unarchive:
     src: /tmp/jetbrains-toolbox.tar.gz
-    dest: "{{ ansible_env.HOME }}/.local/bin"
-    extra_opts: [--strip-components=1]
-    exclude: [README.txt]
-  become: false
+    dest: /opt/jetbrains-toolbox
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+  become: true
