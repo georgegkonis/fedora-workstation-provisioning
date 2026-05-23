@@ -10,3 +10,9 @@
     name:
       - com.getpostman.Postman
     state: present
+
+- name: Install Ferdium (Flatpak)
+  community.general.flatpak:
+    name:
+      - org.ferdium.Ferdium
+    state: present
