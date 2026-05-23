@@ -3,6 +3,7 @@
   ansible.builtin.rpm_key:
     state: present
     key: https://packages.microsoft.com/keys/microsoft.asc
+  become: true
 
 - name: Add VS Code repository
   ansible.builtin.yum_repository:
@@ -12,8 +13,10 @@
     enabled: true
     gpgcheck: true
     gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+  become: true
 
 - name: Install Visual Studio Code
   ansible.builtin.dnf:
     name: code
     state: present
+  become: true
