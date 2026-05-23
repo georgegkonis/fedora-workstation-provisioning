@@ -5,14 +5,9 @@
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
-- name: Install Postman (Flatpak)
+- name: Install Flatpak applications
   community.general.flatpak:
     name:
       - com.getpostman.Postman
-    state: present
-
-- name: Install Ferdium (Flatpak)
-  community.general.flatpak:
-    name:
       - org.ferdium.Ferdium
     state: present
