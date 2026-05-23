@@ -13,7 +13,7 @@
     state: present
   become: true
 
-- name: Fetch latest JetBrains Toolbox release data
+- name: Fetch latest JetBrains Toolbox release
   ansible.builtin.uri:
     url: "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release"
     return_content: true
@@ -27,14 +27,14 @@
     mode: '0644'
   become: false
 
-- name: Create /opt/jetbrains-toolbox directory
+- name: Create JetBrains Toolbox directory
   ansible.builtin.file:
     path: /opt/jetbrains-toolbox
     state: directory
     mode: '0755'
   become: true
 
-- name: Extract JetBrains Toolbox to /opt
+- name: Extract JetBrains Toolbox
   ansible.builtin.unarchive:
     src: /tmp/jetbrains-toolbox.tar.gz
     dest: /opt/jetbrains-toolbox
