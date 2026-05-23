@@ -1,0 +1,31 @@
+# Ignore Ansible local cache, logs, and roles downloaded by ansible-galaxy
+.ansible/
+
+# Ignore Python cache and virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env/
+.venv/
+venv/
+ENV/
+
+# Ignore editor/OS files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Ignore secret or sensitive files (uncomment if you add them)
+# secrets.yml
+# vault.yml
+# *.key
+# *.pem
+
+# Ignore systemd logs or temp files
+*.log
+
+# Ignore VS Code settings (optional)
+.vscode/
