@@ -1,0 +1,12 @@
+---
+- name: Enable Flathub for Flatpak apps
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
+- name: Install Postman (Flatpak)
+  community.general.flatpak:
+    name:
+      - com.getpostman.Postman
+    state: present

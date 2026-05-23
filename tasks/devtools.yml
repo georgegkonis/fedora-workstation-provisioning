@@ -1,0 +1,11 @@
+---
+- name: Install developer tools and containers
+  ansible.builtin.dnf:
+    name:
+      - git
+      - zsh
+      - podman
+      - tmux
+      - curl
+      - make
+    state: present

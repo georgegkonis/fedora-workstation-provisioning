@@ -1,0 +1,22 @@
+---
+- name: Download JetBrains Toolbox
+  ansible.builtin.get_url:
+    url: "https://download.jetbrains.com/toolbox/jetbrains-toolbox-3.4.3.81140.tar.gz"
+    dest: /tmp/jetbrains-toolbox.tar.gz
+    mode: '0644'
+  become: false
+
+- name: Create user bin directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: '0755'
+  become: false
+
+- name: Extract JetBrains Toolbox
+  ansible.builtin.unarchive:
+    src: /tmp/jetbrains-toolbox.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    extra_opts: [--strip-components=1]
+    exclude: [README.txt]
+  become: false

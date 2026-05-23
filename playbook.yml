@@ -2,25 +2,24 @@
 - name: Provision Local Development Workstation
   hosts: localhost
   become: true
-
   tasks:
-    - name: Ensure system packages are updated to latest versions
-      dnf:
-        name: "*"
-        state: latest
+    - name: Run system updates
+      ansible.builtin.import_tasks: tasks/system.yml
 
-    - name: Install essential developer utilities and container tools
-      dnf:
-        name:
-          - git
-          - zsh
-          - podman
-          - tmux
-          - curl
-        state: present
+    - name: Install dev tools
+      ansible.builtin.import_tasks: tasks/devtools.yml
 
-    - name: Enable Flathub repository for graphical applications
-      flatpak_remote:
-        name: flathub
-        state: present
-        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    - name: Configure flatpak
+      ansible.builtin.import_tasks: tasks/flatpak.yml
+
+    - name: Install VS Code
+      ansible.builtin.import_tasks: tasks/vscode.yml
+
+    - name: Install Docker
+      ansible.builtin.import_tasks: tasks/docker.yml
+
+    - name: Install JetBrains
+      ansible.builtin.import_tasks: tasks/jetbrains.yml
+
+    - name: Install 1Password
+      ansible.builtin.import_tasks: tasks/1password.yml
