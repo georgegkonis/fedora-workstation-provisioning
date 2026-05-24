@@ -1,0 +1,19 @@
+---
+- name: Install system-wide GNOME extensions
+  ansible.builtin.dnf:
+    name:
+      - gnome-shell-extension-appindicator
+      - gnome-shell-extension-dash-to-dock
+      - gnome-shell-extension-caffeine
+    state: present
+  become: true
+
+# - name: Enable GNOME extensions
+#   ansible.builtin.command: "gnome-extensions enable {{ item }}"
+#   loop:
+#     - appindicatorsupport@rgcjonas.gmail.com
+#     - dash-to-dock@micxgx.gmail.com
+#     - caffeine@patapon.info
+#   become: false
+#   failed_when: false
+# changed_when: false

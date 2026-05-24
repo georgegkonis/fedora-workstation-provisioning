@@ -1,0 +1,6 @@
+---
+- name: Include system tasks
+  ansible.builtin.import_tasks: system.yml
+
+- name: Include core utilities tasks
+  ansible.builtin.import_tasks: core.yml

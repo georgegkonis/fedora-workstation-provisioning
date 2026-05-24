@@ -1,0 +1,7 @@
+---
+- name: Install shell and terminal tools
+  ansible.builtin.dnf:
+    name:
+      - zsh
+      - tmux
+    state: present

@@ -1,0 +1,6 @@
+---
+- name: Include docker tasks
+  ansible.builtin.import_tasks: docker.yml
+
+- name: Include podman tasks
+  ansible.builtin.import_tasks: podman.yml

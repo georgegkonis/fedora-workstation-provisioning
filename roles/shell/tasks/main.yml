@@ -1,0 +1,6 @@
+---
+- name: Include shell tools tasks
+  ansible.builtin.import_tasks: tools.yml
+
+- name: Include powershell tasks
+  ansible.builtin.import_tasks: powershell.yml

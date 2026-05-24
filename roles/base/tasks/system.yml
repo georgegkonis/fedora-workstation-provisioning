@@ -5,9 +5,3 @@
     state: latest
     update_cache: true
   # noqa: package-latest
-
-- name: Install core system packages
-  ansible.builtin.dnf:
-    name:
-      - gnome-tweaks
-    state: present

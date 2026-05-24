@@ -1,0 +1,12 @@
+---
+- name: Include jetbrains tasks
+  ansible.builtin.import_tasks: jetbrains.yml
+
+- name: Include vscode tasks
+  ansible.builtin.import_tasks: vscode.yml
+
+- name: Include sdks tasks
+  ansible.builtin.import_tasks: sdks.yml
+
+- name: Include postman tasks
+  ansible.builtin.import_tasks: postman.yml

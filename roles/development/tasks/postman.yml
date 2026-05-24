@@ -1,0 +1,6 @@
+---
+- name: Install Postman via Flatpak
+  community.general.flatpak:
+    name:
+      - com.getpostman.Postman
+    state: present

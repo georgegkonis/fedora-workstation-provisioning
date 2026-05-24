@@ -2,30 +2,9 @@
 - name: Provision Local Development Workstation
   hosts: localhost
   become: true
-  tasks:
-    - name: Run system updates
-      ansible.builtin.import_tasks: tasks/system.yml
-
-    - name: Install dev tools
-      ansible.builtin.import_tasks: tasks/devtools.yml
-
-    - name: Install PowerShell
-      ansible.builtin.import_tasks: tasks/powershell.yml
-
-    - name: Configure flatpak
-      ansible.builtin.import_tasks: tasks/flatpak.yml
-
-    - name: Install programming languages
-      ansible.builtin.import_tasks: tasks/sdks.yml
-
-    - name: Install VS Code
-      ansible.builtin.import_tasks: tasks/vscode.yml
-
-    - name: Install Docker
-      ansible.builtin.import_tasks: tasks/docker.yml
-
-    - name: Install JetBrains
-      ansible.builtin.import_tasks: tasks/jetbrains.yml
-
-    - name: Install 1Password
-      ansible.builtin.import_tasks: tasks/1password.yml
+  roles:
+    - { role: base, tags: base }
+    - { role: shell, tags: shell }
+    - { role: desktop, tags: desktop }
+    - { role: containers, tags: containers }
+    - { role: development, tags: development }

@@ -1,11 +1,8 @@
 ---
-- name: Install developer tools and containers
+- name: Install core utilities
   ansible.builtin.dnf:
     name:
       - git
-      - zsh
-      - podman
-      - tmux
       - curl
       - make
     state: present
