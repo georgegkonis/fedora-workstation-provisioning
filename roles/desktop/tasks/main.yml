@@ -1,9 +1,9 @@
 ---
-- name: Include 1Password tasks
-  ansible.builtin.import_tasks: 1password.yml
+- name: Include desktop apps tasks
+  ansible.builtin.import_tasks: apps.yml
 
 - name: Include GNOME tasks
   ansible.builtin.import_tasks: gnome.yml
 
-- name: Include desktop apps tasks
-  ansible.builtin.import_tasks: apps.yml
+- name: Include 1Password tasks
+  ansible.builtin.import_tasks: 1password.yml

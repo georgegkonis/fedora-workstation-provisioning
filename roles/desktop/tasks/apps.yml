@@ -10,4 +10,9 @@
     name:
       - org.ferdium.Ferdium
       - com.mattjakeman.ExtensionManager
+      - com.spotify.Client
+      - com.heliumlabs.Helium
+      - org.gnome.Extensions
+      - org.gnome.Maps
+      - org.gnome.Weather
     state: present
