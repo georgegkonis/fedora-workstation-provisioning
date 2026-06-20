@@ -1,7 +1,8 @@
 ---
-- name: Provision Local Development Workstation
+- name: Setup local machine
   hosts: localhost
-  become: true
+  connection: local
+
   roles:
     - { role: base, tags: base }
     - { role: shell, tags: shell }
