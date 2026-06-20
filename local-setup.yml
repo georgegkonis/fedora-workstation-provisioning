@@ -8,4 +8,4 @@
     - { role: shell, tags: shell }
     - { role: desktop, tags: desktop }
     - { role: containers, tags: containers }
-    - { role: development, tags: development }
+    - { role: dev, tags: dev }
