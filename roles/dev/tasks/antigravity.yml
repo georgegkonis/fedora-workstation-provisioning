@@ -1,0 +1,10 @@
+---
+- name: Check if Antigravity CLI is installed
+  ansible.builtin.command: which antigravity
+  register: antigravity_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Antigravity CLI
+  ansible.builtin.shell: curl -fsSL https://antigravity.google/cli/install.sh | bash
+  when: antigravity_check.rc != 0
