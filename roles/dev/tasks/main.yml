@@ -7,3 +7,12 @@
 
 - name: Include sdks tasks
   ansible.builtin.import_tasks: sdks.yml
+
+- name: Include antigravity tasks
+  ansible.builtin.import_tasks: antigravity.yml
+
+- name: Include claude-code tasks
+  ansible.builtin.import_tasks: claude-code.yml
+
+- name: Include codex tasks
+  ansible.builtin.import_tasks: codex.yml
