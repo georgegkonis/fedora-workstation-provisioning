@@ -6,3 +6,11 @@
       - curl
       - make
     state: present
+
+- name: Optimize DNF performance configuration
+  ansible.builtin.blockinfile:
+    path: /etc/dnf/dnf.conf
+    block: |
+      max_parallel_downloads=10
+      fastestmirror=True
+    marker: "# {mark} ANSIBLE MANAGED DNF OPTIMIZATIONS"
