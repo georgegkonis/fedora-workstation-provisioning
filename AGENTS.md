@@ -35,13 +35,13 @@ sudo dnf install -y ansible git
 - Run full provisioning:
 
 ```bash
-sudo ansible-playbook -i intentory.ini playbook.yml
+sudo ansible-playbook -i intentory.ini local-setup.yml
 ```
 
 - Run a role by tag:
 
 ```bash
-sudo ansible-playbook -i intentory.ini playbook.yml --tags base
+sudo ansible-playbook -i intentory.ini local-setup.yml --tags base
 ```
 
 ## Project-specific conventions to preserve

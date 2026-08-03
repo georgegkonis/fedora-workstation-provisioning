@@ -17,7 +17,7 @@ This is my internal Ansible setup for provisioning a fresh Fedora Linux workstat
 	```
 2. Run the playbook from this directory:
 	```bash
-	sudo ansible-playbook -i intentory.ini playbook.yml
+	sudo ansible-playbook -i intentory.ini local-setup.yml
 	```
 	*(Make sure to use `intentory.ini` as the inventory file name.)*
 
