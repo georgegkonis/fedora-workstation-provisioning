@@ -7,6 +7,3 @@
 
 - name: Include sdks tasks
   ansible.builtin.import_tasks: sdks.yml
-
-- name: Include postman tasks
-  ansible.builtin.import_tasks: postman.yml
