@@ -4,3 +4,4 @@
     name:
       - podman
     state: present
+  become: true

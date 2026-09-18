@@ -1,0 +1,5 @@
+---
+# Set a destination version for each IDE after installing it with Toolbox.
+# Empty by default because Toolbox's current IDE versions may differ.
+personal_jetbrains_versions: {}
+personal_morewaita_revision: 7415d0e7664027d1294235cb96041e9cfacfca8a

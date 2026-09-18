@@ -3,9 +3,15 @@
   hosts: localhost
   connection: local
 
+  pre_tasks:
+    - name: Resolve the desktop user for user-owned configuration
+      ansible.builtin.import_tasks: roles/desktop/tasks/user_context.yml
+      tags: always
+
   roles:
     - { role: base, tags: base }
     - { role: shell, tags: shell }
     - { role: desktop, tags: desktop }
     - { role: containers, tags: containers }
     - { role: dev, tags: dev }
+    - { role: preferences, tags: preferences }

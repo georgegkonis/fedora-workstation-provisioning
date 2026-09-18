@@ -1,0 +1,38 @@
+---
+# The whole playbook runs via `sudo ansible-playbook`, so tasks without an explicit
+# user context execute as root. gsettings/gnome-extensions talk to the logged-in
+# user's D-Bus session, not root's — hence become_user + explicit
+# DBUS_SESSION_BUS_ADDRESS/XDG_RUNTIME_DIR wherever this is used.
+
+- name: Determine target (non-root) user
+  ansible.builtin.set_fact:
+    desktop_target_user: "{{ provisioning_user | default(ansible_env.SUDO_USER | default(ansible_user_id), true) }}"
+
+- name: Require a non-root desktop user
+  ansible.builtin.assert:
+    that: desktop_target_user != 'root'
+    fail_msg: Run with sudo from your desktop account or pass -e provisioning_user=YOUR_USER.
+
+- name: Look up the desktop user's home directory
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ desktop_target_user }}"
+
+- name: Set desktop user home directory
+  ansible.builtin.set_fact:
+    desktop_target_home: "{{ ansible_facts.getent_passwd[desktop_target_user][4] }}"
+
+- name: Look up target user's uid
+  ansible.builtin.command: "id -u {{ desktop_target_user }}"
+  register: desktop_target_uid_result
+  changed_when: false
+  check_mode: false
+
+- name: Set target user session facts
+  ansible.builtin.set_fact:
+    desktop_target_uid: "{{ desktop_target_uid_result.stdout }}"
+    desktop_user_env:
+      HOME: "{{ desktop_target_home }}"
+      PATH: "{{ desktop_target_home }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+      DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ desktop_target_uid_result.stdout }}/bus"
+      XDG_RUNTIME_DIR: "/run/user/{{ desktop_target_uid_result.stdout }}"

@@ -1,0 +1,10 @@
+---
+personal_typst_version: '0.15.0'
+# Enabled on the source laptop. Incompatible extensions are reported and skipped.
+personal_gnome_extensions_enabled:
+  - advanced-media-controller@sanjai.com
+  - clipboard-indicator@tudmotu.com
+  - dynamic-music-pill@andbal
+  - weatheroclock@CleoMenezesJr.github.io
+  - caffeine@patapon.info
+  - docker-manager@omerfarukgungor

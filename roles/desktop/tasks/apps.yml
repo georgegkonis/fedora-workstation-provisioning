@@ -3,13 +3,18 @@
   ansible.builtin.dnf:
     name:
       - gnome-tweaks
+      - flatpak
+      - ptyxis
+      - python3-psutil
     state: present
+  become: true
 
 - name: Enable Flathub for Flatpak apps
   community.general.flatpak_remote:
     name: flathub
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  become: true
 
 - name: Install Desktop Flatpak applications
   community.general.flatpak:
@@ -22,7 +27,7 @@
       - com.github.tchx84.Flatseal # Flatseal
       - io.missioncenter.MissionCenter # Mission Center
       - org.localsend.localsend_app # LocalSend
-      - it.miamotors.GearLever # Gearlever
+      - it.mijorus.gearlever # Gearlever
       - com.brave.Browser # Brave
       - io.podman_desktop.PodmanDesktop # Podman Desktop
       - com.github.marhkb.Pods # Pods
@@ -44,5 +49,6 @@
       - org.zotero.Zotero # Zotero
       - dev.qwery.AddWater # Add Water
       - com.getpostman.Postman # Postman
+      - xyz.ketok.Speedtest # Present on the source laptop
     state: present
   become: true

@@ -5,3 +5,4 @@
       - zsh
       - tmux
     state: present
+  become: true

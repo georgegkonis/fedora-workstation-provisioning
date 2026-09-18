@@ -1,0 +1,59 @@
+---
+- name: Install development and CLI tools from the source laptop
+  ansible.builtin.dnf:
+    name:
+      - nodejs22
+      - nodejs22-npm
+      - python3
+      - python3-pip
+      - gcc
+      - gcc-c++
+      - ninja-build
+      - gh
+      - git-subtree
+      - jq
+      - bat
+      - ripgrep
+      - neovim
+    state: present
+  become: true
+
+- name: Import Microsoft repository signing key
+  ansible.builtin.rpm_key:
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+  become: true
+
+- name: Register Microsoft repository for Azure CLI
+  ansible.builtin.yum_repository:
+    name: packages-microsoft-com-prod
+    description: Microsoft Production
+    baseurl: https://packages.microsoft.com/rhel/9/prod/
+    enabled: true
+    gpgcheck: true
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+  become: true
+
+- name: Install Azure CLI
+  ansible.builtin.dnf:
+    name: azure-cli
+    state: present
+  become: true
+
+- name: Download HashiCorp Fedora repository
+  ansible.builtin.get_url:
+    url: https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    dest: /etc/yum.repos.d/hashicorp.repo
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Install Terraform
+  ansible.builtin.dnf:
+    name: terraform
+    state: present
+  become: true
+
+- name: Include Typst installation
+  ansible.builtin.import_tasks: typst.yml

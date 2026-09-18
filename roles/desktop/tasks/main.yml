@@ -1,4 +1,7 @@
 ---
+- name: Include user context tasks
+  ansible.builtin.import_tasks: user_context.yml
+
 - name: Include desktop apps tasks
   ansible.builtin.import_tasks: apps.yml
 

@@ -8,6 +8,9 @@
 - name: Include sdks tasks
   ansible.builtin.import_tasks: sdks.yml
 
+- name: Include additional development tools
+  ansible.builtin.import_tasks: tools.yml
+
 - name: Include antigravity tasks
   ansible.builtin.import_tasks: antigravity.yml
 

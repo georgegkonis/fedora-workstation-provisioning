@@ -5,4 +5,5 @@
       - dotnet-sdk-8.0
       - dotnet-sdk-10.0
     state: present
+    disablerepo: packages-microsoft-com-prod
   become: true

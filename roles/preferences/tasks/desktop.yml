@@ -1,0 +1,45 @@
+---
+- name: Install dconf module dependencies
+  ansible.builtin.dnf:
+    name:
+      - dconf
+      - python3-psutil
+      - dbus-tools
+      - dbus-daemon
+      - git
+    state: present
+  become: true
+
+- name: Create user icon theme directory
+  ansible.builtin.file:
+    path: "{{ desktop_target_home }}/.local/share/icons"
+    state: directory
+    owner: "{{ desktop_target_user }}"
+    mode: '0755'
+  become: true
+
+- name: Install the source laptop's MoreWaita icon theme revision
+  ansible.builtin.git:
+    repo: https://github.com/somepaulo/MoreWaita.git
+    dest: "{{ desktop_target_home }}/.local/share/icons/MoreWaita"
+    version: "{{ personal_morewaita_revision }}"
+    update: false
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Load captured desktop and terminal preferences
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/files/dconf.yml"
+
+- name: Apply desktop and terminal preferences as the desktop user
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  loop: "{{ personal_dconf_settings | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

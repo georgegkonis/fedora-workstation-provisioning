@@ -1,0 +1,9 @@
+---
+- name: Include desktop and terminal preferences
+  ansible.builtin.import_tasks: desktop.yml
+
+- name: Include Bash preferences
+  ansible.builtin.import_tasks: shell.yml
+
+- name: Include editor preferences
+  ansible.builtin.import_tasks: editors.yml

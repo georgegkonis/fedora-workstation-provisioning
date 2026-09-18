@@ -1,0 +1,6 @@
+<application>
+  <component name="GeneralSettings">
+    <option name="showTipsOnStartup" value="false" />
+    <option name="confirmExit" value="false" />
+  </component>
+</application>

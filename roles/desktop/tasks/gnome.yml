@@ -1,18 +1,87 @@
 ---
-# - name: Install GNOME extensions for user
-#   ansible.builtin.dnf:
-#     name:
-#       - gnome-shell-extension-appindicator
-#       - gnome-shell-extension-dash-to-dock
-#       - gnome-shell-extension-caffeine
-#     state: present
-#   become: false
+- name: Determine GNOME Shell major version
+  ansible.builtin.command: gnome-shell --version
+  register: desktop_gnome_shell_version_result
+  changed_when: false
+  check_mode: false
 
-# - name: Enable GNOME extensions for user
-#   ansible.builtin.command: gnome-extensions enable {{ item }}
-#   loop:
-#     - org.gnome.shell.extensions.appindicator
-#     - org.gnome.shell.extensions.dash-to-dock
-#     - org.gnome.shell.extensions.caffeine
-#   become: true
-#   changed_when: false
+- name: Set GNOME extension facts
+  ansible.builtin.set_fact:
+    desktop_gnome_shell_major: "{{ desktop_gnome_shell_version_result.stdout | regex_search('[0-9]+') }}"
+
+- name: Set GNOME extensions list
+  ansible.builtin.set_fact:
+    desktop_gnome_extensions:
+      - caffeine@patapon.info
+      - dash-to-dock@micxgx.gmail.com
+      - appindicatorsupport@rgcjonas.gmail.com
+      - apps-menu@gnome-shell-extensions.gcampax.github.com
+      - launch-new-instance@gnome-shell-extensions.gcampax.github.com
+      - places-menu@gnome-shell-extensions.gcampax.github.com
+      - window-list@gnome-shell-extensions.gcampax.github.com
+      - background-logo@fedorahosted.org
+      - blur-my-shell@aunetx
+      - clipboard-indicator@tudmotu.com
+      - tilingshell@ferrarodomenico.com
+      - rounded-window-corners@fxgn
+      - weatheroclock@CleoMenezesJr.github.io
+      - dynamic-music-pill@andbal
+      - just-perfection-desktop@just-perfection
+      - advanced-media-controller@sanjai.com
+      - docker-manager@omerfarukgungor
+
+- name: Set GNOME extensions to enable by default
+  ansible.builtin.set_fact:
+    desktop_gnome_extensions_enabled: "{{ personal_gnome_extensions_enabled }}"
+
+- name: Fetch extension-info from extensions.gnome.org
+  ansible.builtin.uri:
+    url: "https://extensions.gnome.org/extension-info/?uuid={{ item }}&shell_version={{ desktop_gnome_shell_major }}"
+    return_content: true
+  register: desktop_gnome_extension_info
+  loop: "{{ desktop_gnome_extensions }}"
+  failed_when: desktop_gnome_extension_info.status not in [200, 404]
+  check_mode: false
+
+- name: Select extensions compatible with this GNOME version
+  ansible.builtin.set_fact:
+    desktop_gnome_compatible_extensions: "{{ desktop_gnome_extension_info.results | selectattr('json.download_url', 'defined') | rejectattr('json.download_url', 'equalto', none) | rejectattr('json.download_url', 'equalto', '') | list }}"
+
+- name: Report extensions without a compatible download
+  ansible.builtin.debug:
+    msg: "Skipping {{ item.item }}: no compatible release for GNOME {{ desktop_gnome_shell_major }}."
+  loop: "{{ desktop_gnome_extension_info.results }}"
+  when: not (item.json.download_url | default(''))
+
+- name: Download GNOME extensions from extensions.gnome.org
+  ansible.builtin.get_url:
+    url: "https://extensions.gnome.org{{ item.json.download_url }}"
+    dest: "/tmp/{{ item.item }}-{{ item.json.download_url | hash('sha256') }}.shell-extension.zip"
+    mode: '0644'
+  loop: "{{ desktop_gnome_compatible_extensions }}"
+  register: desktop_gnome_downloads
+
+- name: Check installed GNOME extensions
+  ansible.builtin.stat:
+    path: "{{ desktop_target_home }}/.local/share/gnome-shell/extensions/{{ item.item }}/metadata.json"
+  loop: "{{ desktop_gnome_compatible_extensions }}"
+  register: desktop_gnome_extension_state
+
+- name: Install GNOME extensions
+  ansible.builtin.command:
+    argv: [gnome-extensions, install, --force, "{{ item.0.dest }}"]
+  loop: "{{ desktop_gnome_downloads.results | zip(desktop_gnome_extension_state.results) | list }}"
+  when: item.0.changed or not item.1.stat.exists
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+  changed_when: true
+
+- name: Enable GNOME extensions for user
+  community.general.dconf:
+    key: /org/gnome/shell/enabled-extensions
+    value: "@as {{ desktop_gnome_extensions_enabled | intersect(desktop_gnome_compatible_extensions | map(attribute='item') | list) | sort | to_json }}"
+    state: present
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

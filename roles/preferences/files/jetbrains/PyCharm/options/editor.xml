@@ -1,0 +1,15 @@
+<application>
+  <component name="CodeInsightSettings">
+    <option name="REFORMAT_ON_PASTE" value="1" />
+    <option name="INDENT_TO_CARET_ON_PASTE" value="true" />
+  </component>
+  <component name="EditorSettings">
+    <option name="languageStickyLines">
+      <map>
+        <entry key="Jupyter" value="false" />
+      </map>
+    </option>
+    <option name="USE_SOFT_WRAPS" value="" />
+    <option name="SHOW_INTENTION_PREVIEW" value="false" />
+  </component>
+</application>

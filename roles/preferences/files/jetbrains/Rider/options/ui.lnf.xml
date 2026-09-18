@@ -1,0 +1,12 @@
+<application>
+  <component name="UISettings">
+    <option name="DIFFERENT_TOOLWINDOW_BACKGROUND" value="true" />
+    <option name="MAX_LOOKUP_WIDTH2" value="1000" />
+    <option name="NAVIGATION_BAR_LOCATION" value="TOP" />
+    <option name="REMEMBER_SIZE_FOR_EACH_TOOL_WINDOW_NEW_UI" value="true" />
+    <option name="SHOW_NAVIGATION_BAR_MEMBERS" value="false" />
+    <option name="SHOW_NAVIGATION_BAR" value="false" />
+    <option name="showTreeIndentGuides" value="true" />
+    <option name="WIDESCREEN_SUPPORT" value="true" />
+  </component>
+</application>
