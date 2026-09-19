@@ -1,9 +1,31 @@
 ---
-- name: Include desktop and terminal preferences
-  ansible.builtin.import_tasks: desktop.yml
 
-- name: Include Bash preferences
+- name: Create personal directories
+  ansible.builtin.import_tasks: directories.yml
+  tags: directories
+
+- name: Configure Git preferences
+  ansible.builtin.import_tasks: git.yml
+  tags: git
+
+- name: Configure Obsidian vaults
+  ansible.builtin.import_tasks: obsidian.yml
+  tags: obsidian
+
+- name: Configure preference dependencies
+  ansible.builtin.import_tasks: packages.yml
+
+- name: Configure icon theme
+  ansible.builtin.import_tasks: icons.yml
+
+- name: Configure desktop and terminal preferences
+  ansible.builtin.import_tasks: dconf.yml
+
+- name: Configure Bash preferences
   ansible.builtin.import_tasks: shell.yml
 
-- name: Include editor preferences
-  ansible.builtin.import_tasks: editors.yml
+- name: Configure VS Code preferences
+  ansible.builtin.import_tasks: vscode.yml
+
+- name: Configure JetBrains preferences
+  ansible.builtin.import_tasks: jetbrains.yml

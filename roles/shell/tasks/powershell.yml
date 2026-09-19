@@ -1,4 +1,5 @@
 ---
+
 - name: Register the Microsoft repository
   become: true
   ansible.builtin.dnf:

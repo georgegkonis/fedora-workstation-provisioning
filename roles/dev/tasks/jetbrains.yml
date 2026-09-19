@@ -1,15 +1,8 @@
 ---
+
 - name: Install Toolbox dependencies
   ansible.builtin.dnf:
-    name:
-      - fuse
-      - libXi
-      - libXrender
-      - libXtst
-      - fontconfig
-      - gtk3
-      - xcb-util-keysyms
-      - glx-utils
+    name: "{{ dev_toolbox_dependencies }}"
     state: present
   become: true
 

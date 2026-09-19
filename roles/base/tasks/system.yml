@@ -1,4 +1,5 @@
 ---
+
 - name: Update all system packages
   ansible.builtin.dnf:
     name: "*"

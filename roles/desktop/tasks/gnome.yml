@@ -1,4 +1,5 @@
 ---
+
 - name: Determine GNOME Shell major version
   ansible.builtin.command: gnome-shell --version
   register: desktop_gnome_shell_version_result
@@ -8,31 +9,6 @@
 - name: Set GNOME extension facts
   ansible.builtin.set_fact:
     desktop_gnome_shell_major: "{{ desktop_gnome_shell_version_result.stdout | regex_search('[0-9]+') }}"
-
-- name: Set GNOME extensions list
-  ansible.builtin.set_fact:
-    desktop_gnome_extensions:
-      - caffeine@patapon.info
-      - dash-to-dock@micxgx.gmail.com
-      - appindicatorsupport@rgcjonas.gmail.com
-      - apps-menu@gnome-shell-extensions.gcampax.github.com
-      - launch-new-instance@gnome-shell-extensions.gcampax.github.com
-      - places-menu@gnome-shell-extensions.gcampax.github.com
-      - window-list@gnome-shell-extensions.gcampax.github.com
-      - background-logo@fedorahosted.org
-      - blur-my-shell@aunetx
-      - clipboard-indicator@tudmotu.com
-      - tilingshell@ferrarodomenico.com
-      - rounded-window-corners@fxgn
-      - weatheroclock@CleoMenezesJr.github.io
-      - dynamic-music-pill@andbal
-      - just-perfection-desktop@just-perfection
-      - advanced-media-controller@sanjai.com
-      - docker-manager@omerfarukgungor
-
-- name: Set GNOME extensions to enable by default
-  ansible.builtin.set_fact:
-    desktop_gnome_extensions_enabled: "{{ personal_gnome_extensions_enabled }}"
 
 - name: Fetch extension-info from extensions.gnome.org
   ansible.builtin.uri:

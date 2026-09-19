@@ -1,4 +1,5 @@
 ---
+
 - name: Check if Antigravity CLI is installed
   ansible.builtin.command: which agy
   register: dev_antigravity_check

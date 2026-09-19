@@ -1,12 +1,4 @@
 ---
-- name: Install core utilities
-  ansible.builtin.dnf:
-    name:
-      - git
-      - curl
-      - make
-    state: present
-  become: true
 
 - name: Optimize DNF performance configuration
   ansible.builtin.blockinfile:

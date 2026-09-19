@@ -36,7 +36,7 @@ Selected VS Code settings and 29 extensions have been exported. Cloud project se
 
 ## Captured Software and Preferences
 
-- 238 dconf values: desktop, input devices, keyboard shortcuts, extension preferences, and Ptyxis.
+- 244 dconf values: desktop, Files, input devices, keyboard shortcuts, extension preferences, and Ptyxis.
 - 28 installed Flatpak app IDs, recorded in `roles/preferences/files/installed-flatpaks.yml`; the desktop app list covers these and preserves existing repository choices.
 - Node.js 22/npm, Python/pip, GCC/C++, Ninja, GitHub CLI, git-subtree, jq, bat, ripgrep, Neovim, Terraform, Azure CLI, and Typst 0.15.0.
 - Existing .NET SDK, PowerShell, Docker, Podman, Toolbox, and CLI installer tasks remain part of provisioning.

@@ -1,0 +1,40 @@
+---
+
+dev_packages:
+  - nodejs22
+  - nodejs22-npm
+  - python3
+  - python3-pip
+  - gcc
+  - gcc-c++
+  - autoconf
+  - automake
+  - ccache
+  - cscope
+  - ctags
+  - gdb
+  - meson
+  - ninja-build
+  - strace
+  - valgrind
+  - python3-ansible-lint
+  - gh
+  - git-subtree
+  - jq
+  - bat
+  - ripgrep
+  - neovim
+
+dev_dotnet_sdks:
+  - dotnet-sdk-8.0
+  - dotnet-sdk-10.0
+
+dev_toolbox_dependencies:
+  - fuse
+  - libXi
+  - libXrender
+  - libXtst
+  - fontconfig
+  - gtk3
+  - xcb-util-keysyms
+  - glx-utils

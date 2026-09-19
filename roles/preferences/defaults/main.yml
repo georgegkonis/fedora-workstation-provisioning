@@ -3,3 +3,30 @@
 # Empty by default because Toolbox's current IDE versions may differ.
 personal_jetbrains_versions: {}
 personal_morewaita_revision: 7415d0e7664027d1294235cb96041e9cfacfca8a
+
+# Directory names are relative to the destination user's home.
+personal_directories:
+  - Projects
+  - Documents/Obsidian
+
+# Leave empty to retain an existing identity or configure it later.
+personal_git_name: ''
+personal_git_email: ''
+personal_git_config:
+  init.defaultBranch: main
+  fetch.prune: 'true'
+  core.autocrlf: input
+  user.useConfigOnly: 'true'
+
+# Add one entry per vault after creating its remote repository. Example:
+# personal_obsidian_vaults:
+#   - name: Personal
+#     repo: git@github.com:georgegkonis/personal-vault.git
+personal_obsidian_vaults: []
+
+personal_preference_packages:
+  - dconf
+  - python3-psutil
+  - dbus-tools
+  - dbus-daemon
+  - git

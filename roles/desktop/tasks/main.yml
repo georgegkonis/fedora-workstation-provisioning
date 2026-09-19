@@ -1,12 +1,13 @@
 ---
-- name: Include user context tasks
-  ansible.builtin.import_tasks: user_context.yml
 
-- name: Include desktop apps tasks
-  ansible.builtin.import_tasks: apps.yml
+- name: Configure desktop packages
+  ansible.builtin.import_tasks: packages.yml
 
-- name: Include GNOME tasks
+- name: Configure Flatpak applications
+  ansible.builtin.import_tasks: flatpak.yml
+
+- name: Configure GNOME extensions
   ansible.builtin.import_tasks: gnome.yml
 
-- name: Include 1Password tasks
+- name: Configure 1Password
   ansible.builtin.import_tasks: 1password.yml

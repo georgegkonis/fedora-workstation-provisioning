@@ -1,4 +1,10 @@
 personal_dconf_settings:
+  /org/gnome/nautilus/preferences/date-time-format: '''simple'''
+  /org/gnome/nautilus/preferences/default-folder-viewer: '''list-view'''
+  /org/gnome/nautilus/preferences/fts-enabled: 'false'
+  /org/gnome/nautilus/preferences/show-directory-item-counts: '''always'''
+  /org/gnome/nautilus/preferences/show-image-thumbnails: '''always'''
+  /org/gnome/shell/app-switcher/current-workspace-only: 'true'
   /org/gnome/Ptyxis/Profiles/c09a10e9c6f319f1405cbcce6a11bf79/bold-is-bright: 'false'
   /org/gnome/Ptyxis/Profiles/c09a10e9c6f319f1405cbcce6a11bf79/label: '''Default'''
   /org/gnome/Ptyxis/Profiles/c09a10e9c6f319f1405cbcce6a11bf79/login-shell: 'false'

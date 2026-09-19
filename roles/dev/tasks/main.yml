@@ -1,21 +1,32 @@
 ---
-- name: Include jetbrains tasks
+
+- name: Configure JetBrains Toolbox
   ansible.builtin.import_tasks: jetbrains.yml
 
-- name: Include vscode tasks
+- name: Configure VS Code
   ansible.builtin.import_tasks: vscode.yml
 
-- name: Include sdks tasks
+- name: Configure .NET SDKs
   ansible.builtin.import_tasks: sdks.yml
 
-- name: Include additional development tools
-  ansible.builtin.import_tasks: tools.yml
+- name: Configure development packages
+  ansible.builtin.import_tasks: packages.yml
 
-- name: Include antigravity tasks
+- name: Configure Azure CLI
+  ansible.builtin.import_tasks: azure-cli.yml
+  when: include_work_tools | bool
+
+- name: Configure Terraform
+  ansible.builtin.import_tasks: terraform.yml
+
+- name: Configure Typst
+  ansible.builtin.import_tasks: typst.yml
+
+- name: Configure Antigravity CLI
   ansible.builtin.import_tasks: antigravity.yml
 
-- name: Include claude-code tasks
+- name: Configure Claude Code CLI
   ansible.builtin.import_tasks: claude-code.yml
 
-- name: Include codex tasks
+- name: Configure Codex CLI
   ansible.builtin.import_tasks: codex.yml

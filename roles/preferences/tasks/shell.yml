@@ -1,4 +1,5 @@
 ---
+
 - name: Ensure personal CLI tools are available in Bash
   ansible.builtin.blockinfile:
     path: "{{ desktop_target_home }}/.bashrc"

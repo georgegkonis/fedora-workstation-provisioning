@@ -1,0 +1,21 @@
+---
+
+- name: Enable Flathub for Flatpak apps
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  become: true
+
+- name: Install Desktop Flatpak applications
+  community.general.flatpak:
+    name: "{{ desktop_flatpak_apps }}"
+    state: present
+  become: true
+
+- name: Install work Flatpak applications
+  community.general.flatpak:
+    name: "{{ desktop_work_flatpak_apps }}"
+    state: present
+  when: include_work_tools | bool
+  become: true

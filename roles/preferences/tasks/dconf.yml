@@ -1,0 +1,17 @@
+---
+
+- name: Load captured desktop and terminal preferences
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/files/dconf.yml"
+
+- name: Apply desktop and terminal preferences as the desktop user
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  loop: "{{ personal_dconf_settings | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

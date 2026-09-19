@@ -1,8 +1,7 @@
 ---
+
 - name: Install shell and terminal tools
   ansible.builtin.dnf:
-    name:
-      - zsh
-      - tmux
+    name: "{{ shell_packages }}"
     state: present
   become: true

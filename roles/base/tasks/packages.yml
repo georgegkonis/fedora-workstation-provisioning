@@ -1,0 +1,7 @@
+---
+
+- name: Install core utilities
+  ansible.builtin.dnf:
+    name: "{{ base_packages }}"
+    state: present
+  become: true

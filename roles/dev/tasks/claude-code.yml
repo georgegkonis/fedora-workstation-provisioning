@@ -1,4 +1,5 @@
 ---
+
 - name: Check if Claude Code is installed
   ansible.builtin.command: which claude
   register: dev_claude_code_check

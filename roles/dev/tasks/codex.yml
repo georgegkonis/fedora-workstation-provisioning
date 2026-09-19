@@ -1,4 +1,5 @@
 ---
+
 - name: Check if Codex CLI is installed
   ansible.builtin.command: which codex
   register: dev_codex_check

@@ -1,0 +1,15 @@
+---
+
+- name: Copy 1Password GNOME shortcut script
+  ansible.builtin.copy:
+    src: 1password-gnome-shortcut.sh
+    dest: /tmp/1password-gnome-shortcut.sh
+    mode: '0755'
+
+- name: Run 1Password GNOME shortcut script
+  ansible.builtin.command: bash /tmp/1password-gnome-shortcut.sh
+  register: desktop_shortcut_result
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+  changed_when: "'CHANGED' in desktop_shortcut_result.stdout"
