@@ -6,4 +6,5 @@
     state: latest
     update_cache: true
   become: true
+  tags: update
   # noqa: package-latest

@@ -27,7 +27,6 @@ dev_packages:
 
 dev_dotnet_sdks:
   - dotnet-sdk-8.0
-  - dotnet-sdk-10.0
 
 dev_toolbox_dependencies:
   - fuse
