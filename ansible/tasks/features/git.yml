@@ -1,0 +1,113 @@
+---
+- name: Ensure Git is installed
+  ansible.builtin.dnf:
+    name: git
+    state: present
+  become: true
+
+- name: Configure personal Git defaults
+  community.general.git_config:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    scope: global
+    state: present
+  loop: "{{ provision_git_options | dict2items }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Configure supplied personal Git identity
+  community.general.git_config:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    scope: global
+    state: present
+  loop:
+    - name: user.name
+      value: "{{ profile.git.name }}"
+    - name: user.email
+      value: "{{ profile.git.email }}"
+  when:
+    - not profile.work_machine | bool
+    - item.value | length > 0
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Remove the global Git identity on work machines
+  community.general.git_config:
+    name: "{{ item }}"
+    scope: global
+    state: absent
+  loop: [user.name, user.email]
+  when: profile.work_machine | bool
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Configure personal Git identity for work machines
+  community.general.git_config:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    scope: file
+    file: "{{ desktop_target_home }}/.gitconfig-personal"
+    state: present
+  loop:
+    - name: user.name
+      value: "{{ profile.git.name }}"
+    - name: user.email
+      value: "{{ profile.git.email }}"
+  when:
+    - profile.work_machine | bool
+    - item.value | length > 0
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Scope personal Git identity to the personal projects directory
+  community.general.git_config:
+    name: "includeIf.gitdir:{{ desktop_personal_projects_path }}/.path"
+    value: "{{ desktop_target_home }}/.gitconfig-personal"
+    scope: global
+    state: present
+  when: profile.work_machine | bool
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Remove work-machine personal Git scope on personal machines
+  community.general.git_config:
+    name: "includeIf.gitdir:{{ desktop_target_home }}/Projects/Personal/.path"
+    scope: global
+    state: absent
+  when: not profile.work_machine | bool
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Configure work Git identity
+  community.general.git_config:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    scope: file
+    file: "{{ desktop_target_home }}/.gitconfig-work"
+    state: present
+  loop:
+    - name: user.name
+      value: "{{ profile.git.work_name | default('') }}"
+    - name: user.email
+      value: "{{ profile.git.work_email | default('') }}"
+  when: profile.work_machine | bool
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Scope work Git identity to the work projects directory
+  community.general.git_config:
+    name: "includeIf.gitdir:{{ desktop_work_projects_path }}/.path"
+    value: "{{ desktop_target_home }}/.gitconfig-work"
+    scope: global
+    state: "{{ 'present' if profile.work_machine else 'absent' }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

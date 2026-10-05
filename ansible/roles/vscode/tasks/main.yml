@@ -1,0 +1,6 @@
+---
+- name: Install VS Code
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure VS Code
+  ansible.builtin.import_tasks: configure.yml

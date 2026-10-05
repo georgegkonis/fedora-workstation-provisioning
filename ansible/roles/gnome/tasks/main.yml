@@ -1,0 +1,19 @@
+---
+- name: Install dconf dependencies
+  ansible.builtin.dnf:
+    name:
+      - dconf
+      - python3-psutil
+      - dbus-tools
+      - dbus-daemon
+    state: present
+  become: true
+
+- name: Install selected GNOME extensions
+  ansible.builtin.import_tasks: extensions.yml
+
+- name: Install MoreWaita icon theme
+  ansible.builtin.import_tasks: icons.yml
+
+- name: Apply captured GNOME preferences
+  ansible.builtin.import_tasks: dconf.yml

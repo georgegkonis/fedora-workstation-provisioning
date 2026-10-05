@@ -1,0 +1,8 @@
+---
+- name: Update Fedora workstation
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Update installed software
+      ansible.builtin.import_tasks: ../tasks/update.yml

@@ -1,0 +1,124 @@
+---
+- name: Set up Fedora workstation
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ../../profile.local.yml
+    - ../vars/catalog.yml
+
+  pre_tasks:
+    - name: Resolve the desktop user
+      ansible.builtin.import_tasks: ../tasks/user_context.yml
+      tags: always
+
+    - name: Validate the machine profile
+      ansible.builtin.import_tasks: ../tasks/preflight.yml
+      tags: [always, profile_check]
+
+  tasks:
+    - name: Configure the system
+      ansible.builtin.import_tasks: ../tasks/system.yml
+      tags: system
+
+    - name: Install applications
+      ansible.builtin.import_tasks: ../tasks/packages.yml
+      tags: applications
+
+    - name: Install .NET SDKs
+      ansible.builtin.import_tasks: ../tasks/toolchains/dotnet.yml
+      when: profile.toolchains.dotnet | length > 0
+      tags: dotnet
+
+    - name: Install Java JDKs
+      ansible.builtin.import_tasks: ../tasks/toolchains/java.yml
+      when: profile.toolchains.java | length > 0
+      tags: java
+
+    - name: Install Node.js versions
+      ansible.builtin.import_tasks: ../tasks/toolchains/node.yml
+      when: profile.toolchains.node | length > 0
+      tags: node
+
+    - name: Install Python versions
+      ansible.builtin.import_tasks: ../tasks/toolchains/python.yml
+      when: profile.toolchains.python | length > 0
+      tags: python
+
+    - name: Install Anaconda Distribution
+      ansible.builtin.import_tasks: ../tasks/toolchains/anaconda.yml
+      when: profile.install_anaconda | bool
+      tags: anaconda
+
+    - name: Configure Docker
+      ansible.builtin.import_tasks: ../tasks/features/docker.yml
+      tags: docker
+
+    - name: Configure Podman
+      ansible.builtin.import_tasks: ../tasks/features/podman.yml
+      tags: podman
+
+    - name: Configure PowerShell
+      ansible.builtin.import_tasks: ../tasks/features/powershell.yml
+      tags: powershell
+
+    - name: Configure Terraform
+      ansible.builtin.import_tasks: ../tasks/features/terraform.yml
+      tags: terraform
+
+    - name: Configure Azure CLI on work machines
+      ansible.builtin.import_tasks: ../tasks/features/azure-cli.yml
+      when: profile.work_machine | bool
+      tags: azure_cli
+
+    - name: Configure Typst
+      ansible.builtin.import_tasks: ../tasks/features/typst.yml
+      tags: typst
+
+    - name: Configure Antigravity CLI
+      ansible.builtin.import_tasks: ../tasks/features/antigravity.yml
+      tags: antigravity
+
+    - name: Configure Claude Code CLI
+      ansible.builtin.import_tasks: ../tasks/features/claude-code.yml
+      tags: claude_code
+
+    - name: Configure Codex CLI
+      ansible.builtin.import_tasks: ../tasks/features/codex.yml
+      tags: codex
+
+    - name: Configure GNOME
+      ansible.builtin.import_role:
+        name: gnome
+      tags: gnome
+
+    - name: Configure 1Password
+      ansible.builtin.import_role:
+        name: onepassword
+      tags: onepassword
+
+    - name: Configure VS Code
+      ansible.builtin.import_role:
+        name: vscode
+      tags: vscode
+
+    - name: Configure JetBrains tools
+      ansible.builtin.import_role:
+        name: jetbrains
+      tags: jetbrains
+
+    - name: Create project directories
+      ansible.builtin.import_tasks: ../tasks/features/directories.yml
+      tags: directories
+
+    - name: Configure Git
+      ansible.builtin.import_tasks: ../tasks/features/git.yml
+      tags: git
+
+    - name: Clone configured Obsidian vaults
+      ansible.builtin.import_tasks: ../tasks/features/obsidian.yml
+      when: profile.obsidian_vaults | length > 0
+      tags: obsidian
+
+    - name: Configure Bash PATH
+      ansible.builtin.import_tasks: ../tasks/features/shell.yml
+      tags: bash

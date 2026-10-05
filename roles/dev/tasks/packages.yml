@@ -1,7 +1,0 @@
----
-
-- name: Install development and CLI tools from the source laptop
-  ansible.builtin.dnf:
-    name: "{{ dev_packages }}"
-    state: present
-  become: true

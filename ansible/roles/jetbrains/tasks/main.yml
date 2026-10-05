@@ -1,0 +1,7 @@
+---
+- name: Install JetBrains Toolbox
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure selected JetBrains IDEs
+  ansible.builtin.import_tasks: configure.yml
+  when: profile.jetbrains_versions | length > 0

@@ -1,5 +1,6 @@
 # Ignore Ansible local cache, logs, and roles downloaded by ansible-galaxy
 .ansible/
+profile.local.yml
 
 # Ignore Python cache and virtual environments
 __pycache__/

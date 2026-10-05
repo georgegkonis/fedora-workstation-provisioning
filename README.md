@@ -1,167 +1,86 @@
-# Personal Fedora Workstation Provisioning
+# Fedora workstation provisioning
 
-Ansible setup for a fresh personal Fedora workstation, including selected preferences captured from the work laptop. The
-playbook installs software and changes system configuration; run it on the **personal laptop**.
-
-## Run on the Personal Laptop
-
-Log into your GNOME desktop account, open a terminal, and run from this repository:
+Clone this repository on a fresh Fedora desktop, then run:
 
 ```bash
-sudo dnf install -y ansible git
-sudo ansible-galaxy collection install -r requirements.yml
-sudo ansible-playbook -i intentory.ini local-setup.yml
+./bootstrap.sh
+$EDITOR profile.local.yml
+just check
+just validate
+just run
+just verify
 ```
 
-The inventory filename is intentionally `intentory.ini`. User configuration targets the account that invoked sudo. To
-select another existing account, pass `-e provisioning_user=YOUR_USER`.
+`bootstrap.sh` installs Ansible, Git, and Just, then installs the Ansible collection in `ansible/requirements.yml`. Run the playbook as your logged-in desktop user. `just run` prompts for sudo and applies the system changes. The inventory is intentionally named `ansible/intentory.ini`.
 
-Check syntax without provisioning:
+## Machine profile
 
-```bash
-ansible-playbook -i intentory.ini local-setup.yml --syntax-check
-```
-
-Run selected roles using `--tags base`, `shell`, `desktop`, `containers`, `dev`, or `preferences`. For example, after
-software installation:
-
-```bash
-sudo ansible-playbook -i intentory.ini local-setup.yml --tags preferences
-```
-
-The preferences role expects VS Code to be installed. Desktop extension installation requires GNOME. Log out and back in
-after provisioning so GNOME loads newly installed extensions. A syntax check does not verify repository availability or
-package compatibility; full provisioning still needs validation on the destination laptop.
-
-## What Transfers
-
-- Desktop appearance, clock, US International/Greek keyboard layouts, pointer preferences, shortcuts, and extension
-  configuration.
-- The source's enabled GNOME extension selection, where compatible releases exist. Unavailable releases are reported and
-  skipped.
-- MoreWaita icons at the captured Git revision and Ptyxis terminal profile preferences.
-- Selected VS Code preferences and 29 extensions. Replaced preference files receive backups.
-- The installed Flatpak apps, plus the repository's existing app selection.
-- Node.js 22/npm, Python/pip, .NET SDKs, compiler tools, GitHub CLI, Terraform, Azure CLI, Typst 0.15.0, and existing
-  shell/container/CLI tooling.
-
-Passwords, work tokens, SSH keys, browser profiles, cloud project selections, playback history, wallpapers, custom
-sounds, and company configuration are not copied. Authenticate applications separately. Bash receives a portable
-`$HOME/.local/bin` PATH block; the work laptop's startup file is not copied.
-
-## Optional Work Tools
-
-Work-specific software is disabled on the personal profile by default:
+`profile.yml` is the committed template. Bootstrap copies it to ignored `profile.local.yml` if that file does not exist. Edit the local copy for each machine; rerunning bootstrap preserves it.
 
 ```yaml
-include_work_tools: false
+profile:
+  work_machine: false
+  install_anaconda: false
+  toolchains:
+    dotnet: ['8.0']
+    java: []
+    node: ['22']
+    python: ['system']
+  git:
+    name: George Gkonis
+    email: git@georgegkonis.com
+    work_name: ''
+    work_email: ''
+  jetbrains_versions: {}
+  obsidian_vaults: []
 ```
 
-The work group currently contains Teams for Linux, Azure CLI, and the Azure Repos VS Code extension. Enable it for a run
-with:
+The common setup installs the applications, CLI tools, and desktop preferences listed in `ansible/vars/catalog.yml`. Personal repos go directly under `~/Projects`. With `work_machine: true`, the personal projects path becomes `~/Projects/Personal`, and setup also creates `~/Projects/Work`. Fill in `git.work_name` and `git.work_email` in the local profile. Git uses the personal identity under `Personal` and the work identity under `Work`; commits outside those directories require an explicit identity. Work machines also add Teams, Azure CLI, and the Azure Repos VS Code extension.
+
+Toolchain lists select Fedora package versions; an empty list skips that runtime. `python: ['system']` installs Fedora's default Python and pip. Versions must be available on the destination Fedora release. Set `install_anaconda: true` for the full Anaconda Distribution in `~/anaconda3`. Its release and checksums are pinned in `ansible/vars/catalog.yml`; batch installation accepts its installer terms and does not activate the base environment by default.
+
+`jetbrains_versions` maps an IDE to an installed version for preference restoration; install the IDE with Toolbox first. `obsidian_vaults` lists Git repositories to clone initially; later runs do not pull them. Keep credentials out of both profile files. Changing a choice to false or removing a version does not uninstall existing software.
+
+`just check` checks all three playbooks' syntax, and `just validate` checks the profile without provisioning. `just verify` checks installed RPMs, system Flatpaks, selected runtimes, user paths, CLI tools, and VS Code extensions without changing them. Run it after setup; it fails if expected items are missing. These checks do not verify package or installer availability before installation. Log out and back in after provisioning so GNOME loads extensions. Authenticate applications separately.
+
+## Run setup, updates, and verification
 
 ```bash
-sudo ansible-playbook -i intentory.ini local-setup.yml -e include_work_tools=true
+just run       # apply the full setup
+just update    # upgrade installed RPMs and system Flatpaks
+just verify    # read-only checks against the local profile
 ```
 
-The owning role defaults keep the lists separate: `desktop_work_flatpak_apps` for Flatpak applications and
-`personal_work_vscode_extensions` for VS Code extensions. Add future employer-specific tools to those lists or guard
-their task imports with `when: include_work_tools | bool`. Credentials, VPN profiles, certificates, Git identities, and
-organization settings stay outside this repository.
-
-## Personal Directories and Git
-
-The preferences role creates `~/Projects` as the destination user. Add other home-relative directory names and your
-personal Git identity to `group_vars/all.yml` or a local variables file:
-
-```yaml
-personal_directories:
-  - Projects
-  - Projects/experiments
-  - Documents/Obsidian
-personal_git_name: George Gkonis
-personal_git_email: git@georgegkonis.com
-```
-
-Apply just these settings on the personal laptop:
+`just update` upgrades installed software; it does not install missing profile selections or reapply preferences. To revisit one setup feature:
 
 ```bash
-sudo ansible-playbook -i intentory.ini local-setup.yml --tags directories,git
+just tag docker
+just tag vscode
+just tag gnome
+just tag dotnet
 ```
 
-Git defaults to `main` for new repositories, prunes stale remote references on fetch, uses LF line endings in the
-repository, and requires an explicitly configured identity. Empty identity variables leave existing values untouched;
-set them before your first commit on a fresh laptop. Other existing Git settings are preserved. Customize defaults
-through the `personal_git_config` dictionary. SSH keys, authentication, and commit signing are configured separately.
+Use `just --list` for all recipes. A tagged run may rely on prerequisites from a full run.
 
-### Git-synchronized Obsidian vaults
+## Layout
 
-Configure each existing vault repository with its local directory name:
+The root contains the bootstrap command and machine profile; Ansible internals live under `ansible/`.
 
-```yaml
-personal_obsidian_vaults:
-  - name: Personal
-    repo: git@github.com:georgegkonis/personal-vault.git
-```
+| Path | Purpose |
+| --- | --- |
+| `profile.yml` | Committed profile template |
+| `profile.local.yml` | Ignored machine-specific profile, created by bootstrap |
+| `ansible/vars/catalog.yml` | Common and work-specific software and preference lists |
+| `ansible/playbooks/local-setup.yml` | Full setup |
+| `ansible/playbooks/update.yml` | Update installed RPMs and system Flatpaks |
+| `ansible/playbooks/verify.yml` | Read-only setup checks |
+| `ansible/ansible.cfg` | Resolves roles within `ansible/` |
+| `ansible/tasks/features/` | Small features with ordered tasks |
+| `ansible/tasks/toolchains/` | Versioned runtimes and Anaconda |
+| `ansible/roles/gnome/`, `ansible/roles/onepassword/`, `ansible/roles/vscode/`, `ansible/roles/jetbrains/` | Features with multiple tasks or settings assets |
 
-Then clone configured vaults with:
+`ansible/tasks/user_context.yml` resolves the desktop account. User settings target that account; system changes use `become: true`. This repository targets Fedora and DNF.
 
-```bash
-sudo ansible-playbook -i intentory.ini local-setup.yml --tags obsidian
-```
-
-Vaults are cloned under `~/Documents/Obsidian/<name>`. Provisioning performs the initial clone and does not pull changes
-on later runs, avoiding automatic merges while Obsidian may have local edits. Continue using your normal `git pull`,
-commit, and push workflow. Configure SSH keys and host access before running this tag, or use an authenticated HTTPS
-remote.
-
-References: [Git setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
-and [Ansible Git configuration](https://docs.ansible.com/projects/ansible/latest/collections/community/general/git_config_module.html).
-
-## JetBrains Preferences
-
-Install Rider, PyCharm, WebStorm, and DataGrip using Toolbox. Close the IDEs, then supply their destination
-configuration versions in a local variables file:
-
-```yaml
-personal_jetbrains_versions:
-  Rider: '2026.2'
-  PyCharm: '2026.2'
-  WebStorm: '2026.2'
-  DataGrip: '2026.2'
-```
-
-Apply with `--tags preferences -e @/path/to/your-versions.yml`. Match the versions actually installed; editor and
-appearance preferences were captured from 2026.2 and may need adjustment for other releases. Existing files are backed
-up. Licensing and account setup remain interactive.
-
-## Structure and Sources
-
-`local-setup.yml` resolves the desktop user once through `tasks/user_context.yml`, then runs `base` → `shell` →
-`desktop` → `containers` → `dev` → `preferences`.
-
-| Location                   | Responsibility                                                    |
-|----------------------------|-------------------------------------------------------------------|
-| `tasks/`                   | Shared user and session setup                                     |
-| `roles/base/tasks/`        | System updates, core packages, DNF configuration                  |
-| `roles/shell/tasks/`       | Shell packages and PowerShell                                     |
-| `roles/desktop/tasks/`     | Desktop packages, Flatpak apps, GNOME extensions, 1Password       |
-| `roles/containers/tasks/`  | Docker and Podman                                                 |
-| `roles/dev/tasks/`         | Editors, SDKs, development packages, individual CLI tools         |
-| `roles/preferences/tasks/` | Personal directories, Git, icons, dconf, Bash, editor preferences |
-| `roles/preferences/files/` | Captured settings and preference assets                           |
-| `group_vars/all.yml`       | Personal selections and pinned Typst version                      |
-
-Each role's `tasks/main.yml` imports focused task files. 1Password installation, shortcuts, and Firefox integration are
-grouped under `roles/desktop/tasks/1password/`.
-
-Package lists, Flatpak app IDs, and GNOME extension installation lists live in the owning role's `defaults/main.yml`.
-Override these variables in `group_vars/all.yml` or a local file passed with `-e @/path/to/overrides.yml`; edit task
-files when changing installation behavior. Enabled extensions remain in `group_vars/all.yml` under
-`personal_gnome_extensions_enabled`.
-
-Installation
-references: [Ansible dconf](https://docs.ansible.com/projects/ansible/latest/collections/community/general/dconf_module.html), [VS Code CLI](https://code.visualstudio.com/docs/configure/command-line), [Terraform](https://docs.hashicorp.com/terraform/install), [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=dnf), [MoreWaita](https://github.com/somepaulo/MoreWaita),
-and [Typst releases](https://github.com/typst/typst/releases).
+The Anaconda installer comes from the [official archive](https://repo.anaconda.com/archive/). Provisioning also uses Flathub, Docker CE, Microsoft, HashiCorp, 1Password, GNOME Extensions, and JetBrains services.
 
 MIT License; see LICENSE. MoreWaita is downloaded separately under its upstream license.

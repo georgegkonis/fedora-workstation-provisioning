@@ -1,8 +1,0 @@
----
-
-- name: Install .NET SDKs
-  ansible.builtin.dnf:
-    name: "{{ dev_dotnet_sdks }}"
-    state: present
-    disablerepo: packages-microsoft-com-prod
-  become: true

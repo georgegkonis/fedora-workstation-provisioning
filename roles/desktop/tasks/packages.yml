@@ -1,7 +1,0 @@
----
-
-- name: Install Desktop applications
-  ansible.builtin.dnf:
-    name: "{{ desktop_packages }}"
-    state: present
-  become: true

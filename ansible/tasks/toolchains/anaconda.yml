@@ -1,0 +1,38 @@
+---
+- name: Require an Anaconda-supported Linux architecture
+  ansible.builtin.assert:
+    that: ansible_architecture in ['x86_64', 'aarch64']
+    fail_msg: The configured Anaconda Distribution installer supports x86_64 and aarch64.
+
+- name: Download the pinned Anaconda Distribution installer
+  ansible.builtin.get_url:
+    url: "https://repo.anaconda.com/archive/Anaconda3-{{ provision_anaconda_release }}-Linux-{{ ansible_architecture }}.sh"
+    dest: "/tmp/Anaconda3-{{ provision_anaconda_release }}-Linux-{{ ansible_architecture }}.sh"
+    checksum: "sha256:{{ provision_anaconda_sha256[ansible_architecture] }}"
+    mode: '0644'
+
+- name: Install Anaconda Distribution for the desktop user
+  ansible.builtin.command:
+    argv:
+      - bash
+      - "/tmp/Anaconda3-{{ provision_anaconda_release }}-Linux-{{ ansible_architecture }}.sh"
+      - -b
+      - -p
+      - "{{ desktop_target_home }}/anaconda3"
+    creates: "{{ desktop_target_home }}/anaconda3/bin/conda"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Make Conda available to interactive Bash shells
+  ansible.builtin.blockinfile:
+    path: "{{ desktop_target_home }}/.bashrc"
+    create: true
+    mode: '0644'
+    marker: '# {mark} ANSIBLE MANAGED CONDA'
+    block: |
+      if [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/anaconda3/etc/profile.d/conda.sh"
+      fi
+  become: true
+  become_user: "{{ desktop_target_user }}"

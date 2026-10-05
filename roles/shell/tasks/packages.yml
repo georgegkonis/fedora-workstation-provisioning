@@ -1,7 +1,0 @@
----
-
-- name: Install shell and terminal tools
-  ansible.builtin.dnf:
-    name: "{{ shell_packages }}"
-    state: present
-  become: true

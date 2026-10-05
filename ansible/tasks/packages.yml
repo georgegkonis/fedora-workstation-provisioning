@@ -1,0 +1,32 @@
+---
+- name: Install Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ provision_dnf_packages }}"
+    state: present
+  become: true
+
+- name: Ensure Flatpak is installed
+  ansible.builtin.dnf:
+    name: flatpak
+    state: present
+  become: true
+
+- name: Enable Flathub for selected applications
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  become: true
+
+- name: Install Flatpak applications
+  community.general.flatpak:
+    name: "{{ provision_flatpak_apps }}"
+    state: present
+  become: true
+
+- name: Install work Flatpak applications
+  community.general.flatpak:
+    name: "{{ provision_work_flatpak_apps }}"
+    state: present
+  become: true
+  when: profile.work_machine | bool

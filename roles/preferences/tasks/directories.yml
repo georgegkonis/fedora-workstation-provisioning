@@ -1,9 +1,0 @@
----
-- name: Create directories in the personal user's home
-  ansible.builtin.file:
-    path: "{{ desktop_target_home }}/{{ item }}"
-    state: directory
-    mode: '0755'
-  loop: "{{ personal_directories }}"
-  become: true
-  become_user: "{{ desktop_target_user }}"

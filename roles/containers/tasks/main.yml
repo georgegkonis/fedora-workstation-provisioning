@@ -1,7 +1,0 @@
----
-
-- name: Configure Docker
-  ansible.builtin.import_tasks: docker.yml
-
-- name: Configure Podman
-  ansible.builtin.import_tasks: podman.yml

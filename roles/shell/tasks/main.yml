@@ -1,7 +1,0 @@
----
-
-- name: Configure shell packages
-  ansible.builtin.import_tasks: packages.yml
-
-- name: Configure PowerShell
-  ansible.builtin.import_tasks: powershell.yml

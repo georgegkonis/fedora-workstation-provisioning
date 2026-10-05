@@ -1,0 +1,18 @@
+---
+- name: Verify Fedora workstation setup
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ../../profile.local.yml
+    - ../vars/catalog.yml
+
+  pre_tasks:
+    - name: Resolve the desktop user
+      ansible.builtin.import_tasks: ../tasks/user_context.yml
+
+    - name: Validate the machine profile
+      ansible.builtin.import_tasks: ../tasks/preflight.yml
+
+  tasks:
+    - name: Verify installed software and user settings
+      ansible.builtin.import_tasks: ../tasks/verify.yml

@@ -1,0 +1,9 @@
+---
+- name: Install 1Password and CLI
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure 1Password GNOME shortcuts
+  ansible.builtin.import_tasks: shortcuts.yml
+
+- name: Configure 1Password Firefox integration
+  ansible.builtin.import_tasks: firefox.yml

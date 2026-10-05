@@ -1,7 +1,0 @@
----
-
-- name: Install dconf module dependencies
-  ansible.builtin.dnf:
-    name: "{{ personal_preference_packages }}"
-    state: present
-  become: true

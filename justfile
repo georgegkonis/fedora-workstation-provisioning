@@ -1,23 +1,36 @@
-inventory := "intentory.ini"
-playbook := "local-setup.yml"
+export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 
-# Install dependencies
+inventory := "ansible/intentory.ini"
+setup_playbook := "ansible/playbooks/local-setup.yml"
+update_playbook := "ansible/playbooks/update.yml"
+verify_playbook := "ansible/playbooks/verify.yml"
+
+# Install dependencies after cloning
 deps:
-    sudo dnf install -y ansible git
-    ansible-galaxy collection install -r requirements.yml
+    ./bootstrap.sh
 
 # Run full provisioning
 run:
-    sudo ansible-playbook -i {{ inventory }} {{ playbook }}
+    ansible-playbook -K -i {{ inventory }} {{ setup_playbook }}
 
-# Run a specific role/tag (e.g. `just tag base`)
+# Run a selected feature (e.g. `just tag docker`)
 tag TAG:
-    sudo ansible-playbook -i {{ inventory }} {{ playbook }} --tags {{ TAG }}
+    ansible-playbook -K -i {{ inventory }} {{ setup_playbook }} --tags {{ TAG }}
 
-# Update all system packages
+# Update installed RPM and system Flatpak packages
 update:
-    sudo ansible-playbook -i {{ inventory }} {{ playbook }} --tags update
+    ansible-playbook -K -i {{ inventory }} {{ update_playbook }}
+
+# Check installed software and user settings without changing them
+verify:
+    ansible-playbook -i {{ inventory }} {{ verify_playbook }}
 
 # Check syntax without provisioning
 check:
-    ansible-playbook -i {{ inventory }} {{ playbook }} --syntax-check
+    ansible-playbook -i {{ inventory }} {{ setup_playbook }} --syntax-check
+    ansible-playbook -i {{ inventory }} {{ update_playbook }} --syntax-check
+    ansible-playbook -i {{ inventory }} {{ verify_playbook }} --syntax-check
+
+# Validate the profile without provisioning
+validate:
+    ansible-playbook -i {{ inventory }} {{ setup_playbook }} --tags profile_check
