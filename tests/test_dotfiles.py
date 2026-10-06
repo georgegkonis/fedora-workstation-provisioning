@@ -2,8 +2,10 @@
 
 import hashlib
 import json
+from contextlib import closing
 from pathlib import Path
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -19,13 +21,15 @@ class DotfileTests(unittest.TestCase):
     def test_profiles_preserve_existing_state_and_converge(self):
         profiles = [
             ("personal", {}),
+            ("personal", {"apps": {"onepassword": False}}),
+            ("personal", {"preferences": {"browser": "chrome"}}),
             ("minimal", {}),
             ("work", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
                              "preferences": {"shell": "zsh"}, "development": {"anaconda": True},
                              "jetbrains_versions": {"Rider": "2026.2"}}),
         ]
         for preset, overrides in profiles:
-            with self.subTest(preset=preset), tempfile.TemporaryDirectory() as directory:
+            with self.subTest(preset=preset, overrides=overrides), tempfile.TemporaryDirectory() as directory:
                 base = Path(directory)
                 home = base / "home"
                 home.mkdir()
@@ -42,6 +46,22 @@ class DotfileTests(unittest.TestCase):
                 rider = home / ".config/JetBrains/Rider2026.2/options"
                 rider.mkdir(parents=True)
                 (rider / "editor.xml").write_text('<application><component name="Unrelated"/></application>')
+                firefox = home / ".config/mozilla/firefox"
+                firefox_profile = firefox / "random.Profile 1"
+                firefox_profile.mkdir(parents=True)
+                (firefox / "profiles.ini").write_text(
+                    "[Profile0]\nName=default-release\nIsRelative=1\nPath=random.Profile 1\nStoreID=a1b2\n"
+                    "[InstallTEST]\nDefault=random.Profile 1\n")
+                personal_profile = firefox / "other.random"
+                personal_profile.mkdir()
+                (firefox / "Profile Groups").mkdir()
+                with closing(sqlite3.connect(firefox / "Profile Groups/a1b2.sqlite")) as database:
+                    database.execute("CREATE TABLE Profiles (name TEXT, path TEXT)")
+                    database.executemany("INSERT INTO Profiles VALUES (?, ?)",
+                                         [("Personal", personal_profile.name), ("Work", firefox_profile.name)])
+                    database.commit()
+                user_js = firefox_profile / "user.js"
+                user_js.write_text('// Keep\nuser_pref("custom.example", true);\n')
                 command = [shutil.which("chezmoi"), "--config", str(config_file),
                            "--persistent-state", str(base / "state.boltdb")]
 
@@ -67,6 +87,18 @@ class DotfileTests(unittest.TestCase):
                 self.assertIn("CUSTOM=kept", (home / ".bashrc").read_text())
                 self.assertEqual((home / ".bashrc").read_text().count("# BEGIN CHEZMOI MANAGED WORKSTATION"), 1)
                 self.assertIn("st = status", (home / ".gitconfig").read_text())
+                self.assertTrue(user_js.read_text().startswith('// Keep\nuser_pref("custom.example", true);\n'))
+                if config["features"]["desktop"] and config["preferences"]["browser"] == "firefox":
+                    self.assertIn('user_pref("browser.startup.homepage", "https://start.duckduckgo.com/");',
+                                  user_js.read_text())
+                    self.assertEqual(user_js.read_text().count("// BEGIN CHEZMOI MANAGED FIREFOX"), 1)
+                    self.assertIn('user_pref("privacy.globalprivacycontrol.enabled", true);', user_js.read_text())
+                    personal_js = (personal_profile / "user.js").read_text()
+                    self.assertIn('user_pref("signon.generation.enabled", false);', personal_js)
+                    self.assertNotIn('user_pref("privacy.globalprivacycontrol.enabled", true);', personal_js)
+                else:
+                    self.assertEqual(user_js.read_text(), '// Keep\nuser_pref("custom.example", true);\n')
+                    self.assertFalse((personal_profile / "user.js").exists())
                 if preset == "minimal":
                     self.assertFalse((home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh").exists())
                 if preset == "work":

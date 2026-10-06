@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+{{ template "firefox.py" . }}
+
+apply_preferences(
+    Path({{ .chezmoi.destDir | quote }}),
+    Path({{ .chezmoi.sourceDir | quote }}) / ".chezmoitemplates/firefox/{{ if .workstation.features.work }}work{{ else }}personal{{ end }}.js",
+)
