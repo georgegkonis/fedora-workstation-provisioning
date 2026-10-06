@@ -163,8 +163,6 @@ def validate_services(value, label):
 
 def validate(config):
     validate_shape(config, read_yaml(ROOT / "config/defaults.yml"))
-    require(config["machine"]["type"] in ("desktop", "laptop"),
-            "machine.type: choose desktop or laptop")
     for key, choices in PREFERENCES.items():
         require(config["preferences"][key] in choices,
                 f"preferences.{key}: choose {', '.join(choices)}")

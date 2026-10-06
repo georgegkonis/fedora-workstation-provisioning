@@ -9,7 +9,7 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 - Git is the source of truth. Never commit credentials, `.local.yml`, legacy `profile.local.yml`, or generated `.workstation/` state.
 - `bootstrap.sh` delegates orchestration to `scripts/bootstrap.py`; UI emits configuration and never performs feature installation directly.
 - `scripts/configuration.py` is the only precedence/validation implementation: defaults → preset → machine → local overrides. Mappings merge; lists/scalars replace.
-- Machine definition, machine type, feature selection and implementation preferences are independent. Machine files contain only hardware options and machine metadata.
+- Machine definition, feature selection and implementation preferences are independent. Machine files contain only hardware options and machine metadata.
 
 ## Layout
 
@@ -29,15 +29,15 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 
 ```bash
 ./bootstrap.sh                        # interactive apply
-./bootstrap.sh --preset personal-laptop
+./bootstrap.sh --preset personal
 ./bootstrap.sh --show-config
 ./bootstrap.sh --validate
 ./bootstrap.sh --yes                  # reapply saved selections
 ./bootstrap.sh --check --diff
 just check                           # validation, syntax, configuration tests
 just lint
-just dotfiles
-just verify
+just run --yes --dotfiles
+just run --verify
 ```
 
 Check mode must not install bootstrap dependencies, save user selections, or execute installers. It may write ignored execution metadata. Syntax/profile checks must run before changing task behavior. In restricted environments, redirect Ansible local/remote temporary paths to `/tmp` through environment variables.

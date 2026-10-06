@@ -1,66 +1,49 @@
 export ANSIBLE_CONFIG := "ansible/ansible.cfg"
+set positional-arguments
 
-inventory := "ansible/intentory.ini"
-setup_playbook := "ansible/playbook.yml"
-update_playbook := "ansible/playbooks/update.yml"
-verify_playbook := "ansible/verify.yml"
+playbooks := "ansible/playbook.yml ansible/verify.yml ansible/playbooks/update.yml"
 
-# Interactive setup
-deps:
-    ./bootstrap.sh
-
-# Install the minimal preset, ignoring saved overrides (e.g. `just minimal --show-config`)
-minimal *ARGS:
-    ./bootstrap.sh --preset minimal --no-local {{ ARGS }}
-
-# Run full provisioning
-run:
-    ./bootstrap.sh --yes
-
-# Run a selected feature (e.g. `just tag docker`)
-tag TAG:
-    ./bootstrap.sh --yes --tags {{ TAG }}
+# Configure the workstation (e.g. `just run --yes --tags gnome`)
+[arg('preset', long, help='Preset from config/presets')]
+[arg('machine', long, help='Hardware definition from config/machines')]
+[arg('local', long, help='Local overrides file')]
+[arg('tags', long, help='Comma-separated feature tags')]
+[arg('no_local', long='no-local', value='--no-local', help='Ignore saved overrides')]
+[arg('yes', long, value='--yes', help='Skip configuration and confirmation prompts')]
+[arg('configure', long, value='--configure', help='Edit saved selections interactively')]
+[arg('show_config', long='show-config', value='--show-config', help='Print resolved configuration')]
+[arg('validate', long, value='--validate', help='Validate configuration only')]
+[arg('syntax_check', long='syntax-check', value='--syntax-check', help='Check Ansible syntax')]
+[arg('check', long, value='--check', help='Ansible check mode and chezmoi dry run')]
+[arg('verify', long, value='--verify', help='Verify installed state')]
+[arg('diff', long, value='--diff', help='Show proposed changes')]
+[arg('dotfiles', long, value='--dotfiles', help='Run only chezmoi')]
+[arg('help', long, short='h', value='--help', help='Show bootstrap help')]
+run preset='' machine='' local='' tags='' no_local='' yes='' configure='' show_config='' validate='' syntax_check='' check='' verify='' diff='' dotfiles='' help='':
+    ./bootstrap.sh \
+        {{ if preset == '' { '' } else { '--preset=' + quote(preset) } }} \
+        {{ if machine == '' { '' } else { '--machine=' + quote(machine) } }} \
+        {{ if local == '' { '' } else { '--local=' + quote(local) } }} \
+        {{ if tags == '' { '' } else { '--tags=' + quote(tags) } }} \
+        {{ no_local }} {{ yes }} {{ configure }} {{ show_config }} {{ validate }} {{ syntax_check }} {{ check }} {{ verify }} {{ diff }} {{ dotfiles }} {{ help }}
 
 # Update installed RPM and system Flatpak packages
-update:
-    ansible-playbook -K -i {{ inventory }} {{ update_playbook }}
-
-# Check installed software and user settings without changing them
-verify:
-    ./bootstrap.sh --verify
+[arg('args', help='Ansible options, e.g. --check --diff --tags TAGS')]
+update *args:
+    ansible-playbook -K -i ansible/intentory.ini ansible/playbooks/update.yml "$@"
 
 # Validate configuration, syntax, and tests without provisioning
 check:
     ./bootstrap.sh --validate
-    ansible-playbook -i {{ inventory }} {{ setup_playbook }} --syntax-check
-    ansible-playbook -i {{ inventory }} {{ update_playbook }} --syntax-check
-    ansible-playbook -i {{ inventory }} {{ verify_playbook }} --syntax-check
+    for playbook in {{ playbooks }}; do ansible-playbook -i ansible/intentory.ini "$playbook" --syntax-check || exit; done
     python3 -m unittest discover -s tests
 
 # Run configuration and isolated dotfile tests
-test:
-    python3 -m unittest discover -s tests
+[arg('args', help='unittest options, e.g. -v -f -k PATTERN')]
+test *args:
+    python3 -m unittest discover -s tests "$@"
 
 # Lint Ansible without provisioning
-lint:
-    ansible-lint {{ setup_playbook }} {{ verify_playbook }} {{ update_playbook }}
-
-# Validate the profile without provisioning
-validate:
-    ./bootstrap.sh --validate
-
-# Ansible check mode and chezmoi dry run
-dry-run:
-    ./bootstrap.sh --check
-
-# Show proposed changes without applying them
-diff:
-    ./bootstrap.sh --check --diff
-
-# Show the full resolved configuration
-config:
-    ./bootstrap.sh --show-config
-
-# Apply only user dotfiles
-dotfiles:
-    ./bootstrap.sh --yes --dotfiles
+[arg('args', help='ansible-lint options, e.g. --offline --strict -v')]
+lint *args:
+    ansible-lint {{ playbooks }} "$@"

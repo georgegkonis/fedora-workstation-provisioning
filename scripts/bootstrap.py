@@ -81,8 +81,6 @@ def configure(config, local, engine):
 
     local = copy.deepcopy(local)
     defaults = engine.read_yaml(ROOT / "config/defaults.yml")
-    local.setdefault("machine", {})["type"] = choose(
-        "Machine type", ["desktop", "laptop"], [config["machine"]["type"]])
     enabled = choose("Features", list(engine.FEATURES),
                      [x for x in engine.FEATURES if config["features"][x]], multiple=True)
     local["features"] = {key: key in enabled for key in engine.FEATURES}

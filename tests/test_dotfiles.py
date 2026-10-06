@@ -18,9 +18,9 @@ import configuration
 class DotfileTests(unittest.TestCase):
     def test_profiles_preserve_existing_state_and_converge(self):
         profiles = [
-            ("personal-desktop", {}),
+            ("personal", {}),
             ("minimal", {}),
-            ("work-laptop", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
+            ("work", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
                              "preferences": {"shell": "zsh"}, "development": {"anaconda": True},
                              "jetbrains_versions": {"Rider": "2026.2"}}),
         ]
@@ -69,7 +69,7 @@ class DotfileTests(unittest.TestCase):
                 self.assertIn("st = status", (home / ".gitconfig").read_text())
                 if preset == "minimal":
                     self.assertFalse((home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh").exists())
-                if preset == "work-laptop":
+                if preset == "work":
                     self.assertNotIn("Old Name", (home / ".gitconfig").read_text())
                     self.assertIn("work@example.test", (home / ".config/git/work.gitconfig").read_text())
                     self.assertIn("Unrelated", (rider / "editor.xml").read_text())

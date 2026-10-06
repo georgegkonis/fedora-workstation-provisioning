@@ -28,18 +28,20 @@ class ConfigurationTests(unittest.TestCase):
     def test_precedence_and_lists_replace(self):
         machines = self.root / "config/machines"
         machines.mkdir()
-        (machines / "example.yml").write_text("machine:\n  type: laptop\nhardware:\n  packages: [hardware-package]\n")
-        config = self.resolve(preset="personal-desktop", machine="example", local={
-            "machine": {"type": "desktop"}, "hardware": {"packages": ["local-package"]},
+        (machines / "example.yml").write_text("hardware:\n  packages: [hardware-package]\n")
+        config = self.resolve(preset="work", machine="example", local={
+            "features": {"gaming": True}, "hardware": {"packages": ["local-package"]},
             "packages": {"base": ["git"]},
         })
-        self.assertEqual(config["machine"], {"type": "desktop", "id": "example"})
+        self.assertEqual(config["machine"], {"id": "example"})
+        self.assertTrue(config["features"]["work"])
+        self.assertTrue(config["features"]["gaming"])
         self.assertEqual(config["hardware"]["packages"], ["local-package"])
         self.assertEqual(config["packages"]["base"], ["git"])
         self.assertIn("gcc", config["packages"]["development"])
 
     def test_saved_selection_and_explicit_preset(self):
-        local = {"_selection": {"preset": "work-laptop"}}
+        local = {"_selection": {"preset": "work"}}
         self.assertTrue(self.resolve(local=local)["features"]["work"])
         self.assertFalse(self.resolve(preset="minimal", local=local)["features"]["work"])
         self.assertIn("_selection", local, "resolving must not mutate supplied overrides")
@@ -74,6 +76,7 @@ class ConfigurationTests(unittest.TestCase):
             {"development": {"dotnet": [8.0]}},
             {"development": {"ai_clis": ["unknown"]}},
             {"machine": []},
+            {"machine": {"type": "laptop"}},
             {"apps": {"vscode": False}},
             {"git": {"work_name": "Name"}},
             {"obsidian_vaults": [{"name": "../outside", "repo": "example"}]},

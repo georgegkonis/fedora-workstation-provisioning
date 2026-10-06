@@ -1,7 +1,6 @@
 ---
 # Shared configuration. Maps merge recursively; lists are replaced by later layers.
 machine:
-  type: desktop
   id: ''
 features:
   desktop: true
