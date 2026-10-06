@@ -1,0 +1,58 @@
+---
+- name: Configure Fedora workstation
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/catalog.yml
+
+  pre_tasks:
+    - name: Load validated workstation configuration
+      ansible.builtin.import_tasks: tasks/configuration.yml
+      tags: [always, profile_check]
+
+    - name: Resolve the desktop account
+      ansible.builtin.import_tasks: tasks/user_context.yml
+      tags: always
+
+    - name: Resolve selected software
+      ansible.builtin.import_tasks: tasks/software.yml
+      tags: always
+
+  roles:
+    - role: base
+      tags: base
+    - role: repositories
+      tags: [repositories, packages, development, work, vscode, onepassword, docker, terraform, powershell, azure_cli]
+    - role: packages
+      tags: packages
+    - role: flatpak
+      tags: [flatpak, applications]
+    - role: onepassword
+      when: workstation.features.desktop and workstation.apps.onepassword
+      tags: onepassword
+    - role: vscode
+      when: workstation.features.desktop and workstation.apps.vscode
+      tags: vscode
+    - role: jetbrains
+      when: workstation.features.desktop and workstation.apps.jetbrains
+      tags: jetbrains
+    - role: gnome
+      when: workstation.features.desktop
+      tags: gnome
+    - role: development
+      when: workstation.features.development
+      tags: development
+    - role: work
+      when: workstation.features.work
+      tags: work
+    - role: hardware
+      tags: hardware
+    - role: services
+      tags: [services, containers, docker, virtualization, hardware]
+
+  post_tasks:
+    - name: Summarize optional components requiring attention
+      ansible.builtin.debug:
+        msg: "GNOME extension warnings: {{ gnome_extension_failures | default([]) }}"
+      when: gnome_extension_failures | default([]) | length > 0
+      tags: always

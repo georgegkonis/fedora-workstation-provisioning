@@ -1,0 +1,18 @@
+{{ if not .workstation.features.desktop }}
+.config/JetBrains
+.var/app/org.mozilla.firefox
+jetbrains-preferences.py
+{{ end }}
+{{ if or (not .workstation.apps.onepassword) (ne .workstation.preferences.browser "firefox") }}
+.var/app/org.mozilla.firefox
+{{ end }}
+{{ if or (not .workstation.apps.jetbrains) (not .workstation.jetbrains_versions) }}
+jetbrains-preferences.py
+{{ end }}
+{{ if ne .workstation.preferences.shell "zsh" }}
+.zshrc
+{{ end }}
+{{ if not .workstation.features.work }}
+.config/git/personal.gitconfig
+.config/git/work.gitconfig
+{{ end }}

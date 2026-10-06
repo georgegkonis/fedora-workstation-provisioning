@@ -1,0 +1,25 @@
+---
+- name: Create the personal projects directory
+  ansible.builtin.file:
+    path: "{{ desktop_personal_projects_path }}"
+    state: directory
+    mode: '0755'
+  become: true
+  become_user: "{{ desktop_target_user }}"
+
+- name: Create the work projects directory
+  ansible.builtin.file:
+    path: "{{ desktop_work_projects_path }}"
+    state: directory
+    mode: '0755'
+  when: workstation.features.work | bool
+  become: true
+  become_user: "{{ desktop_target_user }}"
+
+- name: Create the Obsidian vault directory
+  ansible.builtin.file:
+    path: "{{ desktop_target_home }}/Documents/Obsidian"
+    state: directory
+    mode: '0755'
+  become: true
+  become_user: "{{ desktop_target_user }}"

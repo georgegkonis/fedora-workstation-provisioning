@@ -1,0 +1,5 @@
+{{ if .workstation.git.email }}
+[user]
+    name = {{ .workstation.git.name | quote }}
+    email = {{ .workstation.git.email | quote }}
+{{ end }}

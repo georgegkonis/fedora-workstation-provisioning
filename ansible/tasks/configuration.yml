@@ -1,0 +1,22 @@
+---
+- name: Resolve configuration using the shared loader
+  ansible.builtin.command:
+    argv: >-
+      {{ ['python3', playbook_dir + '/../scripts/configuration.py', '--format', 'json']
+         + (['--effective', workstation_effective_file] if workstation_effective_file is defined else [])
+         + (['--local', workstation_local_file] if workstation_local_file is defined else [])
+         + (['--preset', workstation_preset] if workstation_preset is defined else [])
+         + (['--machine', workstation_machine] if workstation_machine is defined else [])
+         + (['--no-local'] if workstation_ignore_local | default(false) else []) }}
+  register: workstation_configuration_result
+  changed_when: false
+  check_mode: false
+
+- name: Store effective configuration
+  ansible.builtin.set_fact:
+    workstation: "{{ workstation_configuration_result.stdout | from_json }}"
+
+- name: Require Fedora
+  ansible.builtin.assert:
+    that: ansible_facts.distribution == 'Fedora'
+    fail_msg: This repository supports Fedora Workstation only.

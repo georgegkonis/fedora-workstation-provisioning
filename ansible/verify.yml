@@ -1,0 +1,18 @@
+---
+- name: Verify selected workstation state
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/catalog.yml
+
+  pre_tasks:
+    - name: Load validated workstation configuration
+      ansible.builtin.import_tasks: tasks/configuration.yml
+    - name: Resolve the desktop account
+      ansible.builtin.import_tasks: tasks/user_context.yml
+    - name: Resolve selected software
+      ansible.builtin.import_tasks: tasks/software.yml
+
+  tasks:
+    - name: Verify machine state
+      ansible.builtin.import_tasks: tasks/verify.yml

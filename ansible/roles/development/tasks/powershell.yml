@@ -1,0 +1,7 @@
+---
+- name: Install PowerShell
+  become: true
+  ansible.builtin.dnf:
+    name: powershell
+    state: present
+    update_cache: true

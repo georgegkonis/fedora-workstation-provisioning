@@ -1,0 +1,16 @@
+---
+- name: Install the Fedora Python runtime and pip
+  ansible.builtin.dnf:
+    name:
+      - python3
+      - python3-pip
+    state: present
+  become: true
+  when: "'system' in workstation.development.python"
+
+- name: Install selected additional Fedora Python runtimes
+  ansible.builtin.dnf:
+    name: "python{{ item }}"
+    state: present
+  loop: "{{ workstation.development.python | reject('equalto', 'system') | list }}"
+  become: true

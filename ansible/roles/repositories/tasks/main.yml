@@ -1,0 +1,85 @@
+---
+- name: Configure explicitly declared RPM repositories
+  ansible.builtin.yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgkey: "{{ item.gpgkey }}"
+    gpgcheck: true
+    enabled: true
+  loop: "{{ workstation.repositories.rpm }}"
+  become: true
+
+- name: Enable selected COPRs
+  community.general.copr:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ workstation.repositories.copr }}"
+  become: true
+
+- name: Import Microsoft signing key for selected vendor tools
+  ansible.builtin.rpm_key:
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+  when: >-
+    (workstation.features.desktop and workstation.apps.vscode) or
+    (workstation.features.development and workstation.development.powershell) or
+    (workstation.features.work and workstation.work.azure_cli)
+  become: true
+
+- name: Import 1Password signing key when selected
+  ansible.builtin.rpm_key:
+    key: https://downloads.1password.com/linux/keys/1password.asc
+    state: present
+  when: workstation.features.desktop and workstation.apps.onepassword
+  become: true
+
+- name: Configure selected vendor repositories
+  ansible.builtin.yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgkey: "{{ item.gpgkey }}"
+    gpgcheck: true
+    repo_gpgcheck: "{{ item.repo_gpgcheck | default(omit) }}"
+    enabled: true
+    exclude: "{{ item.exclude | default(omit) }}"
+  loop:
+    - name: code
+      description: Visual Studio Code
+      baseurl: https://packages.microsoft.com/yumrepos/vscode
+      gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+      selected: "{{ workstation.features.desktop and workstation.apps.vscode }}"
+    - name: 1password
+      description: 1Password Stable Channel
+      baseurl: https://downloads.1password.com/linux/rpm/stable/$basearch
+      gpgkey: https://downloads.1password.com/linux/keys/1password.asc
+      repo_gpgcheck: true
+      selected: "{{ workstation.features.desktop and workstation.apps.onepassword }}"
+    - name: packages-microsoft-com-prod
+      description: Microsoft Production (vendor RHEL 9 channel)
+      baseurl: https://packages.microsoft.com/rhel/9/prod/
+      gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+      exclude: dotnet* aspnetcore* netstandard*
+      selected: "{{ (workstation.features.development and workstation.development.powershell)
+                     or (workstation.features.work and workstation.work.azure_cli) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.selected
+  become: true
+
+- name: Configure Docker repository
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/fedora/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: '0644'
+  when: workstation.features.development and workstation.development.containers and workstation.preferences.container_engine == 'docker'
+  become: true
+
+- name: Configure HashiCorp repository
+  ansible.builtin.get_url:
+    url: https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    dest: /etc/yum.repos.d/hashicorp.repo
+    mode: '0644'
+  when: workstation.features.development and workstation.development.terraform
+  become: true

@@ -7,3 +7,4 @@
 
 - name: Configure 1Password Firefox integration
   ansible.builtin.import_tasks: firefox.yml
+  when: workstation.preferences.browser == 'firefox'

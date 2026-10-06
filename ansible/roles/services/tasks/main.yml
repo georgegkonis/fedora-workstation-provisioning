@@ -1,0 +1,54 @@
+---
+- name: Deploy declared system unit files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../systemd/system/{{ item.unit }}"
+    dest: "/etc/systemd/system/{{ item.name }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ workstation_system_services }}"
+  when: item.unit is defined
+  become: true
+  notify: Reload system units
+
+- name: Create the user systemd unit directory
+  ansible.builtin.file:
+    path: "{{ desktop_target_home }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  when: workstation.services.user | selectattr('unit', 'defined') | list | length > 0
+
+- name: Deploy declared user unit files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../systemd/user/{{ item.unit }}"
+    dest: "{{ desktop_target_home }}/.config/systemd/user/{{ item.name }}"
+    mode: '0644'
+  loop: "{{ workstation.services.user }}"
+  when: item.unit is defined
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  notify: Reload user units
+
+- name: Reload unit definitions before configuring services
+  ansible.builtin.meta: flush_handlers
+
+- name: Configure declared system services
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    enabled: "{{ item.enabled | default(true) }}"
+    state: "{{ item.state | default('started') }}"
+  loop: "{{ workstation_system_services }}"
+  become: true
+
+- name: Configure declared user services
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    scope: user
+    enabled: "{{ item.enabled | default(true) }}"
+    state: "{{ item.state | default('started') }}"
+  loop: "{{ workstation.services.user }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

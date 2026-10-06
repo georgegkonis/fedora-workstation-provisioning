@@ -24,7 +24,7 @@
 
 - name: Set project directory paths
   ansible.builtin.set_fact:
-    desktop_personal_projects_path: "{{ desktop_target_home }}/Projects{{ '/Personal' if profile.work_machine else '' }}"
+    desktop_personal_projects_path: "{{ desktop_target_home }}/Projects{{ '/Personal' if workstation.features.work else '' }}"
     desktop_work_projects_path: "{{ desktop_target_home }}/Projects/Work"
 
 - name: Look up target user's uid

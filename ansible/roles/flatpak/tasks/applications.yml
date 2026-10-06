@@ -1,0 +1,8 @@
+---
+- name: Install declared Flatpak application IDs
+  community.general.flatpak:
+    name: "{{ selected_flatpaks }}"
+    method: system
+    state: present
+  when: selected_flatpaks | length > 0
+  become: true

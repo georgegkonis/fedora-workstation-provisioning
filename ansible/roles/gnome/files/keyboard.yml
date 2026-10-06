@@ -1,0 +1,8 @@
+---
+gnome_keyboard_settings:
+- key: /org/gnome/desktop/input-sources/sources
+  value: '[(''xkb'', ''us+altgr-intl''), (''xkb'', ''gr'')]'
+  description: Use US international AltGr and Greek layouts
+- key: /org/gnome/desktop/wm/keybindings/switch-input-source
+  value: '[''<Super>space'', ''XF86Keyboard'']'
+  description: Switch keyboard layouts with Super+Space

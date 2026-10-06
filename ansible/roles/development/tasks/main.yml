@@ -1,0 +1,65 @@
+---
+- name: Install .NET SDKs
+  ansible.builtin.import_tasks: dotnet.yml
+  when: workstation.development.dotnet | length > 0
+  tags: dotnet
+
+- name: Install Java JDKs
+  ansible.builtin.import_tasks: java.yml
+  when: workstation.development.java | length > 0
+  tags: java
+
+- name: Install Node.js
+  ansible.builtin.import_tasks: node.yml
+  when: workstation.development.node | length > 0
+  tags: node
+
+- name: Install Python
+  ansible.builtin.import_tasks: python.yml
+  when: workstation.development.python | length > 0
+  tags: python
+
+- name: Install Anaconda Distribution
+  ansible.builtin.import_tasks: anaconda.yml
+  when: workstation.development.anaconda
+  tags: anaconda
+
+- name: Install Podman
+  ansible.builtin.import_tasks: podman.yml
+  when: workstation.development.containers and workstation.preferences.container_engine == 'podman'
+  tags: containers
+
+- name: Install Docker
+  ansible.builtin.import_tasks: docker.yml
+  when: workstation.development.containers and workstation.preferences.container_engine == 'docker'
+  tags: [containers, docker]
+
+- name: Install PowerShell
+  ansible.builtin.import_tasks: powershell.yml
+  when: workstation.development.powershell
+  tags: powershell
+
+- name: Install Terraform
+  ansible.builtin.import_tasks: terraform.yml
+  when: workstation.development.terraform
+  tags: terraform
+
+- name: Install Typst
+  ansible.builtin.import_tasks: typst.yml
+  when: workstation.development.typst
+  tags: typst
+
+- name: Install Antigravity
+  ansible.builtin.import_tasks: antigravity.yml
+  when: "'antigravity' in workstation.development.ai_clis"
+  tags: antigravity
+
+- name: Install Claude Code
+  ansible.builtin.import_tasks: claude-code.yml
+  when: "'claude-code' in workstation.development.ai_clis"
+  tags: claude_code
+
+- name: Install Codex
+  ansible.builtin.import_tasks: codex.yml
+  when: "'codex' in workstation.development.ai_clis"
+  tags: codex

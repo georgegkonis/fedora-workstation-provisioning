@@ -1,0 +1,63 @@
+---
+- name: Install base Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.base }}"
+    state: present
+  become: true
+  tags: base
+
+- name: Install desktop Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation_desktop_packages | unique | list }}"
+    state: present
+  when: workstation.features.desktop
+  become: true
+  tags: desktop
+
+- name: Install development Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.development }}"
+    state: present
+  when: workstation.features.development
+  become: true
+  tags: development
+
+- name: Install work Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.work }}"
+    state: present
+  when: workstation.features.work and workstation.packages.work | length > 0
+  become: true
+  tags: work
+
+- name: Install gaming Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.gaming }}"
+    state: present
+  when: workstation.features.gaming and workstation.packages.gaming | length > 0
+  become: true
+  tags: gaming
+
+- name: Install virtualization Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.virtualization }}"
+    state: present
+  when: workstation.features.virtualization
+  become: true
+  tags: virtualization
+
+- name: Install selected Fedora fonts
+  ansible.builtin.dnf:
+    name: "{{ workstation.fonts }}"
+    state: present
+  when: workstation.fonts | length > 0
+  become: true
+  tags: fonts
+
+- name: Set the selected login shell after installing it
+  ansible.builtin.user:
+    name: "{{ desktop_target_user }}"
+    shell: "/bin/{{ workstation.preferences.shell }}"
+  when: workstation.features.desktop
+  become: true
+  tags: desktop

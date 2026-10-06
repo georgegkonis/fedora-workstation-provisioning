@@ -1,0 +1,5 @@
+---
+- name: Install Azure CLI
+  ansible.builtin.import_tasks: azure-cli.yml
+  when: workstation.work.azure_cli
+  tags: azure_cli

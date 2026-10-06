@@ -1,0 +1,6 @@
+---
+machine:
+  type: laptop
+features:
+  work: true
+  gaming: false

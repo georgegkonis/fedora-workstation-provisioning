@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""Attach the owned Git include while preserving unrelated Git configuration."""
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+home = {{ .chezmoi.destDir | quote }}
+work = {{ if .workstation.features.work }}True{{ else }}False{{ end }}
+with tempfile.TemporaryDirectory() as directory:
+    path = Path(directory) / "gitconfig"
+    path.write_text(sys.stdin.read())
+
+    def git(*args, allowed=(0,)):
+        result = subprocess.run(["git", "config", "--file", str(path), *args],
+                                text=True, capture_output=True)
+        if result.returncode not in allowed:
+            raise RuntimeError(result.stderr)
+        return result.stdout.strip()
+
+    if work:
+        for key in ("user.name", "user.email"):
+            git("--unset-all", key, allowed=(0, 5))
+    # Retire only the scopes created by the previous Ansible implementation.
+    for projects, identity in (("Personal", "personal"), ("Work", "work")):
+        key = f"includeIf.gitdir:{home}/Projects/{projects}/.path"
+        if git("--get", key, allowed=(0, 1)) == f"{home}/.gitconfig-{identity}":
+            git("--unset-all", key, allowed=(0, 5))
+    # Keep this include last, so the repository's explicitly owned defaults win.
+    git("--fixed-value", "--unset-all", "include.path", "~/.config/git/workstation.gitconfig", allowed=(0, 5))
+    git("--add", "include.path", "~/.config/git/workstation.gitconfig")
+    sys.stdout.write(path.read_text())

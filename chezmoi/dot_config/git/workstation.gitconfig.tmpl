@@ -1,0 +1,19 @@
+# Managed workstation defaults; unrelated global settings live in ~/.gitconfig.
+[init]
+    defaultBranch = main
+[fetch]
+    prune = true
+[core]
+    autocrlf = input
+[user]
+    useConfigOnly = true
+{{ if .workstation.features.work }}
+[includeIf "gitdir:~/Projects/Personal/"]
+    path = ~/.config/git/personal.gitconfig
+[includeIf "gitdir:~/Projects/Work/"]
+    path = ~/.config/git/work.gitconfig
+{{ else if .workstation.git.email }}
+[user]
+    name = {{ .workstation.git.name | quote }}
+    email = {{ .workstation.git.email | quote }}
+{{ end }}

@@ -1,0 +1,7 @@
+---
+- name: Install selected Fedora OpenJDK development kits
+  ansible.builtin.dnf:
+    name: "java-{{ item }}-openjdk-devel"
+    state: present
+  loop: "{{ workstation.development.java }}"
+  become: true

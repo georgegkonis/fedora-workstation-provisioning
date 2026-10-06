@@ -1,0 +1,13 @@
+---
+- name: Reload system units
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
+
+- name: Reload user units
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    scope: user
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

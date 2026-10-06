@@ -1,0 +1,20 @@
+---
+gnome_extensions_settings:
+- key: /org/gnome/shell/extensions/dash-to-dock/dock-position
+  value: '''BOTTOM'''
+  description: Place the dock at the bottom
+- key: /org/gnome/shell/extensions/dash-to-dock/click-action
+  value: '''minimize-or-overview'''
+  description: Minimize or show overview on dock click
+- key: /org/gnome/shell/extensions/dash-to-dock/scroll-action
+  value: '''cycle-windows'''
+  description: Cycle windows with dock scrolling
+- key: /org/gnome/shell/extensions/clipboard-indicator/toggle-menu
+  value: '[''<Super>v'']'
+  description: Open clipboard history with Super+V
+- key: /org/gnome/shell/extensions/tilingshell/inner-gaps
+  value: uint32 5
+  description: Use five-pixel inner tiling gaps
+- key: /org/gnome/shell/extensions/tilingshell/outer-gaps
+  value: uint32 5
+  description: Use five-pixel outer tiling gaps

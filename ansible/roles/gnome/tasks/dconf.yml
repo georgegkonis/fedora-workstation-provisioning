@@ -1,17 +1,18 @@
 ---
 
-- name: Load captured desktop and terminal preferences
+- name: Load intentionally managed GNOME settings
   ansible.builtin.include_vars:
-    file: "{{ role_path }}/files/dconf.yml"
+    dir: "{{ role_path }}/files"
+    extensions: [yml]
 
-- name: Apply desktop and terminal preferences as the desktop user
+- name: Apply named GNOME preferences
   community.general.dconf:
     key: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present
-  loop: "{{ personal_dconf_settings | dict2items }}"
+  loop: "{{ gnome_interface_settings + gnome_keyboard_settings + gnome_input_settings + gnome_extensions_settings }}"
   loop_control:
-    label: "{{ item.key }}"
+    label: "{{ item.description }}"
   become: true
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env }}"

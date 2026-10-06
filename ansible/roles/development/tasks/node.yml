@@ -1,0 +1,9 @@
+---
+- name: Install selected Fedora Node.js runtimes and npm
+  ansible.builtin.dnf:
+    name:
+      - "nodejs{{ item }}"
+      - "nodejs{{ item }}-npm"
+    state: present
+  loop: "{{ workstation.development.node }}"
+  become: true

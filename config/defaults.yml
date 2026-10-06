@@ -1,0 +1,159 @@
+---
+# Shared configuration. Maps merge recursively; lists are replaced by later layers.
+machine:
+  type: desktop
+  id: ''
+features:
+  desktop: true
+  development: true
+  work: false
+  gaming: true
+  virtualization: false
+preferences:
+  shell: bash
+  terminal: ptyxis
+  editor: vscode
+  browser: firefox
+  container_engine: podman
+development:
+  dotnet:
+  - '8.0'
+  java: []
+  node:
+  - '22'
+  python:
+  - system
+  containers: true
+  terraform: true
+  powershell: true
+  typst: true
+  anaconda: false
+  ai_clis:
+  - antigravity
+  - claude-code
+  - codex
+apps:
+  onepassword: true
+  vscode: true
+  jetbrains: true
+  podman_desktop: true
+git:
+  name: George Gkonis
+  email: git@georgegkonis.com
+  work_name: ''
+  work_email: ''
+work:
+  azure_cli: true
+packages:
+  base:
+  - git
+  - curl
+  - fastfetch
+  - tree
+  - zip
+  - unzip
+  - rclone
+  - tmux
+  - jq
+  - bat
+  - ripgrep
+  desktop:
+  - gnome-tweaks
+  - neovim
+  development:
+  - make
+  - gcc
+  - gcc-c++
+  - autoconf
+  - automake
+  - ccache
+  - cscope
+  - ctags
+  - gdb
+  - meson
+  - ninja-build
+  - strace
+  - valgrind
+  - python3-ansible-lint
+  - gh
+  - git-subtree
+  work: []
+  gaming: []
+  virtualization:
+  - qemu-kvm
+  - libvirt
+  - virt-manager
+flatpak:
+  remotes:
+  - name: flathub
+    url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  applications:
+    desktop:
+    - org.ferdium.Ferdium
+    - com.spotify.Client
+    - com.mattjakeman.ExtensionManager
+    - com.github.tchx84.Flatseal
+    - io.missioncenter.MissionCenter
+    - org.localsend.localsend_app
+    - it.mijorus.gearlever
+    - com.protonvpn.www
+    - io.github.kolunmi.Bazaar
+    - io.github.mfat.sshpilot
+    - io.github.mrvladus.List
+    - io.github.pwr_solaar.solaar
+    - io.gitlab.metadatacleaner.metadatacleaner
+    - md.obsidian.Obsidian
+    - me.timschneeberger.GalaxyBudsClient
+    - org.gimp.GIMP
+    - org.qbittorrent.qBittorrent
+    - org.videolan.VLC
+    - org.zotero.Zotero
+    - xyz.ketok.Speedtest
+    development:
+    - org.zaproxy.ZAP
+    - com.getpostman.Postman
+    work:
+    - com.github.IsmaelMartinez.teams_for_linux
+    gaming:
+    - com.valvesoftware.Steam
+    virtualization: []
+gnome:
+  extensions:
+  - caffeine@patapon.info
+  - dash-to-dock@micxgx.gmail.com
+  - appindicatorsupport@rgcjonas.gmail.com
+  - apps-menu@gnome-shell-extensions.gcampax.github.com
+  - launch-new-instance@gnome-shell-extensions.gcampax.github.com
+  - places-menu@gnome-shell-extensions.gcampax.github.com
+  - window-list@gnome-shell-extensions.gcampax.github.com
+  - background-logo@fedorahosted.org
+  - blur-my-shell@aunetx
+  - clipboard-indicator@tudmotu.com
+  - tilingshell@ferrarodomenico.com
+  - rounded-window-corners@fxgn
+  - weatheroclock@CleoMenezesJr.github.io
+  - dynamic-music-pill@andbal
+  - just-perfection-desktop@just-perfection
+  - advanced-media-controller@sanjai.com
+  - docker-manager@omerfarukgungor
+  enabled_extensions:
+  - caffeine@patapon.info
+  - dash-to-dock@micxgx.gmail.com
+  - appindicatorsupport@rgcjonas.gmail.com
+  - blur-my-shell@aunetx
+  - clipboard-indicator@tudmotu.com
+  - tilingshell@ferrarodomenico.com
+  - weatheroclock@CleoMenezesJr.github.io
+  - dynamic-music-pill@andbal
+jetbrains_versions: {}
+obsidian_vaults: []
+repositories:
+  rpm: []
+  copr: []
+services:
+  system: []
+  user: []
+fonts: []
+hardware:
+  packages: []
+  services: []

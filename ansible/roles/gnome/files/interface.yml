@@ -1,0 +1,29 @@
+---
+gnome_interface_settings:
+- key: /org/gnome/desktop/interface/color-scheme
+  value: '''prefer-dark'''
+  description: Use dark appearance
+- key: /org/gnome/desktop/interface/gtk-theme
+  value: '''Adwaita'''
+  description: Use Adwaita
+- key: /org/gnome/desktop/interface/icon-theme
+  value: '''MoreWaita'''
+  description: Use the managed MoreWaita theme
+- key: /org/gnome/desktop/interface/font-name
+  value: '''Adwaita Sans 11'''
+  description: Use Adwaita Sans 11
+- key: /org/gnome/desktop/interface/monospace-font-name
+  value: '''Adwaita Mono 11'''
+  description: Use Adwaita Mono 11
+- key: /org/gnome/desktop/interface/clock-format
+  value: '''24h'''
+  description: Use a 24-hour clock
+- key: /org/gnome/desktop/interface/clock-show-weekday
+  value: 'true'
+  description: Show the weekday
+- key: /org/gnome/desktop/wm/preferences/button-layout
+  value: '''appmenu:minimize,close'''
+  description: Show minimize and close buttons
+- key: /org/gnome/nautilus/preferences/default-folder-viewer
+  value: '''list-view'''
+  description: Use list view in Files

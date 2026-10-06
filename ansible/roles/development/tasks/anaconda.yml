@@ -1,0 +1,40 @@
+---
+- name: Require an Anaconda-supported Linux architecture
+  ansible.builtin.assert:
+    that: ansible_architecture in ['x86_64', 'aarch64']
+    fail_msg: The configured Anaconda Distribution installer supports x86_64 and aarch64.
+
+- name: Validate the declared installer release and checksums
+  ansible.builtin.assert:
+    that:
+      - provision_anaconda_release is match('^[0-9]{4}[.][0-9]{2}-[0-9]+$')
+      - provision_anaconda_sha256.x86_64 is match('^[0-9a-f]{64}$')
+      - provision_anaconda_sha256.aarch64 is match('^[0-9a-f]{64}$')
+    fail_msg: The Anaconda release/checksums in ansible/vars/catalog.yml are invalid.
+
+- name: Check whether Anaconda is installed
+  ansible.builtin.stat:
+    path: "{{ desktop_target_home }}/anaconda3/bin/conda"
+  register: development_anaconda_binary
+
+- name: Download the pinned Anaconda Distribution installer
+  ansible.builtin.get_url:
+    url: "https://repo.anaconda.com/archive/Anaconda3-{{ provision_anaconda_release }}-Linux-{{ ansible_architecture }}.sh"
+    dest: "/tmp/Anaconda3-{{ provision_anaconda_release }}-Linux-{{ ansible_architecture }}.sh"
+    checksum: "sha256:{{ provision_anaconda_sha256[ansible_architecture] }}"
+    mode: '0644'
+  when: not development_anaconda_binary.stat.exists and not ansible_check_mode
+
+- name: Install Anaconda Distribution for the desktop user
+  ansible.builtin.command:
+    argv:
+      - bash
+      - "/tmp/Anaconda3-{{ provision_anaconda_release }}-Linux-{{ ansible_architecture }}.sh"
+      - -b
+      - -p
+      - "{{ desktop_target_home }}/anaconda3"
+    creates: "{{ desktop_target_home }}/anaconda3/bin/conda"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+  when: not development_anaconda_binary.stat.exists and not ansible_check_mode

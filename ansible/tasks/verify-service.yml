@@ -1,0 +1,21 @@
+---
+- name: Read declared systemd unit state
+  ansible.builtin.command:
+    argv: [systemctl, "--{{ verify_service_scope }}", show, "{{ verify_service.name }}", '--property=LoadState,ActiveState,UnitFileState']
+  register: verify_unit_state
+  changed_when: false
+  check_mode: false
+  become: "{{ verify_service_scope == 'user' }}"
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Require the declared unit state
+  ansible.builtin.assert:
+    that:
+      - "'LoadState=loaded' in verify_unit_state.stdout_lines"
+      - "('ActiveState=active' if verify_service.state | default('started') == 'started' else 'ActiveState=inactive') in verify_unit_state.stdout_lines"
+      - >-
+        (verify_unit_state.stdout_lines | select('match', '^UnitFileState=(enabled|enabled-runtime)$') | list | length > 0)
+        if verify_service.enabled | default(true) else
+        (verify_unit_state.stdout_lines | select('match', '^UnitFileState=(disabled|static|indirect)$') | list | length > 0)
+    fail_msg: "{{ verify_service.name }} does not match its declared state: {{ verify_unit_state.stdout }}"

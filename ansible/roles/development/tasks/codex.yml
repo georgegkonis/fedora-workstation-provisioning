@@ -1,0 +1,21 @@
+---
+
+- name: Check if Codex CLI is installed
+  ansible.builtin.command: which codex
+  register: development_codex_check
+  failed_when: false
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Install Codex CLI
+  ansible.builtin.shell: set -o pipefail && curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  args:
+    executable: /bin/bash
+  when: not ansible_check_mode and development_codex_check.rc != 0
+  changed_when: true
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

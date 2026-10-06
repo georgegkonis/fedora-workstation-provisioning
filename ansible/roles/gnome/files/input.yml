@@ -1,0 +1,8 @@
+---
+gnome_input_settings:
+- key: /org/gnome/desktop/peripherals/touchpad/tap-to-click
+  value: 'true'
+  description: Enable touchpad tapping
+- key: /org/gnome/desktop/peripherals/touchpad/two-finger-scrolling-enabled
+  value: 'true'
+  description: Enable two-finger scrolling

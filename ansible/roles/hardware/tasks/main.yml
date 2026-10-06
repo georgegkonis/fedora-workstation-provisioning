@@ -1,0 +1,7 @@
+---
+- name: Install machine-specific hardware packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.hardware.packages }}"
+    state: present
+  when: workstation.hardware.packages | length > 0
+  become: true

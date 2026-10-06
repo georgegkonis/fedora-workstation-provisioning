@@ -14,12 +14,12 @@
     state: present
   become: true
 
-- name: Install the source laptop's MoreWaita icon theme revision
+- name: Install the declared MoreWaita icon theme revision
   ansible.builtin.git:
     repo: https://github.com/somepaulo/MoreWaita.git
     dest: "{{ desktop_target_home }}/.local/share/icons/MoreWaita"
     version: "{{ provision_morewaita_revision }}"
-    update: false
+    update: true
   become: true
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env }}"

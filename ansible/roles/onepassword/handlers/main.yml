@@ -1,0 +1,5 @@
+---
+- name: Reload 1Password sysctl
+  ansible.builtin.command: sysctl --system
+  become: true
+  changed_when: true

@@ -1,3 +1,0 @@
----
-- name: Configure DNF settings
-  ansible.builtin.import_tasks: dnf.yml

@@ -1,0 +1,54 @@
+---
+- name: Ensure Flatpak is installed when applications are selected
+  ansible.builtin.dnf:
+    name: flatpak
+    state: present
+  become: true
+  when: workstation_flatpaks | length > 0
+  tags: [desktop, development, work, gaming, virtualization]
+
+- name: Configure declared Flatpak remotes
+  community.general.flatpak_remote:
+    name: "{{ item.name }}"
+    flatpakrepo_url: "{{ item.url }}"
+    method: system
+    state: present
+  loop: "{{ workstation.flatpak.remotes }}"
+  become: true
+  when: workstation_flatpaks | length > 0
+  tags: [desktop, development, work, gaming, virtualization]
+
+- name: Install desktop Flatpaks
+  ansible.builtin.import_tasks: applications.yml
+  vars:
+    selected_flatpaks: "{{ workstation_desktop_flatpaks }}"
+  when: workstation.features.desktop
+  tags: desktop
+
+- name: Install development Flatpaks
+  ansible.builtin.import_tasks: applications.yml
+  vars:
+    selected_flatpaks: "{{ workstation_development_flatpaks }}"
+  when: workstation.features.development
+  tags: development
+
+- name: Install work Flatpaks
+  ansible.builtin.import_tasks: applications.yml
+  vars:
+    selected_flatpaks: "{{ workstation.flatpak.applications.work }}"
+  when: workstation.features.work
+  tags: work
+
+- name: Install gaming Flatpaks
+  ansible.builtin.import_tasks: applications.yml
+  vars:
+    selected_flatpaks: "{{ workstation.flatpak.applications.gaming }}"
+  when: workstation.features.gaming
+  tags: gaming
+
+- name: Install virtualization Flatpaks
+  ansible.builtin.import_tasks: applications.yml
+  vars:
+    selected_flatpaks: "{{ workstation.flatpak.applications.virtualization }}"
+  when: workstation.features.virtualization
+  tags: virtualization

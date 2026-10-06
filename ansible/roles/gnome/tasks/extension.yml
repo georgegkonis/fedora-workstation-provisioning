@@ -1,0 +1,66 @@
+---
+- name: Install one optional GNOME extension
+  block:
+    - name: Query compatible extension release
+      ansible.builtin.uri:
+        url: "https://extensions.gnome.org/extension-info/?uuid={{ gnome_extension_uuid }}&shell_version={{ gnome_shell_major }}"
+        return_content: true
+        timeout: 20
+      register: gnome_extension_release
+
+    - name: Require a compatible release
+      ansible.builtin.assert:
+        that: gnome_extension_release.json.download_url | default('') | length > 0
+        fail_msg: "No compatible release for GNOME {{ gnome_shell_major }}."
+
+    - name: Check installed extension metadata
+      ansible.builtin.stat:
+        path: "{{ desktop_target_home }}/.local/share/gnome-shell/extensions/{{ gnome_extension_uuid }}/metadata.json"
+      register: gnome_extension_metadata
+
+    - name: Read the managed extension release marker
+      ansible.builtin.command:
+        argv: [cat, "{{ desktop_target_home }}/.local/share/gnome-shell/extensions/{{ gnome_extension_uuid }}/.workstation-release"]
+      register: gnome_extension_marker
+      changed_when: false
+      failed_when: false
+
+    - name: Download extension when the selected release changes
+      ansible.builtin.get_url:
+        url: "https://extensions.gnome.org{{ gnome_extension_release.json.download_url }}"
+        dest: "/tmp/{{ gnome_extension_uuid }}-{{ gnome_extension_release.json.download_url | hash('sha256') }}.zip"
+        mode: '0644'
+      register: gnome_extension_download
+      when: >-
+        not gnome_extension_metadata.stat.exists or
+        gnome_extension_marker.stdout != gnome_extension_release.json.download_url
+
+    - name: Install the selected extension release
+      ansible.builtin.command:
+        argv: [gnome-extensions, install, --force, "{{ gnome_extension_download.dest }}"]
+      when: gnome_extension_download is not skipped
+      changed_when: true
+      become: true
+      become_user: "{{ desktop_target_user }}"
+      environment: "{{ desktop_user_env }}"
+
+    - name: Record the installed extension release
+      ansible.builtin.copy:
+        content: "{{ gnome_extension_release.json.download_url }}\n"
+        dest: "{{ desktop_target_home }}/.local/share/gnome-shell/extensions/{{ gnome_extension_uuid }}/.workstation-release"
+        mode: '0644'
+      become: true
+      become_user: "{{ desktop_target_user }}"
+
+    - name: Record the available extension
+      ansible.builtin.set_fact:
+        gnome_available_extensions: "{{ gnome_available_extensions + [gnome_extension_uuid] }}"
+  rescue:
+    - name: Record optional extension failure
+      ansible.builtin.set_fact:
+        gnome_extension_failures: >-
+          {{ gnome_extension_failures + [gnome_extension_uuid + ': ' + (ansible_failed_result.msg | default('installation failed'))] }}
+
+    - name: Report optional extension failure and continue
+      ansible.builtin.debug:
+        msg: "Optional GNOME extension needs attention: {{ gnome_extension_uuid }}: {{ ansible_failed_result.msg | default('installation failed') }}"

@@ -1,54 +1,21 @@
-# Personal Laptop Settings Inventory
+# Workstation migration provenance
 
-Source: current work laptop, Fedora 44. Selected preferences are captured in the feature roles and selected through `profile.local.yml`. This is not a complete configuration backup.
+The original migration inventory was collected from a Fedora 44 work laptop. It is historical context, not a complete backup or a declaration that every exported value should be managed.
 
-## Desktop Preferences
+The current architecture uses `config/defaults.yml`, presets and ignored `.local.yml` selections. The legacy `profile.local.yml` is translated on the next bootstrap apply when `.local.yml` does not exist.
 
-| Setting | Current value |
-| --- | --- |
-| Color scheme | Prefer dark |
-| GTK theme | Adwaita |
-| Icon theme | MoreWaita |
-| Interface font | Adwaita Sans 11 |
-| Window buttons | `appmenu:minimize,close` |
-| Touchpad tap-to-click | Enabled |
-| Keyboard layouts | US International with AltGr (`us+altgr-intl`), Greek (`gr`) |
+## Intentionally retained state
 
-The GNOME role installs MoreWaita at the source laptop's Git revision before applying the icon preference.
+- Software and extension choices are represented as semantic package/Flatpak lists and component options.
+- GNOME appearance, keyboard layout, selected input behavior and a small set of extension preferences are named declarations under the GNOME role.
+- The old 244-value dconf export was removed. Profile UUIDs, window sizes, extension runtime data and unreviewed defaults are not restored.
+- VS Code installation is managed by Ansible; extensions and personal editor settings are restored through Settings Sync after signing in. Provisioning preserves existing VS Code state.
+- Selected JetBrains editor/appearance XML components are retained under `chezmoi/.chezmoitemplates/jetbrains`; registry state, accounts, company code styles and project data remain unmanaged.
+- Shell configuration receives a managed hook. The source startup file contained a work credential and must never be copied wholesale.
+- Git identities and work/personal directory scopes are rendered by chezmoi.
 
-## Enabled GNOME Extensions
+## Manual state
 
-- `caffeine@patapon.info`
-- `dash-to-dock@micxgx.gmail.com`
-- `appindicatorsupport@rgcjonas.gmail.com`
-- `blur-my-shell@aunetx`
-- `clipboard-indicator@tudmotu.com`
-- `tilingshell@ferrarodomenico.com`
-- `weatheroclock@CleoMenezesJr.github.io`
-- `dynamic-music-pill@andbal`
+Authenticate applications and install/authenticate IDEs through Toolbox. Select JetBrains destination versions in `.local.yml` before applying preferences. Wallpapers and custom sounds remain unmanaged. Keep SSH keys, VPN credentials, certificates, tokens and employer secrets outside the repository.
 
-The GNOME role installs compatible releases and enables the selection in `ansible/vars/catalog.yml`. Additional extensions from the existing repository list remain available; unavailable releases are reported and skipped.
-
-## Preference Files Located
-
-- `~/.bashrc`
-- `~/.config/Code/User/settings.json`
-
-Selected VS Code settings and 29 extensions have been exported. Cloud project selections and extension runtime state are excluded. Bash receives only a portable PATH block; the source startup file contains a work credential and must not be copied into the repository.
-
-## Captured Software and Preferences
-
-- 244 dconf values: desktop, Files, input devices, keyboard shortcuts, extension preferences, and Ptyxis.
-- 28 installed Flatpak app IDs, now represented in `ansible/vars/catalog.yml` alongside the existing repository choices.
-- Node.js 22/npm, Python/pip, GCC/C++, Ninja, GitHub CLI, git-subtree, jq, bat, ripgrep, Neovim, Terraform, Azure CLI, and Typst 0.15.0.
-- Existing .NET SDK, PowerShell, Docker, Podman, Toolbox, and CLI installer tasks remain part of provisioning.
-- Selected JetBrains editor and appearance XML components, excluding registry state, company code styles, accounts, and project data.
-
-## Destination Steps
-
-- Install and authenticate JetBrains IDEs through Toolbox; use `profile.jetbrains_versions` in `profile.local.yml` to restore preferences into the installed versions (see README).
-- Authenticate applications and configure personal cloud accounts separately.
-- Choose personal wallpapers and custom sounds; their source files are not transferred.
-- Validate full provisioning on the personal laptop. Checks here do not establish that every external repository or installer works on a fresh system.
-
-Keep credentials, SSH keys, VPN profiles, company certificates, and employer configuration outside this repository.
+Syntax, lint, loader tests and isolated dotfile verification do not prove that every external repository/installer works on a fresh Fedora system. Validate full provisioning on a disposable workstation or VM before relying on a rebuild.

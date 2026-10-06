@@ -1,0 +1,45 @@
+---
+# Shared with read-only verification so disabled features are not required.
+- name: Select desktop package and application preferences
+  ansible.builtin.set_fact:
+    workstation_desktop_packages: >-
+      {{ workstation.packages.desktop + [workstation.preferences.shell, workstation.preferences.terminal]
+         + (['neovim'] if workstation.preferences.editor == 'neovim' else []) }}
+    workstation_desktop_flatpaks: >-
+      {{ workstation.flatpak.applications.desktop
+         + [('org.mozilla.firefox' if workstation.preferences.browser == 'firefox' else 'com.google.Chrome')] }}
+    workstation_development_flatpaks: >-
+      {{ workstation.flatpak.applications.development
+         + (['io.podman_desktop.PodmanDesktop', 'com.github.marhkb.Pods']
+            if workstation.features.desktop and workstation.development.containers
+            and workstation.apps.podman_desktop and workstation.preferences.container_engine == 'podman' else []) }}
+
+- name: Select package groups
+  ansible.builtin.set_fact:
+    workstation_packages: >-
+      {{ (workstation.packages.base
+         + (workstation_desktop_packages if workstation.features.desktop else [])
+         + (workstation.packages.development if workstation.features.development else [])
+         + (workstation.packages.work if workstation.features.work else [])
+         + (workstation.packages.gaming if workstation.features.gaming else [])
+         + (workstation.packages.virtualization if workstation.features.virtualization else [])
+         + workstation.fonts) | unique | list }}
+    workstation_flatpaks: >-
+      {{ ((workstation_desktop_flatpaks if workstation.features.desktop else [])
+         + (workstation_development_flatpaks if workstation.features.development else [])
+         + (workstation.flatpak.applications.work if workstation.features.work else [])
+         + (workstation.flatpak.applications.gaming if workstation.features.gaming else [])
+         + (workstation.flatpak.applications.virtualization if workstation.features.virtualization else [])) | unique | list }}
+
+- name: Select declared services and feature service defaults
+  ansible.builtin.set_fact:
+    workstation_system_services: >-
+      {{ workstation.services.system + workstation.hardware.services
+         + ([{'name': 'docker.service', 'enabled': true, 'state': 'started'}]
+            if workstation.features.development and workstation.development.containers
+            and workstation.preferences.container_engine == 'docker'
+            and 'docker.service' not in ((workstation.services.system + workstation.hardware.services) | map(attribute='name') | list)
+            and 'docker' not in ((workstation.services.system + workstation.hardware.services) | map(attribute='name') | list) else [])
+         + ([{'name': 'virtqemud.socket', 'enabled': true, 'state': 'started'}]
+            if workstation.features.virtualization
+            and 'virtqemud.socket' not in ((workstation.services.system + workstation.hardware.services) | map(attribute='name') | list) else []) }}

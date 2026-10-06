@@ -1,0 +1,19 @@
+---
+features:
+  desktop: false
+  development: false
+  work: false
+  gaming: false
+  virtualization: false
+apps:
+  onepassword: false
+  vscode: false
+  jetbrains: false
+  podman_desktop: false
+preferences:
+  editor: neovim
+packages:
+  base:
+  - git
+  - curl
+  - ripgrep

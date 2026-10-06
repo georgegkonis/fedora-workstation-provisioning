@@ -1,0 +1,51 @@
+---
+
+- name: Validate supported Typst architecture
+  ansible.builtin.assert:
+    that: ansible_architecture in ['x86_64', 'aarch64']
+    fail_msg: Typst release installation supports x86_64 and aarch64.
+
+- name: Create Typst and user binary directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ desktop_target_user }}"
+    mode: '0755'
+  loop:
+    - "{{ desktop_target_home }}/.local/bin"
+    - "{{ desktop_target_home }}/.local/share/typst/{{ provision_typst_version }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+
+- name: Check extracted Typst release
+  ansible.builtin.stat:
+    path: "{{ desktop_target_home }}/.local/share/typst/{{ provision_typst_version }}/typst"
+  register: development_typst_binary
+
+- name: Download the declared Typst release
+  ansible.builtin.get_url:
+    url: "https://github.com/typst/typst/releases/download/v{{ provision_typst_version }}/typst-{{ ansible_architecture }}-unknown-linux-musl.tar.xz"
+    dest: "/tmp/typst-{{ provision_typst_version }}-{{ ansible_architecture }}.tar.xz"
+    mode: '0644'
+  when: not development_typst_binary.stat.exists and not ansible_check_mode
+
+- name: Extract Typst release
+  ansible.builtin.unarchive:
+    src: "/tmp/typst-{{ provision_typst_version }}-{{ ansible_architecture }}.tar.xz"
+    dest: "{{ desktop_target_home }}/.local/share/typst/{{ provision_typst_version }}"
+    remote_src: true
+    extra_opts: [--strip-components=1]
+    creates: "{{ desktop_target_home }}/.local/share/typst/{{ provision_typst_version }}/typst"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  when: not development_typst_binary.stat.exists and not ansible_check_mode
+
+- name: Install Typst executable for the desktop user
+  ansible.builtin.copy:
+    src: "{{ desktop_target_home }}/.local/share/typst/{{ provision_typst_version }}/typst"
+    dest: "{{ desktop_target_home }}/.local/bin/typst"
+    remote_src: true
+    owner: "{{ desktop_target_user }}"
+    mode: '0755'
+  become: true
+  when: development_typst_binary.stat.exists or not ansible_check_mode

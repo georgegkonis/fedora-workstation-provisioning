@@ -3,60 +3,62 @@
   ansible.builtin.package_facts:
     manager: rpm
 
-- name: Build the expected software and path lists
+- name: Build expected machine software from enabled selections
   ansible.builtin.set_fact:
-    verify_expected_rpm_packages: >-
-      {{
-        provision_dnf_packages
-        + ['flatpak', 'docker-ce', 'docker-ce-cli', 'containerd.io',
-           'docker-buildx-plugin', 'docker-compose-plugin', 'podman',
-           'powershell', 'terraform', 'code', '1password', '1password-cli']
-        + (['azure-cli'] if profile.work_machine else [])
-        + (profile.toolchains.dotnet | map('regex_replace', '^', 'dotnet-sdk-') | list)
-        + (profile.toolchains.java | map('regex_replace', '^', 'java-')
-           | map('regex_replace', '$', '-openjdk-devel') | list)
-        + (profile.toolchains.node | map('regex_replace', '^', 'nodejs') | list)
-        + (profile.toolchains.node | map('regex_replace', '^', 'nodejs')
-           | map('regex_replace', '$', '-npm') | list)
-        + (['python3', 'python3-pip'] if 'system' in profile.toolchains.python else [])
-        + (profile.toolchains.python | reject('equalto', 'system')
-           | map('regex_replace', '^', 'python') | list)
-      }}
-    verify_expected_flatpaks: >-
-      {{ provision_flatpak_apps
-         + (provision_work_flatpak_apps if profile.work_machine else []) }}
+    verify_expected_rpms: >-
+      {{ workstation_packages + workstation.hardware.packages
+         + (['flatpak'] if workstation_flatpaks | length > 0 else [])
+         + (['code'] if workstation.features.desktop and workstation.apps.vscode else [])
+         + (['1password', '1password-cli'] if workstation.features.desktop and workstation.apps.onepassword else [])
+         + (['azure-cli'] if workstation.features.work and workstation.work.azure_cli else [])
+         + ((workstation.development.dotnet | map('regex_replace', '^', 'dotnet-sdk-') | list)
+            + (workstation.development.java | map('regex_replace', '^', 'java-')
+               | map('regex_replace', '$', '-openjdk-devel') | list)
+            + (workstation.development.node | map('regex_replace', '^', 'nodejs') | list)
+            + (workstation.development.node | map('regex_replace', '^', 'nodejs')
+               | map('regex_replace', '$', '-npm') | list)
+            + (['python3', 'python3-pip'] if 'system' in workstation.development.python else [])
+            + (workstation.development.python | reject('equalto', 'system')
+               | map('regex_replace', '^', 'python') | list)
+            + (['terraform'] if workstation.development.terraform else [])
+            + (['powershell'] if workstation.development.powershell else [])
+            + ((['podman'] if workstation.preferences.container_engine == 'podman'
+                else ['docker-ce', 'docker-ce-cli', 'containerd.io', 'docker-buildx-plugin', 'docker-compose-plugin'])
+               if workstation.development.containers else [])
+            if workstation.features.development else []) | unique | list }}
     verify_expected_paths: >-
-      {{ [desktop_personal_projects_path,
-          desktop_target_home + '/Documents/Obsidian']
-         + ([desktop_work_projects_path,
-             desktop_target_home + '/.gitconfig-personal',
-             desktop_target_home + '/.gitconfig-work']
-            if profile.work_machine else [])
-         + [desktop_target_home + '/.local/bin/typst',
-            desktop_target_home + '/.config/Code/User/settings.json',
-            desktop_target_home + '/.local/share/icons/MoreWaita',
-            desktop_target_home + '/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox']
+      {{ [desktop_personal_projects_path]
+         + ([desktop_work_projects_path] if workstation.features.work else [])
+         + ([desktop_target_home + '/.local/share/icons/MoreWaita'] if workstation.features.desktop else [])
+         + ([desktop_target_home + '/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox']
+            if workstation.features.desktop and workstation.apps.jetbrains else [])
+         + ([desktop_target_home + '/.local/bin/typst']
+            if workstation.features.development and workstation.development.typst else [])
          + ([desktop_target_home + '/anaconda3/bin/conda']
-            if profile.install_anaconda else []) }}
+            if workstation.features.development and workstation.development.anaconda else []) }}
+    verify_expected_clis: >-
+      {{ (workstation.development.ai_clis | map('regex_replace', '^antigravity$', 'agy') | list)
+         if workstation.features.development else [] }}
 
-- name: List installed system Flatpak applications
+- name: List installed system Flatpaks
   ansible.builtin.command:
     argv: [flatpak, list, --system, --app, --columns=application]
   register: verify_installed_flatpaks
   failed_when: false
   changed_when: false
   check_mode: false
+  when: workstation_flatpaks | length > 0
 
-- name: Check expected user paths
+- name: Check declared user installation paths
   ansible.builtin.stat:
     path: "{{ item }}"
   loop: "{{ verify_expected_paths }}"
   register: verify_user_paths
 
-- name: Check user-installed CLI tools
+- name: Check selected user-installed CLIs
   ansible.builtin.command:
     argv: [which, "{{ item }}"]
-  loop: [agy, claude, codex]
+  loop: "{{ verify_expected_clis }}"
   register: verify_cli_tools
   failed_when: false
   changed_when: false
@@ -65,51 +67,39 @@
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env }}"
 
-- name: List installed VS Code extensions
-  ansible.builtin.command:
-    argv: [code, --list-extensions]
-  register: verify_vscode_extensions
-  failed_when: false
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ desktop_target_user }}"
-  environment: "{{ desktop_user_env }}"
-
-- name: Compare installed software and settings with the profile
+- name: Compare selected software with installed state
   ansible.builtin.set_fact:
-    verify_missing_rpms: >-
-      {{ verify_expected_rpm_packages
-         | difference(ansible_facts.packages.keys() | list) }}
-    verify_missing_flatpaks: >-
-      {{ verify_expected_flatpaks
-         | difference(verify_installed_flatpaks.stdout_lines | default([])) }}
-    verify_missing_paths: >-
-      {{ verify_user_paths.results
-         | rejectattr('stat.exists') | map(attribute='item') | list }}
-    verify_missing_clis: >-
-      {{ verify_cli_tools.results
-         | rejectattr('rc', 'equalto', 0) | map(attribute='item') | list }}
-    verify_missing_vscode_extensions: >-
-      {{ (provision_vscode_extensions
-          + (provision_work_vscode_extensions if profile.work_machine else []))
-         | map('lower') | list
-         | difference(verify_vscode_extensions.stdout_lines | default([])
-                      | map('lower') | list) }}
+    verify_missing_rpms: "{{ verify_expected_rpms | difference(ansible_facts.packages.keys() | list) }}"
+    verify_missing_flatpaks: "{{ workstation_flatpaks | difference(verify_installed_flatpaks.stdout_lines | default([])) }}"
+    verify_missing_paths: "{{ verify_user_paths.results | rejectattr('stat.exists') | map(attribute='item') | list }}"
+    verify_missing_clis: "{{ verify_cli_tools.results | rejectattr('rc', 'equalto', 0) | map(attribute='item') | list }}"
 
-- name: Require the expected setup
+- name: Require selected workstation software
   ansible.builtin.assert:
     that:
       - verify_missing_rpms | length == 0
       - verify_missing_flatpaks | length == 0
       - verify_missing_paths | length == 0
       - verify_missing_clis | length == 0
-      - verify_missing_vscode_extensions | length == 0
     fail_msg: |
       Missing RPMs: {{ verify_missing_rpms | join(', ') }}
       Missing Flatpaks: {{ verify_missing_flatpaks | join(', ') }}
       Missing paths: {{ verify_missing_paths | join(', ') }}
-      Missing CLI tools: {{ verify_missing_clis | join(', ') }}
-      Missing VS Code extensions: {{ verify_missing_vscode_extensions | join(', ') }}
-      Flatpak query error: {{ verify_installed_flatpaks.stderr if verify_installed_flatpaks.rc != 0 else 'none' }}
-      VS Code query error: {{ verify_vscode_extensions.stderr if verify_vscode_extensions.rc != 0 else 'none' }}
+      Missing CLIs: {{ verify_missing_clis | join(', ') }}
+      User dotfile contents are checked separately by chezmoi verify.
+
+- name: Verify declared system services
+  ansible.builtin.include_tasks: verify-service.yml
+  loop: "{{ workstation_system_services }}"
+  loop_control:
+    loop_var: verify_service
+  vars:
+    verify_service_scope: system
+
+- name: Verify declared user services
+  ansible.builtin.include_tasks: verify-service.yml
+  loop: "{{ workstation.services.user }}"
+  loop_control:
+    loop_var: verify_service
+  vars:
+    verify_service_scope: user
