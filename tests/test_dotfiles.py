@@ -22,6 +22,7 @@ class DotfileTests(unittest.TestCase):
         profiles = [
             ("personal", {}),
             ("personal", {"apps": {"onepassword": False}}),
+            ("personal", {"features": {"work": True}}),
             ("personal", {"preferences": {"browser": "chrome"}}),
             ("minimal", {}),
             ("work", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
@@ -89,10 +90,15 @@ class DotfileTests(unittest.TestCase):
                 self.assertIn("st = status", (home / ".gitconfig").read_text())
                 self.assertTrue(user_js.read_text().startswith('// Keep\nuser_pref("custom.example", true);\n'))
                 if config["features"]["desktop"] and config["preferences"]["browser"] == "firefox":
-                    self.assertIn('user_pref("browser.startup.homepage", "https://start.duckduckgo.com/");',
-                                  user_js.read_text())
-                    self.assertEqual(user_js.read_text().count("// BEGIN CHEZMOI MANAGED FIREFOX"), 1)
-                    self.assertIn('user_pref("privacy.globalprivacycontrol.enabled", true);', user_js.read_text())
+                    if config["features"]["work"]:
+                        self.assertIn('user_pref("browser.startup.homepage", "https://start.duckduckgo.com/");',
+                                      user_js.read_text())
+                        self.assertEqual(user_js.read_text().count("// BEGIN CHEZMOI MANAGED FIREFOX"), 1)
+                        self.assertIn('user_pref("privacy.globalprivacycontrol.enabled", true);', user_js.read_text())
+                    else:
+                        self.assertEqual(user_js.read_text(), '// Keep\nuser_pref("custom.example", true);\n')
+                        self.assertEqual(applied[str(user_js.relative_to(home))],
+                                         original[str(user_js.relative_to(home))])
                     personal_js = (personal_profile / "user.js").read_text()
                     self.assertIn('user_pref("signon.generation.enabled", false);', personal_js)
                     self.assertNotIn('user_pref("privacy.globalprivacycontrol.enabled", true);', personal_js)

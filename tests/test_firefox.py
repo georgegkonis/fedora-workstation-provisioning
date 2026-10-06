@@ -114,7 +114,7 @@ class FirefoxTests(unittest.TestCase):
                 firefox["apply_preferences"](self.home, self.source)
             self.assertEqual(outside.read_text(), "// Keep\n")
 
-    def test_profile_group_preserves_distinct_personal_and_work_preferences(self):
+    def group_profiles(self):
         work = self.profile()
         personal = self.root / "other.random"
         personal.mkdir()
@@ -134,13 +134,32 @@ class FirefoxTests(unittest.TestCase):
         connection.commit()
         for name, value in (("personal", "personal-setting"), ("work", "work-setting")):
             (self.source.parent / (name + ".js")).write_text(f'user_pref("example", "{value}");\n')
-        firefox["apply_preferences"](self.home, self.source)
+        return work, personal, unrelated, connection, rows
+
+    def test_profile_group_preserves_distinct_personal_and_work_preferences(self):
+        work, personal, unrelated, connection, rows = self.group_profiles()
+        firefox["apply_preferences"](self.home, self.source, work_enabled=True)
         self.assertIn('user_pref("example", "personal-setting");', (personal / "user.js").read_text())
         self.assertNotIn("work-setting", (personal / "user.js").read_text())
         self.assertIn('user_pref("example", "work-setting");', (work / "user.js").read_text())
         self.assertNotIn("personal-setting", (work / "user.js").read_text())
         self.assertFalse((unrelated / "user.js").exists())
         self.assertEqual(connection.execute("SELECT name, path FROM Profiles").fetchall(), rows)
+
+    def test_work_profile_is_unchanged_when_work_feature_is_disabled(self):
+        work, personal, _, _, _ = self.group_profiles()
+        path = work / "user.js"
+        path.write_text('// Keep work preferences\nuser_pref("example", "existing-work");\n')
+        apply = firefox["apply_preferences"]
+        for enabled in (False, True, False):
+            with self.subTest(work_enabled=enabled):
+                before = (path.read_bytes(), path.stat().st_mtime_ns)
+                apply(self.home, self.source, work_enabled=enabled)
+                self.assertIn('user_pref("example", "personal-setting");', (personal / "user.js").read_text())
+                if enabled:
+                    self.assertIn('user_pref("example", "work-setting");', path.read_text())
+                else:
+                    self.assertEqual((path.read_bytes(), path.stat().st_mtime_ns), before)
 
     def test_unreadable_profile_group_fails_before_writes(self):
         profile = self.profile()

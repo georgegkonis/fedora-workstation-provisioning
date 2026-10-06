@@ -54,7 +54,7 @@ def default_profiles(home):
     return sorted(profiles)
 
 
-def profile_targets(home, source):
+def profile_targets(home, source, work_enabled=False):
     defaults = default_profiles(home)
     targets = {profile: source for profile in defaults}
     for root, config in profile_registries(home):
@@ -87,6 +87,11 @@ def profile_targets(home, source):
                     continue
                 preferences = source.parent / (name.casefold() + ".js")
                 target = (root / value).resolve()
+                if name.casefold() == "work" and not work_enabled:
+                    # A Work profile may also be the installation default.
+                    # Remove its fallback rather than applying Personal settings.
+                    targets.pop(target, None)
+                    continue
                 if preferences.is_file() and target.is_relative_to(home.resolve()) and target.is_dir():
                     targets[target] = preferences
     return targets
@@ -104,10 +109,10 @@ def merge_preferences(existing, preferences):
     return "".join(lines[:starts[0]]) + block + "".join(lines[ends[0] + 1:])
 
 
-def apply_preferences(home, source):
-    profiles = profile_targets(home, source)
+def apply_preferences(home, source, work_enabled=False):
+    profiles = profile_targets(home, source, work_enabled)
     if not profiles:
-        print("Firefox preferences: no default profile found; launch Firefox once and reapply dotfiles.")
+        print("Firefox preferences: no eligible profiles found; launch Firefox and check profile names before reapplying.")
     for profile, preferences_file in profiles.items():
         preferences = preferences_file.read_text()
         path = profile / "user.js"

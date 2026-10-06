@@ -4,4 +4,5 @@
 apply_preferences(
     Path({{ .chezmoi.destDir | quote }}),
     Path({{ .chezmoi.sourceDir | quote }}) / ".chezmoitemplates/firefox/{{ if .workstation.features.work }}work{{ else }}personal{{ end }}.js",
+    work_enabled={{ if .workstation.features.work }}True{{ else }}False{{ end }},
 )
