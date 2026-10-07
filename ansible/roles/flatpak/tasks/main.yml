@@ -52,3 +52,15 @@
     selected_flatpaks: "{{ workstation.flatpak.applications.virtualization }}"
   when: workstation.features.virtualization
   tags: virtualization
+
+- name: Apply per-user Flatpak sandbox overrides
+  community.general.ini_file:
+    path: "{{ desktop_target_home }}/.local/share/flatpak/overrides/{{ item.application }}"
+    section: Session Bus Policy
+    option: "{{ item.own_name }}"
+    value: own
+    no_extra_spaces: true
+    mode: "0644"
+  loop: "{{ workstation.flatpak.overrides }}"
+  when: item.application in workstation_flatpaks
+  tags: [desktop, development, work, gaming, virtualization]

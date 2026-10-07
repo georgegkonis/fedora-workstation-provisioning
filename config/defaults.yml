@@ -86,6 +86,12 @@ flatpak:
   remotes:
   - name: flathub
     url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  # Per-user sandbox overrides, applied only when the application is selected.
+  overrides:
+  # Chromium/Electron claims this tray bus name; the sandbox denies it by default,
+  # so the GNOME AppIndicator extension never sees the Teams tray icon.
+  - application: com.github.IsmaelMartinez.teams_for_linux
+    own_name: org.freedesktop.StatusNotifierItem-2-1
   applications:
     desktop:
     - org.ferdium.Ferdium

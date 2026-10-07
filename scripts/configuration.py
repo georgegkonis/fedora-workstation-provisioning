@@ -176,6 +176,7 @@ def validate(config):
     records(config["flatpak"]["remotes"], "flatpak.remotes", ("name", "url"))
     require(len({x["name"] for x in config["flatpak"]["remotes"]}) ==
             len(config["flatpak"]["remotes"]), "flatpak.remotes: duplicate names")
+    records(config["flatpak"]["overrides"], "flatpak.overrides", ("application", "own_name"))
     for key, items in config["gnome"].items():
         string_list(items, f"gnome.{key}")
     require(set(config["gnome"]["enabled_extensions"]) <= set(config["gnome"]["extensions"]),
