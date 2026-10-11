@@ -29,10 +29,9 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 
 ```bash
 ./bootstrap.sh                        # interactive apply
-./bootstrap.sh --preset personal
 ./bootstrap.sh --show-config
 ./bootstrap.sh --validate
-./bootstrap.sh --yes                  # reapply saved selections
+./bootstrap.sh --yes                  # reapply saved selections, or the defaults (personal setup)
 ./bootstrap.sh --check --diff
 just check                           # validation, syntax, configuration tests
 just lint

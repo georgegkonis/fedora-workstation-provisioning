@@ -28,14 +28,14 @@ The interactive frontend uses [gum](https://github.com/charmbracelet/gum) when i
 ## Presets and unattended setup
 
 ```bash
-./bootstrap.sh --preset personal
+./bootstrap.sh --yes
 ./bootstrap.sh --preset work
 ./bootstrap.sh --preset minimal
 ```
 
 Presets skip configuration questions and confirmation. A terminal run can still request the sudo password. Unattended execution requires working noninteractive sudo, or equivalent Ansible become configuration. `--yes` also skips configuration questions and confirmation when using saved selections/defaults.
 
-`personal` uses the shared defaults. `work` enables work and disables personal (software kept off the work laptop, e.g. Steam, qBittorrent, Zotero). `minimal` is a stripped-down desktop: 1Password, a short Flatpak list and a few GNOME extensions. Desktop and development are independently selectable. Personal and virtualization currently use package/Flatpak lists and service defaults; they do not need placeholder roles.
+Without a preset, the shared defaults apply (the personal setup). `work` enables work and disables personal (software kept off the work laptop, e.g. Steam, qBittorrent, Zotero). `minimal` is a stripped-down desktop: 1Password, a short Flatpak list and a few GNOME extensions. Desktop and development are independently selectable. Personal and virtualization currently use package/Flatpak lists and service defaults; they do not need placeholder roles.
 
 For a minimal setup that ignores saved overrides:
 

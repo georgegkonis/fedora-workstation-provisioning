@@ -20,10 +20,10 @@ import configuration
 class DotfileTests(unittest.TestCase):
     def test_profiles_preserve_existing_state_and_converge(self):
         profiles = [
-            ("personal", {}),
-            ("personal", {"apps": {"onepassword": False}}),
-            ("personal", {"features": {"work": True}}),
-            ("personal", {"preferences": {"browser": "chrome"}}),
+            ("", {}),
+            ("", {"apps": {"onepassword": False}}),
+            ("", {"features": {"work": True}}),
+            ("", {"preferences": {"browser": "chrome"}}),
             ("minimal", {}),
             ("work", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
                              "preferences": {"shell": "zsh"}, "development": {"anaconda": True}}),

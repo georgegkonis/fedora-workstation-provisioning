@@ -83,7 +83,7 @@ class ConfigurationTests(unittest.TestCase):
         config = self.resolve(preset="minimal")
         self.assertFalse(config["features"]["development"])
         self.assertTrue(config["development"]["containers"])
-        self.assertEqual(config["development"]["dotnet"], ["8.0"])
+        self.assertEqual(config["development"]["dotnet"], ["8.0", "10.0"])
 
     def test_system_service_cannot_be_duplicated_in_hardware(self):
         with self.assertRaisesRegex(engine.ConfigurationError, "same unit twice"):

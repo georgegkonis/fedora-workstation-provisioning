@@ -2,3 +2,8 @@
 features:
   work: true
   personal: false
+development:
+  dotnet:
+  - '8.0'
+  node:
+  - '22'
