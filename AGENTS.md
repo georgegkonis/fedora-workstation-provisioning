@@ -24,6 +24,7 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 - `chezmoi/`: home state, using templates only where selections vary; modification scripts preserve unrelated state.
 - `systemd/{system,user}/`: custom unit files, created only when needed.
 - `justfile`: convenience commands, no configuration logic.
+- `.agents/skills/<name>/SKILL.md`: agent-agnostic skills (plain Markdown + `name`/`description` frontmatter, no tool-specific names). `.claude/skills` is a symlink to it for Claude Code; do not author skills there.
 
 ## Commands
 
