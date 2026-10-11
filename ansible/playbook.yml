@@ -14,6 +14,11 @@
       ansible.builtin.import_tasks: tasks/user_context.yml
       tags: always
 
+    # Opt-in: skipped unless the upgrade tag is requested (bootstrap --upgrade or just update).
+    - name: Upgrade installed RPMs and system Flatpaks
+      ansible.builtin.import_tasks: tasks/upgrade.yml
+      tags: [upgrade, never]
+
   roles:
     - role: base
       tags: base

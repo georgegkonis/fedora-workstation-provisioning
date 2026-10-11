@@ -16,14 +16,20 @@ playbooks := "ansible/playbook.yml ansible/verify.yml"
 [arg('check', long, value='--check', help='Ansible check mode and chezmoi dry run')]
 [arg('verify', long, value='--verify', help='Verify installed state')]
 [arg('diff', long, value='--diff', help='Show proposed changes')]
+[arg('upgrade', long, value='--upgrade', help='Also upgrade RPMs and system Flatpaks first')]
 [arg('dotfiles', long, value='--dotfiles', help='Run only chezmoi')]
 [arg('help', long, short='h', value='--help', help='Show bootstrap help')]
-run preset='' local='' tags='' no_local='' yes='' configure='' show_config='' validate='' syntax_check='' check='' verify='' diff='' dotfiles='' help='':
+run preset='' local='' tags='' no_local='' yes='' configure='' show_config='' validate='' syntax_check='' check='' verify='' diff='' upgrade='' dotfiles='' help='':
     ./bootstrap.sh \
         {{ if preset == '' { '' } else { '--preset=' + quote(preset) } }} \
         {{ if local == '' { '' } else { '--local=' + quote(local) } }} \
         {{ if tags == '' { '' } else { '--tags=' + quote(tags) } }} \
-        {{ no_local }} {{ yes }} {{ configure }} {{ show_config }} {{ validate }} {{ syntax_check }} {{ check }} {{ verify }} {{ diff }} {{ dotfiles }} {{ help }}
+        {{ no_local }} {{ yes }} {{ configure }} {{ show_config }} {{ validate }} {{ syntax_check }} {{ check }} {{ verify }} {{ diff }} {{ upgrade }} {{ dotfiles }} {{ help }}
+
+# Upgrade installed RPMs and system Flatpaks only
+[arg('args', help='bootstrap options, e.g. --check --diff')]
+update *args:
+    ./bootstrap.sh --yes --tags upgrade "$@"
 
 # Validate configuration, syntax, and tests without provisioning
 check:

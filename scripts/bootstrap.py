@@ -171,6 +171,8 @@ def main():
     modes.add_argument("--verify", action="store_true", help="Verify selected installed state")
     parser.add_argument("--diff", action="store_true")
     parser.add_argument("--tags")
+    parser.add_argument("--upgrade", action="store_true",
+                        help="Also upgrade installed RPMs and system Flatpaks before provisioning")
     parser.add_argument("--dotfiles", action="store_true", help="Run only chezmoi")
     args = parser.parse_args()
     readonly = args.check or args.syntax_check or args.verify or args.show_config or args.validate
@@ -240,8 +242,11 @@ def main():
             command += ["--check"]
         if args.diff:
             command += ["--diff"]
-        if args.tags:
-            command += ["--tags", args.tags]
+        tags = args.tags
+        if args.upgrade and not args.verify:
+            tags = f"{tags},upgrade" if tags else "all,upgrade"
+        if tags:
+            command += ["--tags", tags]
         run(command, env=env)
     if dotfiles and not args.syntax_check:
         chezmoi_config = runtime / "chezmoi.json"

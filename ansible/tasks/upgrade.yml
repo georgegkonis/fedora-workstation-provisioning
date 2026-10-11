@@ -1,0 +1,19 @@
+---
+- name: Upgrade installed RPM packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest  # noqa: package-latest
+    update_cache: true
+  become: true
+
+- name: Check whether Flatpak is installed
+  ansible.builtin.stat:
+    path: /usr/bin/flatpak
+  register: upgrade_flatpak_binary
+
+- name: Upgrade installed system Flatpaks
+  ansible.builtin.command:
+    argv: [flatpak, update, --system, --noninteractive, --assumeyes]
+  become: true
+  changed_when: true
+  when: upgrade_flatpak_binary.stat.exists

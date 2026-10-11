@@ -90,9 +90,13 @@ just run --yes --tags gnome
 just run --yes --tags development
 just run --yes --dotfiles
 just run --verify
+just update                   # upgrade RPMs and system Flatpaks only
+just run --upgrade --yes      # upgrade first, then provision (e.g. a fresh machine)
 ```
 
 `just run` forwards bootstrap arguments; without arguments it opens interactive setup. `just --usage run` summarizes common flags; `just run --help` lists all bootstrap options. `just test` and `just lint` also forward arguments to their underlying tools.
+
+System upgrades are opt-in: runs never upgrade unlisted packages unless `--upgrade` (or `just update`) is given, which keeps repeat runs fast and repeatable. Use `./bootstrap.sh --upgrade` on a fresh machine so the first provisioning starts from current packages.
 
 Repeat runs preserve unrelated packages, settings, shell startup code, Git configuration, and application configuration. Repository-owned keys converge to their declared values. Tagged runs can require prerequisites from a full run. GNOME extensions may require logout/login; authenticate applications separately.
 

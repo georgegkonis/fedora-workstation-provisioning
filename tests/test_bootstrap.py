@@ -51,6 +51,15 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual(chezmoi[-1], "diff")
         self.assertNotIn("--force", chezmoi)
 
+    def test_upgrade_is_opt_in_and_extends_the_tag_selection(self):
+        def tags(*args):
+            ansible = self.execute("--preset", "minimal", "--no-local", *args)[0].call_args_list[0].args[0]
+            return ansible[ansible.index("--tags") + 1] if "--tags" in ansible else None
+        self.assertIsNone(tags())
+        self.assertEqual(tags("--upgrade"), "all,upgrade")
+        self.assertEqual(tags("--upgrade", "--tags", "gnome"), "gnome,upgrade")
+        self.assertEqual(tags("--tags", "upgrade"), "upgrade")
+
     def test_inspection_creates_no_runtime_files_and_runs_no_tools(self):
         run, dependencies = self.execute("--show-config", "--preset", "minimal")
         run.assert_not_called()
