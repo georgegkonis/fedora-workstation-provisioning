@@ -198,7 +198,10 @@ def main():
         raise ValueError("Use --preset NAME or --yes for unattended setup.")
     if not readonly and interactive and not args.yes and (args.configure or not args.preset):
         if not shutil.which("gum"):
-            print("gum is unavailable; using text prompts (install gum for the selection UI).")
+            try:
+                dependencies({"gum": "gum"})
+            except subprocess.CalledProcessError:
+                print("gum could not be installed; using text prompts.")
         if args.configure or not Path(args.local).exists() or confirm("Edit saved selections?"):
             local = configure(config, local, engine)
             config, selection, local = engine.resolve(selection["preset"], local=local)
