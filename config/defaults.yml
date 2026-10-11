@@ -123,33 +123,47 @@ flatpak:
     - com.valvesoftware.Steam
     virtualization: []
 gnome:
-  extensions:
-  - caffeine@patapon.info
-  - dash-to-dock@micxgx.gmail.com
-  - appindicatorsupport@rgcjonas.gmail.com
-  - apps-menu@gnome-shell-extensions.gcampax.github.com
-  - launch-new-instance@gnome-shell-extensions.gcampax.github.com
-  - places-menu@gnome-shell-extensions.gcampax.github.com
-  - window-list@gnome-shell-extensions.gcampax.github.com
-  - background-logo@fedorahosted.org
-  - blur-my-shell@aunetx
+  # Packaged by Fedora: installed system-wide through DNF.
+  system_extensions:
+  - package: gnome-shell-extension-caffeine
+    uuid: caffeine@patapon.info
+  - package: gnome-shell-extension-dash-to-dock
+    uuid: dash-to-dock@micxgx.gmail.com
+  - package: gnome-shell-extension-appindicator
+    uuid: appindicatorsupport@rgcjonas.gmail.com
+  - package: gnome-shell-extension-apps-menu
+    uuid: apps-menu@gnome-shell-extensions.gcampax.github.com
+  - package: gnome-shell-extension-launch-new-instance
+    uuid: launch-new-instance@gnome-shell-extensions.gcampax.github.com
+  - package: gnome-shell-extension-places-menu
+    uuid: places-menu@gnome-shell-extensions.gcampax.github.com
+  - package: gnome-shell-extension-window-list
+    uuid: window-list@gnome-shell-extensions.gcampax.github.com
+  - package: gnome-shell-extension-background-logo
+    uuid: background-logo@fedorahosted.org
+  - package: gnome-shell-extension-blur-my-shell
+    uuid: blur-my-shell@aunetx
+  # Not packaged: installed per user from extensions.gnome.org.
+  user_extensions:
   - clipboard-indicator@tudmotu.com
   - tilingshell@ferrarodomenico.com
   - rounded-window-corners@fxgn
   - weatheroclock@CleoMenezesJr.github.io
   - dynamic-music-pill@andbal
-  - just-perfection-desktop@just-perfection
   - advanced-media-controller@sanjai.com
   - docker-manager@omerfarukgungor
+  - wack-lockscreen-clock@rinzler69-wastaken.github.com
   enabled_extensions:
-  - caffeine@patapon.info
-  - dash-to-dock@micxgx.gmail.com
   - appindicatorsupport@rgcjonas.gmail.com
   - blur-my-shell@aunetx
+  - caffeine@patapon.info
   - clipboard-indicator@tudmotu.com
-  - tilingshell@ferrarodomenico.com
-  - weatheroclock@CleoMenezesJr.github.io
+  - dash-to-dock@micxgx.gmail.com
   - dynamic-music-pill@andbal
+  - launch-new-instance@gnome-shell-extensions.gcampax.github.com
+  - tilingshell@ferrarodomenico.com
+  - wack-lockscreen-clock@rinzler69-wastaken.github.com
+  - weatheroclock@CleoMenezesJr.github.io
 jetbrains_versions: {}
 obsidian_vaults: []
 repositories:

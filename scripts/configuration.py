@@ -177,10 +177,15 @@ def validate(config):
     require(len({x["name"] for x in config["flatpak"]["remotes"]}) ==
             len(config["flatpak"]["remotes"]), "flatpak.remotes: duplicate names")
     records(config["flatpak"]["overrides"], "flatpak.overrides", ("application", "own_name"))
-    for key, items in config["gnome"].items():
-        string_list(items, f"gnome.{key}")
-    require(set(config["gnome"]["enabled_extensions"]) <= set(config["gnome"]["extensions"]),
-            "gnome.enabled_extensions must be included in gnome.extensions")
+    gnome = config["gnome"]
+    records(gnome["system_extensions"], "gnome.system_extensions", ("package", "uuid"))
+    for key in ("user_extensions", "enabled_extensions"):
+        string_list(gnome[key], f"gnome.{key}")
+    declared = [x["uuid"] for x in gnome["system_extensions"]] + gnome["user_extensions"]
+    require(len(declared) == len(set(declared)),
+            "gnome: extension declared as both system and user or duplicated")
+    require(set(gnome["enabled_extensions"]) <= set(declared),
+            "gnome.enabled_extensions must be declared in gnome.system_extensions or gnome.user_extensions")
     patterns = {"dotnet": r"[0-9]+\.[0-9]+", "java": r"[0-9]+", "node": r"[0-9]+",
                 "python": r"system|[0-9]+\.[0-9]+"}
     for key, pattern in patterns.items():

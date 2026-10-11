@@ -83,7 +83,7 @@ class ConfigurationTests(unittest.TestCase):
             {"services": {"user": [{"name": "bad/unit"}]}},
             {"services": {"system": [{"name": "docker", "state": "restarted"}]}},
             {"services": {"system": [{"name": "example", "unit": "../outside"}]}},
-            {"gnome": {"extensions": []}},
+            {"gnome": {"user_extensions": [], "enabled_extensions": ["missing@example"]}},
         ]
         for override in invalid:
             with self.subTest(override=override), self.assertRaises(engine.ConfigurationError):

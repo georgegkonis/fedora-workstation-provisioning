@@ -5,15 +5,23 @@
   changed_when: false
   check_mode: false
 
+- name: Install system GNOME extensions from DNF
+  ansible.builtin.dnf:
+    name: "{{ workstation.gnome.system_extensions | map(attribute='package') | list }}"
+    state: present
+  become: true
+  when: workstation.gnome.system_extensions | length > 0
+
 - name: Initialize extension installation results
   ansible.builtin.set_fact:
+    gnome_system_extension_uuids: "{{ workstation.gnome.system_extensions | map(attribute='uuid') | list }}"
     gnome_shell_major: "{{ gnome_shell_version_result.stdout | regex_search('[0-9]+') }}"
     gnome_available_extensions: []
     gnome_extension_failures: []
 
-- name: Install compatible optional GNOME extensions
+- name: Install compatible optional user GNOME extensions
   ansible.builtin.include_tasks: extension.yml
-  loop: "{{ workstation.gnome.extensions }}"
+  loop: "{{ workstation.gnome.user_extensions }}"
   loop_control:
     loop_var: gnome_extension_uuid
   when: not ansible_check_mode
@@ -38,8 +46,10 @@
     value: >-
       {{ '@as ' + (((gnome_current_extensions.stdout | regex_replace('^@as\s+', '')
                      | default('[]', true) | from_yaml)
-                   | difference(workstation.gnome.extensions | difference(workstation.gnome.enabled_extensions))
-                   + (workstation.gnome.enabled_extensions | intersect(gnome_available_extensions)))
+                   | difference((gnome_system_extension_uuids + workstation.gnome.user_extensions)
+                                | difference(workstation.gnome.enabled_extensions))
+                   + (workstation.gnome.enabled_extensions
+                      | intersect(gnome_system_extension_uuids + gnome_available_extensions)))
                   | unique | sort | to_json) }}
     state: present
   when: not ansible_check_mode
