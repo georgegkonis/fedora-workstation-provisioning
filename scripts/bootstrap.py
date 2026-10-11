@@ -223,7 +223,7 @@ def main():
     if not args.dotfiles:
         collections(readonly)
         env = {**os.environ, "ANSIBLE_CONFIG": str(ROOT / "ansible/ansible.cfg")}
-        playbook = "ansible/playbooks/verify.yml" if args.verify else "ansible/playbook.yml"
+        playbook = "ansible/verify.yml" if args.verify else "ansible/playbook.yml"
         command = ["ansible-playbook", "-i", "ansible/intentory.ini", playbook,
                    "-e", json.dumps({"workstation_effective_file": str(effective)})]
         if args.syntax_check:

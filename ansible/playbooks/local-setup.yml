@@ -1,3 +1,0 @@
----
-- name: Configure workstation through the primary playbook
-  ansible.builtin.import_playbook: ../playbook.yml

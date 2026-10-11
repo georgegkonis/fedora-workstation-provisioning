@@ -29,5 +29,6 @@ Thumbs.db
 # Ignore systemd logs or temp files
 *.log
 
-# Ignore VS Code settings (optional)
+# Ignore editor settings
 .vscode/
+.idea/

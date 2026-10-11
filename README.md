@@ -37,8 +37,6 @@ Presets skip configuration questions and confirmation. A terminal run can still 
 
 `personal` uses the shared defaults. `work` enables work and disables personal (software kept off the work laptop, e.g. Steam, qBittorrent, Zotero). `minimal` is a stripped-down desktop: 1Password, a short Flatpak list and a few GNOME extensions. Desktop and development are independently selectable. Personal and virtualization currently use package/Flatpak lists and service defaults; they do not need placeholder roles.
 
-For saved configurations using the former presets, change `_selection.preset` from `personal-desktop`/`personal-laptop` to `personal`, or from `work-laptop` to `work`, and remove any `machine.type` override.
-
 For a minimal setup that ignores saved overrides:
 
 ```bash
@@ -118,7 +116,7 @@ chezmoi --config .workstation/chezmoi.json \
 
 Bootstrap does not replace another chezmoi repository's global configuration. [Modification scripts/templates](https://www.chezmoi.io/user-guide/manage-different-types-of-file/#manage-part-but-not-all-of-a-file) manage the shell hook and Git include while retaining unrelated content. Whole files under `.config/git/` and `.config/shell/` are explicitly repository-owned. Static files remain static.
 
-Ansible installs VS Code when selected. Its extensions and personal editor settings belong to [VS Code Settings Sync](https://code.visualstudio.com/docs/configure/settings-sync): sign in and enable sync, including Extensions and Settings, after installation. Provisioning does not install or verify extensions, or modify VS Code settings. Existing extensions and settings are preserved. Remote SSH/container extensions require separate setup. The former `vscode.extensions` and `vscode.work_extensions` configuration keys are no longer supported; remove them from local overrides if present.
+Ansible installs VS Code when selected. Its extensions and personal editor settings belong to [VS Code Settings Sync](https://code.visualstudio.com/docs/configure/settings-sync): sign in and enable sync, including Extensions and Settings, after installation. Provisioning does not install or verify extensions, or modify VS Code settings. Existing extensions and settings are preserved. Remote SSH/container extensions require separate setup.
 
 Selected JetBrains XML components live under `.chezmoitemplates/jetbrains`. A small chezmoi configuration script merges them into the newest existing versioned directory of each IDE (e.g. `Rider2026.2`); other XML components remain, and IDEs that have not been launched yet are skipped. Launch Toolbox to install and start the IDEs, then reapply dotfiles while they are closed. This script does not install packages. Its XML outputs are outside chezmoi's normal `diff`/`verify` file tracking.
 
@@ -148,7 +146,7 @@ ansible-playbook -i ansible/intentory.ini ansible/playbook.yml \
   -e workstation_preset=minimal -e workstation_ignore_local=true --check
 ```
 
-Direct Ansible applies only machine state; bootstrap applies chezmoi afterward. `dotfiles` is a bootstrap selection (`--tags dotfiles` or `--dotfiles`). The old setup/verify playbook paths remain compatibility entry points. The inventory name `ansible/intentory.ini` is intentional.
+Direct Ansible applies only machine state; bootstrap applies chezmoi afterward. `dotfiles` is a bootstrap selection (`--tags dotfiles` or `--dotfiles`). The inventory name `ansible/intentory.ini` is intentional.
 
 ## Repository architecture
 
@@ -189,7 +187,7 @@ services:
 
 Add physical-machine overrides only when needed, for example `config/machines/thinkpad-t14.yml`, selected with `--machine thinkpad-t14`. These files accept only `machine` metadata and `hardware` package/service declarations. The loader sets `machine.id` from the selected definition. General applications belong in presets or local overrides.
 
-GNOME settings are named declarations grouped under `ansible/roles/gnome/files/{interface,keyboard,input,extensions}.yml`. Each has a dconf `key`, GVariant `value`, and a description explaining intent. Discover settings with `gsettings list-recursively <schema>` and `dconf read <path>`; commit only deliberately selected values. The former dconf export is no longer applied. GNOME extensions are UUID lists in defaults; incompatible/failed optional extensions are reported and other configuration continues. Unmanaged enabled extensions are preserved.
+GNOME settings are named declarations grouped under `ansible/roles/gnome/files/{interface,keyboard,input,extensions}.yml`. Each has a dconf `key`, GVariant `value`, and a description explaining intent. Discover settings with `gsettings list-recursively <schema>` and `dconf read <path>`; commit only deliberately selected values. GNOME extensions are UUID lists in defaults; incompatible/failed optional extensions are reported and other configuration continues. Unmanaged enabled extensions are preserved.
 
 For a new feature, add a default and validation, associate package/Flatpak lists with it, and add a role only when behavior is substantial. Extend the interactive frontend where useful; execution must work from configuration alone. Add validation tests and update this README when changing the public interface.
 

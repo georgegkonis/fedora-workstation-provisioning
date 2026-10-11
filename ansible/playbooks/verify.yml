@@ -1,3 +1,0 @@
----
-- name: Verify workstation through the primary verification playbook
-  ansible.builtin.import_playbook: ../verify.yml
