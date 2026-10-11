@@ -9,11 +9,11 @@ description: Update the pinned upstream versions, revisions and checksums in ans
 
 ## Workflow
 
-1. Baseline: run `just lint` before changing anything and note any existing failures. They are not caused by the bump; do not fix them here, but report them.
+1. Baseline: run `just lint` before changing anything and note any existing failures (see `validate-change`). They are not caused by the bump; do not fix them here, but report them.
 2. Dry run (writes nothing): `python3 .agents/skills/update-pins/scripts/update_pins.py [typst|gcm|morewaita|anaconda ...]`. No names = all pins. `--json` for machine-readable output. `GITHUB_TOKEN` avoids API rate limits. The script retries network calls itself; if it still exits with a network error, rerun once before reporting.
 3. Show current → latest. Nothing changed: stop. If the user only asked to check, stop here. Otherwise continue without asking again, restricted to the pins they named (default all).
 4. Apply: same command plus `--apply`.
-5. Verify: `just check` (must pass) and `just lint` (must not be worse than the baseline). Never run `just run` or otherwise provision. On a new failure, revert with `git checkout ansible/vars/catalog.yml` and report.
+5. Verify with the `validate-change` skill (`just check` must pass, `just lint` no worse than baseline). On a new failure, revert with `git checkout ansible/vars/catalog.yml` and report.
 6. Review `git diff ansible/vars/catalog.yml`: only the intended pins changed.
 7. Commit with the repo's commit workflow, staging only `ansible/vars/catalog.yml`. One commit per run, subject scoped to what moved, e.g. `chore(development): bump Typst to 0.15.1` or `chore: bump Typst and MoreWaita pins` for several; list old → new in the body for multiple pins. Leave unrelated working-tree changes uncommitted and mention them. Do not push.
 
@@ -27,6 +27,6 @@ description: Update the pinned upstream versions, revisions and checksums in ans
 
 ## When the script stops
 
-If it aborts because an expected upstream asset is missing or renamed, the task's URL template (`ansible/roles/development/tasks/{typst,git_credential_manager,anaconda}.yml`, `ansible/roles/gnome/tasks/icons.yml`) needs updating first. Report that to the user rather than editing the task silently. For major jumps (e.g. Typst 0.x → 1.0), skim release notes for breaking changes and flag them.
+If it aborts because an expected upstream asset is missing or renamed, the task's URL template (`ansible/roles/development/tasks/{typst,git_credential_manager,anaconda}.yml`, `ansible/roles/gnome/tasks/icons.yml`) needs updating first. Report that to the user rather than editing the task silently. For major version jumps, skim release notes for breaking changes and flag them.
 
-A new pin needs the script entry (`PINS` in `update_pins.py`) and a consuming task with a validating `assert` (see `anaconda.yml`).
+To add a new pin, follow the vendor-installer steps in the `add-software` skill; it also needs an entry in `PINS` in `update_pins.py`.
