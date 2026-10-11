@@ -6,7 +6,6 @@
          + (['--effective', workstation_effective_file] if workstation_effective_file is defined else [])
          + (['--local', workstation_local_file] if workstation_local_file is defined else [])
          + (['--preset', workstation_preset] if workstation_preset is defined else [])
-         + (['--machine', workstation_machine] if workstation_machine is defined else [])
          + (['--no-local'] if workstation_ignore_local | default(false) else []) }}
   register: workstation_configuration_result
   changed_when: false

@@ -5,7 +5,6 @@ playbooks := "ansible/playbook.yml ansible/verify.yml ansible/playbooks/update.y
 
 # Configure the workstation (e.g. `just run --yes --tags gnome`)
 [arg('preset', long, help='Preset from config/presets')]
-[arg('machine', long, help='Hardware definition from config/machines')]
 [arg('local', long, help='Local overrides file')]
 [arg('tags', long, help='Comma-separated feature tags')]
 [arg('no_local', long='no-local', value='--no-local', help='Ignore saved overrides')]
@@ -19,10 +18,9 @@ playbooks := "ansible/playbook.yml ansible/verify.yml ansible/playbooks/update.y
 [arg('diff', long, value='--diff', help='Show proposed changes')]
 [arg('dotfiles', long, value='--dotfiles', help='Run only chezmoi')]
 [arg('help', long, short='h', value='--help', help='Show bootstrap help')]
-run preset='' machine='' local='' tags='' no_local='' yes='' configure='' show_config='' validate='' syntax_check='' check='' verify='' diff='' dotfiles='' help='':
+run preset='' local='' tags='' no_local='' yes='' configure='' show_config='' validate='' syntax_check='' check='' verify='' diff='' dotfiles='' help='':
     ./bootstrap.sh \
         {{ if preset == '' { '' } else { '--preset=' + quote(preset) } }} \
-        {{ if machine == '' { '' } else { '--machine=' + quote(machine) } }} \
         {{ if local == '' { '' } else { '--local=' + quote(local) } }} \
         {{ if tags == '' { '' } else { '--tags=' + quote(tags) } }} \
         {{ no_local }} {{ yes }} {{ configure }} {{ show_config }} {{ validate }} {{ syntax_check }} {{ check }} {{ verify }} {{ diff }} {{ dotfiles }} {{ help }}

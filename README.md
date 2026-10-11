@@ -51,17 +51,15 @@ One loader, `scripts/configuration.py`, implements this order:
 
 1. `config/defaults.yml`
 2. `config/presets/<preset>.yml`, if selected
-3. `config/machines/<machine>.yml`, if selected
-4. `.local.yml`, or the file supplied with `--local`
+3. `.local.yml`, or the file supplied with `--local`
 
-Later mappings merge recursively; later lists and scalars replace earlier values. Disabling a feature makes its component selections inactive, without requiring all child options to be cleared. Unknown keys, duplicate YAML keys, malformed YAML, unsupported preferences/versions, incomplete identities, invalid unit definitions, and unknown presets/machines are rejected before provisioning.
+Later mappings merge recursively; later lists and scalars replace earlier values. Disabling a feature makes its component selections inactive, without requiring all child options to be cleared. Unknown keys, duplicate YAML keys, malformed YAML, unsupported preferences/versions, incomplete identities, invalid unit definitions, and unknown presets are rejected before provisioning.
 
-`.local.yml` is ignored by Git. Bootstrap saves only selections/overrides there, not a copy of all defaults. Its optional `_selection` metadata remembers the preset and hardware definition:
+`.local.yml` is ignored by Git. Bootstrap saves only selections/overrides there, not a copy of all defaults. Its optional `_selection` metadata remembers the preset:
 
 ```yaml
 _selection:
   preset: work
-  machine: ''
 preferences:
   shell: zsh
 development:
@@ -74,7 +72,7 @@ git:
   work_email: you@example.com
 ```
 
-Explicit `--preset`/`--machine` flags select their respective layers, while local overrides still win. Use `--no-local` to ignore saved overrides for that run; it never overwrites the saved file. This also helps compare a pristine preset with an established configuration.
+An explicit `--preset` flag selects the preset layer, while local overrides still win. Use `--no-local` to ignore saved overrides for that run; it never overwrites the saved file. This also helps compare a pristine preset with an established configuration.
 
 ```bash
 ./bootstrap.sh --show-config
@@ -154,7 +152,6 @@ Direct Ansible applies only machine state; bootstrap applies chezmoi afterward. 
 | --- | --- |
 | `config/defaults.yml` | Features, preferences, semantic software lists and options |
 | `config/presets/` | Reusable software configurations |
-| `config/machines/` | Optional physical-machine definitions, added when needed |
 | `scripts/configuration.py` | Precedence and validation shared by both engines |
 | `scripts/bootstrap.py` | Interactive frontend, dependency checks and orchestration |
 | `ansible/playbook.yml` | Readable machine-state role sequence |
@@ -185,7 +182,7 @@ services:
 
 `unit` is optional for packaged services. Install their packages in an appropriate package list. Declared system services override the automatic Docker/libvirt service defaults. User services require a running user session; bootstrap does not enable lingering automatically.
 
-Add physical-machine overrides only when needed, for example `config/machines/thinkpad-t14.yml`, selected with `--machine thinkpad-t14`. These files accept only `machine` metadata and `hardware` package/service declarations. The loader sets `machine.id` from the selected definition. General applications belong in presets or local overrides.
+Hardware-specific packages and services go under `hardware` in `.local.yml`. General applications belong in presets.
 
 GNOME settings are named declarations grouped under `ansible/roles/gnome/files/{interface,keyboard,input,extensions}.yml`. Each has a dconf `key`, GVariant `value`, and a description explaining intent. Discover settings with `gsettings list-recursively <schema>` and `dconf read <path>`; commit only deliberately selected values. GNOME extensions are UUID lists in defaults; incompatible/failed optional extensions are reported and other configuration continues. Unmanaged enabled extensions are preserved.
 

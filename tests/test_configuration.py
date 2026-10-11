@@ -26,14 +26,10 @@ class ConfigurationTests(unittest.TestCase):
         return engine.resolve(**kwargs)[0]
 
     def test_precedence_and_lists_replace(self):
-        machines = self.root / "config/machines"
-        machines.mkdir()
-        (machines / "example.yml").write_text("hardware:\n  packages: [hardware-package]\n")
-        config = self.resolve(preset="work", machine="example", local={
+        config = self.resolve(preset="work", local={
             "features": {"personal": True}, "hardware": {"packages": ["local-package"]},
             "packages": {"base": ["git"]},
         })
-        self.assertEqual(config["machine"], {"id": "example"})
         self.assertTrue(config["features"]["work"])
         self.assertTrue(config["features"]["personal"])
         self.assertEqual(config["hardware"]["packages"], ["local-package"])
@@ -51,13 +47,6 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(self.resolve()["features"]["work"])
         self.assertFalse(self.resolve(use_local=False)["features"]["work"])
 
-    def test_machine_definition_cannot_select_general_apps(self):
-        machines = self.root / "config/machines"
-        machines.mkdir()
-        (machines / "example.yml").write_text("apps:\n  jetbrains: false\n")
-        with self.assertRaisesRegex(engine.ConfigurationError, "hardware"):
-            self.resolve(machine="example")
-
     def test_invalid_values_are_rejected(self):
         invalid = [
             {"features": {"develpment": True}},
@@ -65,8 +54,7 @@ class ConfigurationTests(unittest.TestCase):
             {"preferences": {"shell": "fish"}},
             {"development": {"dotnet": [8.0]}},
             {"development": {"ai_clis": ["unknown"]}},
-            {"machine": []},
-            {"machine": {"type": "laptop"}},
+            {"machine": {"id": "example"}},
             {"apps": {"vscode": False}},
             {"git": {"work_name": "Name"}},
             {"obsidian_vaults": [{"name": "../outside", "repo": "example"}]},

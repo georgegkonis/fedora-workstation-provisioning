@@ -155,7 +155,6 @@ def collections(readonly):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset")
-    parser.add_argument("--machine", help="Hardware definition in config/machines")
     parser.add_argument("--local", default=str(ROOT / ".local.yml"))
     parser.add_argument("--no-local", action="store_true", help="Ignore saved overrides for this run")
     parser.add_argument("--yes", action="store_true", help="Apply without configuration/confirmation prompts")
@@ -184,7 +183,7 @@ def main():
     import configuration as engine
     import yaml
 
-    config, selection, local = engine.resolve(args.preset, args.machine, args.local, not args.no_local)
+    config, selection, local = engine.resolve(args.preset, args.local, not args.no_local)
     if args.show_config:
         print(yaml.safe_dump(config, sort_keys=False), end="")
         return
@@ -198,7 +197,7 @@ def main():
             print("gum is unavailable; using text prompts (install gum for the selection UI).")
         if args.configure or not Path(args.local).exists() or confirm("Edit saved selections?"):
             local = configure(config, local, engine)
-            config, selection, local = engine.resolve(selection["preset"], selection["machine"], local=local)
+            config, selection, local = engine.resolve(selection["preset"], local=local)
     print("\nEffective workstation configuration:\n" + yaml.safe_dump(config, sort_keys=False), flush=True)
     if not readonly and interactive and not args.yes and not args.preset:
         if not confirm("Apply this configuration?"):

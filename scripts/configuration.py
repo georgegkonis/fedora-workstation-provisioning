@@ -194,38 +194,26 @@ def validate(config):
     require(len(names) == len(set(names)), "system and hardware services must not declare the same unit twice")
 
 
-def resolve(preset=None, machine=None, local_path=None, use_local=True, local=None):
+def resolve(preset=None, local_path=None, use_local=True, local=None):
     path = Path(local_path).resolve() if local_path else ROOT / ".local.yml"
     local = copy.deepcopy(local if local is not None else local_configuration(path, use_local))
     selection = local.pop("_selection", {})
-    require(isinstance(selection, dict) and set(selection) <= {"preset", "machine"},
-            "_selection: expected preset and/or machine")
+    require(isinstance(selection, dict) and set(selection) <= {"preset"},
+            "_selection: expected preset")
     preset = preset if preset is not None else selection.get("preset", "")
-    machine = machine if machine is not None else selection.get("machine", "")
-    require(isinstance(preset, str) and isinstance(machine, str),
-            "preset and machine names must be strings")
+    require(isinstance(preset, str), "preset name must be a string")
     config = read_yaml(ROOT / "config/defaults.yml")
     if preset:
         config = merge(config, read_yaml(named_file("presets", preset)))
-    if machine:
-        overrides = read_yaml(named_file("machines", machine))
-        require(set(overrides) <= {"machine", "hardware"},
-                "machine definitions may contain only machine metadata and hardware options")
-        config = merge(config, overrides)
-        config["machine"]["id"] = machine
     config = merge(config, local)
     validate_shape(config, read_yaml(ROOT / "config/defaults.yml"))
-    # The selected definition is an identity, not an independently overridable preference.
-    require(config["machine"]["id"] == (machine or ""),
-            "select a machine definition with --machine or _selection.machine")
     validate(config)
-    return config, {"preset": preset, "machine": machine}, local
+    return config, {"preset": preset}, local
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", default=None)
-    parser.add_argument("--machine", default=None)
     parser.add_argument("--local", default=None)
     parser.add_argument("--no-local", action="store_true")
     parser.add_argument("--format", choices=("yaml", "json"), default="yaml")
@@ -236,7 +224,7 @@ def main():
             config = read_yaml(Path(args.effective))
             validate(config)
         else:
-            config, _, _ = resolve(args.preset, args.machine, args.local, not args.no_local)
+            config, _, _ = resolve(args.preset, args.local, not args.no_local)
     except ConfigurationError as exc:
         parser.exit(2, f"Configuration error: {exc}\n")
     print(json.dumps(config) if args.format == "json" else

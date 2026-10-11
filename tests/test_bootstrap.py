@@ -59,7 +59,7 @@ class BootstrapTests(unittest.TestCase):
         self.assertFalse(self.local.exists())
 
     def test_reapply_preserves_local_comments_when_selection_is_unchanged(self):
-        content = "# Keep my comments\n_selection:\n  preset: minimal\n  machine: ''\n"
+        content = "# Keep my comments\n_selection:\n  preset: minimal\n"
         self.local.write_text(content)
         self.execute("--yes")
         self.assertEqual(self.local.read_text(), content)

@@ -8,15 +8,15 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 - Chezmoi owns home configuration: shell hooks, Git, editor/CLI/application preferences. Custom systemd user units are deployed by Ansible with their service lifecycle.
 - Git is the source of truth. Never commit credentials, `.local.yml`, or generated `.workstation/` state.
 - `bootstrap.sh` delegates orchestration to `scripts/bootstrap.py`; UI emits configuration and never performs feature installation directly.
-- `scripts/configuration.py` is the only precedence/validation implementation: defaults → preset → machine → local overrides. Mappings merge; lists/scalars replace.
-- Machine definition, feature selection and implementation preferences are independent. Machine files contain only hardware options and machine metadata.
+- `scripts/configuration.py` is the only precedence/validation implementation: defaults → preset → local overrides. Mappings merge; lists/scalars replace.
+- Feature selection, hardware options and implementation preferences are independent.
 
 ## Layout
 
 - `config/defaults.yml`: shared selections and software data grouped by semantic ownership.
-- `config/presets/`: reusable profiles. Optional `config/machines/` definitions are created only for actual hardware needs.
-- `.local.yml`: ignored selections/overrides, with `_selection` remembering preset/machine names.
-- `ansible/playbook.yml`: primary readable role sequence. Old setup/verify playbook paths are compatibility wrappers.
+- `config/presets/`: reusable profiles.
+- `.local.yml`: ignored selections/overrides, with `_selection` remembering the preset name.
+- `ansible/playbook.yml`: primary readable role sequence. `ansible/verify.yml` verifies installed state.
 - `ansible/intentory.ini`: intentional inventory filename; preserve it.
 - `ansible/tasks/{configuration,user_context,software}.yml`: shared validation, desktop account/session and selected-state resolution.
 - `ansible/roles/`: substantive machine-state components. Do not create empty roles just to match a diagram.
