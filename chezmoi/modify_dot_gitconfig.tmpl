@@ -20,6 +20,8 @@ with tempfile.TemporaryDirectory() as directory:
     if work:
         for key in ("user.name", "user.email"):
             git("--unset-all", key, allowed=(0, 5))
+    # Azure DevOps path-scoped credentials are owned by the work identity file.
+    git("--unset-all", "credential.https://dev.azure.com.useHttpPath", allowed=(0, 5))
     # Keep this include last, so the repository's explicitly owned defaults win.
     git("--fixed-value", "--unset-all", "include.path", "~/.config/git/workstation.gitconfig", allowed=(0, 5))
     git("--add", "include.path", "~/.config/git/workstation.gitconfig")

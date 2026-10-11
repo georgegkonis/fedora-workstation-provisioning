@@ -3,3 +3,5 @@
     name = {{ .workstation.git.work_name | quote }}
     email = {{ .workstation.git.work_email | quote }}
 {{ end }}
+[credential "https://dev.azure.com"]
+    useHttpPath = true

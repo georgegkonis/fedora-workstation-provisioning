@@ -106,6 +106,8 @@ class DotfileTests(unittest.TestCase):
                 if preset == "work":
                     self.assertNotIn("Old Name", (home / ".gitconfig").read_text())
                     self.assertIn("work@example.test", (home / ".config/git/work.gitconfig").read_text())
+                    self.assertIn("dev.azure.com", (home / ".config/git/work.gitconfig").read_text())
+                    self.assertNotIn("dev.azure.com", (home / ".gitconfig").read_text())
                     self.assertTrue((home / ".zshrc").exists())
                     self.assertIn("conda.sh", (home / ".config/shell/workstation.sh").read_text())
 
