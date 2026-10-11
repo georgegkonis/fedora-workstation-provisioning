@@ -36,8 +36,8 @@ apps:
   jetbrains: true
   podman_desktop: true
 git:
-  name: George Gkonis
-  email: git@georgegkonis.com
+  name: ''
+  email: ''
   work_name: ''
   work_email: ''
 work:

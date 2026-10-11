@@ -257,6 +257,8 @@ def main():
         print("Configuration applied. See any 'Optional GNOME extension needs attention' messages above.")
         if config["features"]["desktop"]:
             print("Log out/in to load GNOME extensions and login-shell changes. Authenticate applications separately.")
+        if not config["git"]["email"]:
+            print("Set git.name and git.email in .local.yml before committing.")
         if config["features"]["work"] and not config["git"]["work_email"]:
             print("Set git.work_name and git.work_email in .local.yml before committing work projects.")
         if config["apps"]["jetbrains"] and config["features"]["desktop"] and config["features"]["development"]:
