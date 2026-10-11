@@ -34,8 +34,8 @@
       when: workstation.features.desktop and workstation.apps.vscode
       tags: vscode
     - role: jetbrains
-      when: workstation.features.desktop and workstation.apps.jetbrains
-      tags: jetbrains
+      when: workstation.features.desktop and workstation.features.development and workstation.apps.jetbrains
+      tags: [jetbrains, development]
     - role: gnome
       when: workstation.features.desktop
       tags: gnome

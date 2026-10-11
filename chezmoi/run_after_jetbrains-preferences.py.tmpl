@@ -1,14 +1,27 @@
 #!/usr/bin/env python3
 """Merge selected XML components into versioned IDE files, leaving other components intact."""
-import json
+import re
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-versions = json.loads({{ .workstation.jetbrains_versions | toJson | quote }})
 source = Path({{ .chezmoi.sourceDir | quote }}) / ".chezmoitemplates/jetbrains"
 target = Path({{ .chezmoi.destDir | quote }}) / ".config/JetBrains"
-for ide, version in versions.items():
-    options = target / (ide + version) / "options"
+
+
+def latest(ide):
+    """Newest existing versioned config directory, e.g. Rider2026.2, if the IDE has been launched."""
+    pattern = re.compile(re.escape(ide) + r"([0-9]+(?:\.[0-9]+)*)")
+    found = [(tuple(map(int, m[1].split("."))), path) for path in target.glob(ide + "[0-9]*")
+             if (m := pattern.fullmatch(path.name))]
+    return max(found)[1] if found else None
+
+
+for source_ide in sorted(path for path in source.iterdir() if path.is_dir()):
+    ide = source_ide.name
+    config_dir = latest(ide)
+    if config_dir is None:
+        continue
+    options = config_dir / "options"
     for original in (source / ide / "options").glob("*.xml"):
         path = options / original.name
         owned = ET.parse(original).getroot()

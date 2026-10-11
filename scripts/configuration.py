@@ -205,11 +205,6 @@ def validate(config):
     if config["features"]["desktop"]:
         require(config["preferences"]["editor"] != "vscode" or config["apps"]["vscode"],
                 "preferences.editor=vscode requires apps.vscode=true")
-    for ide, version in config["jetbrains_versions"].items():
-        require(ide in ("Rider", "PyCharm", "WebStorm", "DataGrip"),
-                f"jetbrains_versions: unsupported IDE {ide}")
-        require(isinstance(version, str) and re.fullmatch(r"[0-9]{4}\.[0-9]+", version),
-                "jetbrains_versions: use quoted versions such as '2026.2'")
     records(config["obsidian_vaults"], "obsidian_vaults", ("name", "repo"), ("version",))
     for vault in config["obsidian_vaults"]:
         require(vault["name"] not in (".", "..") and

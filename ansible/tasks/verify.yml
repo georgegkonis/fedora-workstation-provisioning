@@ -31,7 +31,7 @@
          + ([desktop_work_projects_path] if workstation.features.work else [])
          + ([desktop_target_home + '/.local/share/icons/MoreWaita'] if workstation.features.desktop else [])
          + ([desktop_target_home + '/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox']
-            if workstation.features.desktop and workstation.apps.jetbrains else [])
+            if workstation.features.desktop and workstation.features.development and workstation.apps.jetbrains else [])
          + ([desktop_target_home + '/.local/bin/typst']
             if workstation.features.development and workstation.development.typst else [])
          + ([desktop_target_home + '/anaconda3/bin/conda']

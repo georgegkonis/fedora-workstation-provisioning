@@ -260,8 +260,8 @@ def main():
             print("Log out/in to load GNOME extensions and login-shell changes. Authenticate applications separately.")
         if config["features"]["work"] and not config["git"]["work_email"]:
             print("Set git.work_name and git.work_email in .local.yml before committing work projects.")
-        if config["apps"]["jetbrains"] and config["features"]["desktop"]:
-            print("Launch JetBrains Toolbox to install/authenticate IDEs; then set jetbrains_versions for preferences.")
+        if config["apps"]["jetbrains"] and config["features"]["desktop"] and config["features"]["development"]:
+            print("Launch JetBrains Toolbox to install/authenticate IDEs; preferences apply to the newest launched IDE version on the next dotfiles run.")
 
 
 if __name__ == "__main__":

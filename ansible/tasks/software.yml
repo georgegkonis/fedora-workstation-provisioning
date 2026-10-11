@@ -11,7 +11,7 @@
     workstation_development_flatpaks: >-
       {{ workstation.flatpak.applications.development
          + (['io.podman_desktop.PodmanDesktop', 'com.github.marhkb.Pods']
-            if workstation.features.desktop and workstation.development.containers
+            if workstation.features.desktop and workstation.features.development and workstation.development.containers
             and workstation.apps.podman_desktop and workstation.preferences.container_engine == 'podman' else []) }}
 
 - name: Select package groups

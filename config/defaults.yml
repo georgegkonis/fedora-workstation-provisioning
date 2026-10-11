@@ -164,7 +164,6 @@ gnome:
   - tilingshell@ferrarodomenico.com
   - wack-lockscreen-clock@rinzler69-wastaken.github.com
   - weatheroclock@CleoMenezesJr.github.io
-jetbrains_versions: {}
 obsidian_vaults: []
 repositories:
   rpm: []

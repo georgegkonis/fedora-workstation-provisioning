@@ -26,8 +26,7 @@ class DotfileTests(unittest.TestCase):
             ("personal", {"preferences": {"browser": "chrome"}}),
             ("minimal", {}),
             ("work", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
-                             "preferences": {"shell": "zsh"}, "development": {"anaconda": True},
-                             "jetbrains_versions": {"Rider": "2026.2"}}),
+                             "preferences": {"shell": "zsh"}, "development": {"anaconda": True}}),
         ]
         for preset, overrides in profiles:
             with self.subTest(preset=preset, overrides=overrides), tempfile.TemporaryDirectory() as directory:
