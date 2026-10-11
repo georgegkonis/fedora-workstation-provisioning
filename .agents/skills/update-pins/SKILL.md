@@ -9,6 +9,16 @@ description: Update the pinned upstream versions, revisions and checksums in ans
 
 ## Workflow
 
+```
+- [ ] 1. Baseline lint
+- [ ] 2. Dry run
+- [ ] 3. Show current → latest (stop if unchanged or check-only)
+- [ ] 4. Apply
+- [ ] 5. Verify (validate-change)
+- [ ] 6. Review diff
+- [ ] 7. Commit
+```
+
 1. Baseline: run `just lint` before changing anything and note any existing failures (see `validate-change`). They are not caused by the bump; do not fix them here, but report them.
 2. Dry run (writes nothing): `python3 .agents/skills/update-pins/scripts/update_pins.py [typst|gcm|morewaita|anaconda ...]`. No names = all pins. `--json` for machine-readable output. `GITHUB_TOKEN` avoids API rate limits. The script retries network calls itself; if it still exits with a network error, rerun once before reporting.
 3. Show current → latest. Nothing changed: stop. If the user only asked to check, stop here. Otherwise continue without asking again, restricted to the pins they named (default all).
