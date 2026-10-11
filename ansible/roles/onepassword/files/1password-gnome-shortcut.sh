@@ -1,27 +1,13 @@
 #!/bin/bash
-# 1Password GNOME Shortcuts Setup
+# 1Password GNOME Quick Access shortcut setup
 
 # Define shortcuts: path, name, command, binding
 declare -A shortcuts
-shortcuts["show,path"]="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/1pass-show/"
-shortcuts["show,name"]="1Password Show"
-shortcuts["show,command"]="1password --show"
-shortcuts["show,binding"]="<Ctrl><Shift>O"
 
 shortcuts["quick,path"]="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/1pass-quick/"
 shortcuts["quick,name"]="1Password Quick Access"
 shortcuts["quick,command"]="1password --quick-access"
 shortcuts["quick,binding"]="<Ctrl><Shift>space"
-
-shortcuts["lock,path"]="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/1pass-lock/"
-shortcuts["lock,name"]="1Password Lock"
-shortcuts["lock,command"]="1password --lock"
-shortcuts["lock,binding"]="<Ctrl><Shift>L"
-
-shortcuts["fill,path"]="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/1pass-fill/"
-shortcuts["fill,name"]="1Password Fill in Browser"
-shortcuts["fill,command"]="1password --fill"
-shortcuts["fill,binding"]="<Ctrl><Shift>F"
 
 # Get current custom-keybindings and strip @as prefix
 current=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings | sed "s/^@as //")
@@ -30,7 +16,7 @@ current_clean=$(echo "$current" | tr -d '[]' | tr -d "'" | tr -d ' ')
 add_paths=()
 
 # Loop through each shortcut
-for key in quick show lock fill; do
+for key in quick; do
   path="${shortcuts["$key,path"]}"
   name="${shortcuts["$key,name"]}"
   command="${shortcuts["$key,command"]}"
