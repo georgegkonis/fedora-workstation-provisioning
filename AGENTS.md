@@ -45,7 +45,7 @@ Check mode must not install bootstrap dependencies, save user selections, or exe
 ## Conventions
 
 - Prefer fully qualified native Ansible modules, Fedora/DNF/RPM mechanisms, explicit file modes, and command guards.
-- Keep ordinary software in lists. Add options only for meaningful choices; disabling a parent feature makes child selections inactive.
+- Declare applications under `apps` as mappings with a friendly name, enabled flag, feature and installer-specific settings. Keep infrastructure/development dependencies in lists. Disabling a parent feature makes child selections inactive.
 - Configure repositories before packages. Isolate/document vendor installers where packages are unsuitable.
 - Preserve additive/idempotent behavior and unrelated existing state. Never purge unlisted packages or reset whole exported configuration databases.
 - Manage GNOME settings as named, described declarations; optional extension failures must be reported without stopping setup.

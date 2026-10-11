@@ -1,16 +1,6 @@
 ---
-- name: Install VS Code
+- name: Install declared RPM application
   ansible.builtin.dnf:
-    name: code
+    name: "{{ packages_app.packages }}"
     state: present
   become: true
-  when: workstation.features.desktop and workstation.apps.vscode
-  tags: vscode
-
-- name: Install Azure CLI
-  ansible.builtin.dnf:
-    name: azure-cli
-    state: present
-  become: true
-  when: workstation.features.work and workstation.work.azure_cli
-  tags: [work, azure_cli]

@@ -16,7 +16,7 @@
     credentialStore = secretservice
     cacheOptions = --timeout 43200
 {{ end }}
-{{ if and .workstation.git.signing_key .workstation.apps.onepassword }}
+{{ if and .workstation.git.signing_key (has "onepassword" .workstation.selected.integrations) }}
 [user]
     signingkey = {{ .workstation.git.signing_key | quote }}
 [gpg]

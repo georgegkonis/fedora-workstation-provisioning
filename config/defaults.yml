@@ -1,5 +1,5 @@
 ---
-# Shared configuration. Maps merge recursively; lists are replaced by later layers.
+# Mappings merge recursively; lists replace earlier layers.
 features:
   desktop: true
   development: true
@@ -32,10 +32,310 @@ development:
   - claude-code
   - codex
 apps:
-  onepassword: true
-  vscode: true
-  jetbrains: true
-  podman_desktop: true
+  onepassword:
+    name: 1Password
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - 1password
+      - 1password-cli
+    integration: onepassword
+    autostart:
+      enabled: true
+      name: 1password
+      command: /opt/1Password/1password --silent
+      try_exec: /opt/1Password/1password
+  vscode:
+    name: Visual Studio Code
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - code
+  jetbrains:
+    name: JetBrains Toolbox
+    enabled: true
+    feature: development
+    requires:
+      features:
+      - desktop
+    installer: vendor
+    vendor:
+      task: jetbrains
+    autostart:
+      enabled: true
+      name: jetbrains-toolbox
+      command: sh -c '"$HOME/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox" --minimize'
+  ferdium:
+    name: Ferdium
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: org.ferdium.Ferdium
+  spotify:
+    name: Spotify
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: com.spotify.Client
+  extension_manager:
+    name: Extension Manager
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: com.mattjakeman.ExtensionManager
+  flatseal:
+    name: Flatseal
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: com.github.tchx84.Flatseal
+  mission_center:
+    name: Mission Center
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: io.missioncenter.MissionCenter
+  localsend:
+    name: LocalSend
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: org.localsend.localsend_app
+      background: true
+    autostart:
+      enabled: true
+  gear_lever:
+    name: Gear Lever
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: it.mijorus.gearlever
+  protonvpn:
+    name: Proton VPN
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: com.protonvpn.www
+  bazaar:
+    name: Bazaar
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: io.github.kolunmi.Bazaar
+  list:
+    name: List
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: io.github.mrvladus.List
+  solaar:
+    name: Solaar
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: io.github.pwr_solaar.solaar
+  metadata_cleaner:
+    name: Metadata Cleaner
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: io.gitlab.metadatacleaner.metadatacleaner
+  obsidian:
+    name: Obsidian
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: md.obsidian.Obsidian
+  galaxy_buds:
+    name: Galaxy Buds Client
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: me.timschneeberger.GalaxyBudsClient
+  vlc:
+    name: VLC
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: org.videolan.VLC
+  speedtest:
+    name: Speedtest
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: xyz.ketok.Speedtest
+  zap:
+    name: OWASP ZAP
+    enabled: true
+    feature: development
+    installer: flatpak
+    flatpak:
+      id: org.zaproxy.ZAP
+  postman:
+    name: Postman
+    enabled: true
+    feature: development
+    installer: flatpak
+    flatpak:
+      id: com.getpostman.Postman
+  sshpilot:
+    name: SSH Pilot
+    enabled: true
+    feature: development
+    installer: flatpak
+    flatpak:
+      id: io.github.mfat.sshpilot
+  podman_desktop:
+    name: Podman Desktop
+    enabled: true
+    feature: development
+    installer: flatpak
+    flatpak:
+      id: io.podman_desktop.PodmanDesktop
+    requires:
+      features:
+      - desktop
+      development:
+      - containers
+      container_engine: podman
+    autostart:
+      enabled: true
+  pods:
+    name: Pods
+    enabled: true
+    feature: development
+    installer: flatpak
+    flatpak:
+      id: com.github.marhkb.Pods
+    requires:
+      features:
+      - desktop
+      development:
+      - containers
+      container_engine: podman
+  teams:
+    name: Teams for Linux
+    enabled: true
+    feature: work
+    installer: flatpak
+    flatpak:
+      id: com.github.IsmaelMartinez.teams_for_linux
+      background: true
+      own_names:
+      - org.freedesktop.StatusNotifierItem-2-1
+    autostart:
+      enabled: true
+  steam:
+    name: Steam
+    enabled: true
+    feature: personal
+    installer: flatpak
+    flatpak:
+      id: com.valvesoftware.Steam
+      background: true
+  qbittorrent:
+    name: qBittorrent
+    enabled: true
+    feature: personal
+    installer: flatpak
+    flatpak:
+      id: org.qbittorrent.qBittorrent
+  zotero:
+    name: Zotero
+    enabled: true
+    feature: personal
+    installer: flatpak
+    flatpak:
+      id: org.zotero.Zotero
+  gimp:
+    name: GIMP
+    enabled: true
+    feature: personal
+    installer: flatpak
+    flatpak:
+      id: org.gimp.GIMP
+  firefox:
+    name: Firefox
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: org.mozilla.firefox
+    requires:
+      browser: firefox
+  chrome:
+    name: Google Chrome
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: com.google.Chrome
+    requires:
+      browser: chrome
+  azure_cli:
+    name: Azure CLI
+    enabled: true
+    feature: work
+    installer: rpm
+    rpm:
+      packages:
+      - azure-cli
+  gnome_tweaks:
+    name: GNOME Tweaks
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - gnome-tweaks
+  neovim:
+    name: Neovim
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - neovim
+  ptyxis:
+    name: Ptyxis
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - ptyxis
+    requires:
+      terminal: ptyxis
+  gnome_terminal:
+    name: GNOME Terminal
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - gnome-terminal
+    requires:
+      terminal: gnome-terminal
 git:
   name: ''
   email: ''
@@ -43,8 +343,6 @@ git:
   work_email: ''
   signing_key: ''
   work_signing_key: ''
-work:
-  azure_cli: true
 packages:
   base:
   - git
@@ -59,9 +357,7 @@ packages:
   - bat
   - ripgrep
   - just
-  desktop:
-  - gnome-tweaks
-  - neovim
+  desktop: []
   development:
   - make
   - gcc
@@ -86,56 +382,10 @@ packages:
   - libvirt
   - virt-manager
 flatpak:
-  # Portal background permissions, applied per user only to selected applications.
-  # Unlisted applications retain their existing permissions.
-  background:
-  - application: org.localsend.localsend_app
-    allowed: true
-  - application: com.github.IsmaelMartinez.teams_for_linux
-    allowed: true
-  - application: com.valvesoftware.Steam
-    allowed: true
   remotes:
   - name: flathub
     url: https://dl.flathub.org/repo/flathub.flatpakrepo
-  # Per-user sandbox overrides, applied only when the application is selected.
-  overrides:
-  # Chromium/Electron claims this tray bus name; the sandbox denies it by default,
-  # so the GNOME AppIndicator extension never sees the Teams tray icon.
-  - application: com.github.IsmaelMartinez.teams_for_linux
-    own_name: org.freedesktop.StatusNotifierItem-2-1
-  applications:
-    desktop:
-    - org.ferdium.Ferdium
-    - com.spotify.Client
-    - com.mattjakeman.ExtensionManager
-    - com.github.tchx84.Flatseal
-    - io.missioncenter.MissionCenter
-    - org.localsend.localsend_app
-    - it.mijorus.gearlever
-    - com.protonvpn.www
-    - io.github.kolunmi.Bazaar
-    - io.github.mrvladus.List
-    - io.github.pwr_solaar.solaar
-    - io.gitlab.metadatacleaner.metadatacleaner
-    - md.obsidian.Obsidian
-    - me.timschneeberger.GalaxyBudsClient
-    - org.videolan.VLC
-    - xyz.ketok.Speedtest
-    development:
-    - org.zaproxy.ZAP
-    - com.getpostman.Postman
-    - io.github.mfat.sshpilot
-    work:
-    - com.github.IsmaelMartinez.teams_for_linux
-    personal:
-    - com.valvesoftware.Steam
-    - org.qbittorrent.qBittorrent
-    - org.zotero.Zotero
-    - org.gimp.GIMP
-    virtualization: []
 gnome:
-  # Packaged by Fedora: installed system-wide through DNF.
   system_extensions:
   - package: gnome-shell-extension-caffeine
     uuid: caffeine@patapon.info
@@ -155,7 +405,6 @@ gnome:
     uuid: background-logo@fedorahosted.org
   - package: gnome-shell-extension-blur-my-shell
     uuid: blur-my-shell@aunetx
-  # Not packaged: installed per user from extensions.gnome.org.
   user_extensions:
   - clipboard-indicator@tudmotu.com
   - tilingshell@ferrarodomenico.com
@@ -175,32 +424,15 @@ gnome:
   - tilingshell@ferrarodomenico.com
   - wack-lockscreen-clock@rinzler69-wastaken.github.com
   - weatheroclock@CleoMenezesJr.github.io
-  # Desktop entries written to ~/.config/autostart; try_exec skips a missing binary.
   autostart:
-  - name: 1password
-    title: 1Password
-    command: /opt/1Password/1password --silent
-    try_exec: /opt/1Password/1password
   - name: ckb-next
     title: ckb-next
     command: /usr/bin/ckb-next --background
     try_exec: /usr/bin/ckb-next
-  - name: com.github.IsmaelMartinez.teams_for_linux
-    title: Teams for Linux
-    command: flatpak run com.github.IsmaelMartinez.teams_for_linux
   - name: io.elementary.mail
     title: Mail
     command: io.elementary.mail --background
     try_exec: io.elementary.mail
-  - name: io.podman_desktop.PodmanDesktop
-    title: Podman Desktop
-    command: flatpak run io.podman_desktop.PodmanDesktop
-  - name: jetbrains-toolbox
-    title: JetBrains Toolbox
-    command: sh -c '"$HOME/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox" --minimize'
-  - name: org.localsend.localsend_app
-    title: LocalSend
-    command: flatpak run org.localsend.localsend_app
 repositories:
   rpm: []
   copr: []

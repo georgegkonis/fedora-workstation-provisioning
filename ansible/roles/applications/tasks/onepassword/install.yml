@@ -1,12 +1,4 @@
 ---
-- name: Install 1Password and CLI
-  ansible.builtin.dnf:
-    name:
-      - 1password
-      - 1password-cli
-    state: present
-  become: true
-
 - name: Set ptrace_scope for 1Password
   ansible.builtin.copy:
     dest: /etc/sysctl.d/99-1password-ptrace.conf

@@ -8,7 +8,7 @@
   become: true
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env | combine({'LC_ALL': 'C'}) }}"
-  tags: [desktop, development, work, personal, virtualization, flatpak_background]
+  tags: [base, desktop, development, work, personal, virtualization, flatpak_background]
 
 - name: Set the declared Flatpak background permission
   ansible.builtin.command:
@@ -29,7 +29,7 @@
   become: true
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env }}"
-  tags: [desktop, development, work, personal, virtualization, flatpak_background]
+  tags: [base, desktop, development, work, personal, virtualization, flatpak_background]
 
 - name: Preview the Flatpak background permission change
   ansible.builtin.debug:
@@ -41,4 +41,4 @@
     flatpak_background_pattern: >-
       (?m)^background\s+background\s+{{ flatpak_background_app.application | regex_escape }}\s+{{ 'yes' if flatpak_background_app.allowed else 'no' }}(?:\s|$)
   changed_when: true
-  tags: [desktop, development, work, personal, virtualization, flatpak_background]
+  tags: [base, desktop, development, work, personal, virtualization, flatpak_background]

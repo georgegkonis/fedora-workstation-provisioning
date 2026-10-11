@@ -1,5 +1,5 @@
 ---
-- name: Install 1Password and CLI
+- name: Configure 1Password system integration
   ansible.builtin.import_tasks: install.yml
 
 - name: Configure 1Password Quick Access shortcut

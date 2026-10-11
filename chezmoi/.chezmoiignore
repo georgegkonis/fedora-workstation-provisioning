@@ -1,7 +1,7 @@
 {{ if not .workstation.features.desktop }}
 .var/app/org.mozilla.firefox
 {{ end }}
-{{ if or (not .workstation.apps.onepassword) (ne .workstation.preferences.browser "firefox") }}
+{{ if or (not (has "onepassword" .workstation.selected.integrations)) (ne .workstation.preferences.browser "firefox") }}
 .var/app/org.mozilla.firefox
 {{ end }}
 {{ if or (not .workstation.features.desktop) (ne .workstation.preferences.browser "firefox") }}

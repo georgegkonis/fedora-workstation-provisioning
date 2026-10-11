@@ -20,7 +20,7 @@ Configuration flows `config/defaults.yml` → preset → `.local.yml`, resolved 
 ```
 
 1. **Home.** Extend an existing role when the state fits it. Create `ansible/roles/<name>/` only for substantive machine state, never an empty role. Selections, hardware options and implementation preferences stay independent; a parent feature disabled makes children inactive.
-2. **Defaults.** `defaults.yml` is the reference shape: `validate_shape` rejects unknown keys and wrong types, so every new key must exist there with its default. Keep ordinary software in lists, add options only for meaningful choices.
+2. **Defaults.** `defaults.yml` is the reference shape: `validate_shape` rejects unknown configuration keys and wrong types, so every new configuration key must exist there with its default. App records under `apps` use the explicit `validate_apps` schema and permit new stable keys. Declare ordinary apps there; keep infrastructure/development dependencies in lists and add feature options only for meaningful choices.
 3. **Validation.** Add checks to `validate()` (`string_list`, `records`, `require`, regex patterns for versions). Cross-field rules belong here. If it changes what is installed, extend `select()` so `expected_rpms`/`flatpaks` stay correct.
 4. **Ansible.** Role order lives in `ansible/playbook.yml` with `when: workstation.features...` and tags; add the role there. Repositories before packages. Fully qualified native modules, explicit file modes, guards on `command`/`shell`.
 5. **Services.** Declare in `services.system`, `services.user` or `hardware.services` (`name`, optional `enabled`, `state`, `unit`). A custom unit file goes in `systemd/system/` or `systemd/user/` and is deployed by Ansible with the service; the validator checks it exists.

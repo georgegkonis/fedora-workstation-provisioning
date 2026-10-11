@@ -4,7 +4,19 @@
   tags: packages
 
 - name: Install selected application packages
-  ansible.builtin.import_tasks: applications.yml
+  ansible.builtin.include_tasks:
+    file: applications.yml
+    apply:
+      tags:
+        - packages
+        - applications
+        - "{{ packages_app.key }}"
+        - "{{ packages_app.feature }}"
+  loop: "{{ workstation.selected.rpm_apps }}"
+  loop_control:
+    loop_var: packages_app
+    label: "{{ packages_app.name }}"
+  tags: always
 
 - name: Install hardware packages
   ansible.builtin.import_tasks: hardware.yml

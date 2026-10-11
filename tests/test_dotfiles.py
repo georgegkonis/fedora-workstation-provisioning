@@ -23,7 +23,10 @@ class DotfileTests(unittest.TestCase):
         profiles = [
             ("", {}),
             ("", {"git": {"signing_key": "ssh-ed25519 example-test-key"}}),
-            ("", {"apps": {"onepassword": False}}),
+            ("", {"apps": {"onepassword": {"enabled": False}}}),
+            ("", {"apps": {"onepassword": {"enabled": False}},
+                  "git": {"signing_key": "ssh-ed25519 example-test-key"}}),
+            ("", {"features": {"desktop": False}, "git": {"signing_key": "ssh-ed25519 example-test-key"}}),
             ("", {"features": {"work": True}}),
             ("", {"preferences": {"browser": "chrome"}}),
             ("minimal", {}),
@@ -86,9 +89,14 @@ class DotfileTests(unittest.TestCase):
                 self.assertIn("CUSTOM=kept", (home / ".bashrc").read_text())
                 self.assertEqual((home / ".bashrc").read_text().count("# BEGIN CHEZMOI MANAGED WORKSTATION"), 1)
                 self.assertIn("st = status", (home / ".gitconfig").read_text())
-                if config["git"]["signing_key"] and config["apps"]["onepassword"]:
+                if config["git"]["signing_key"] and "onepassword" in config["selected"]["integrations"]:
                     self.assertIn("program = /opt/1Password/op-ssh-sign",
                                   (home / ".config/git/workstation.gitconfig").read_text())
+                else:
+                    self.assertNotIn("op-ssh-sign", (home / ".config/git/workstation.gitconfig").read_text())
+                wrapper_path = home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh"
+                self.assertEqual(wrapper_path.exists(), "onepassword" in config["selected"]["integrations"]
+                                 and config["preferences"]["browser"] == "firefox")
                 self.assertTrue(user_js.read_text().startswith('// Keep\nuser_pref("custom.example", true);\n'))
                 if config["features"]["desktop"] and config["preferences"]["browser"] == "firefox":
                     if config["features"]["work"]:

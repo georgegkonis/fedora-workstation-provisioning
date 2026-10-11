@@ -11,17 +11,22 @@ Pick the mechanism, in this order of preference: Fedora DNF package, Flatpak (GU
 
 | Kind | Edit |
 |---|---|
-| DNF package | `config/defaults.yml` `packages.<group>` (`base`, `desktop`, `development`, `work`, `personal`, `virtualization`) |
-| Flatpak | `config/defaults.yml` `flatpak.applications.<group>` (same groups; use the Flathub app ID) |
+| RPM application | `config/defaults.yml` `apps.<key>` with friendly `name`, `enabled`, `feature`, `installer: rpm`, and `rpm.packages` |
+| Infrastructure/development dependency | `packages.<group>` (`base`, `desktop`, `development`, `work`, `personal`, `virtualization`) |
+| Flatpak application | `apps.<key>` with `name`, `enabled`, `feature`, `installer: flatpak`, and `flatpak.id` |
 | Font | `fonts` |
 | COPR / third-party RPM repo | `repositories.copr` / `repositories.rpm` (`name`, `description`, `baseurl`, `gpgkey`); keep `gpgcheck` on |
 | Packaged GNOME extension | `gnome.system_extensions` (`package`, `uuid`); add the uuid to `gnome.enabled_extensions` to enable it |
 | Extension not in Fedora | `gnome.user_extensions` (uuid); optional, failures are reported, not fatal |
-| Flatpak sandbox override | `flatpak.overrides` |
+| Flatpak background permission | `apps.<key>.flatpak.background` (`true`, `false`, or `null` for unmanaged) |
+| Flatpak session-bus ownership override | `apps.<key>.flatpak.own_names` |
+| App startup at login | `apps.<key>.autostart` (`enabled`, native/vendor `command`, optional `name` and `try_exec`) |
 
-The group is the feature that must be enabled for the item to install. Pick the narrowest one. Presets in `config/presets/` only override lists to narrow them; touch them only if the item must differ per profile (lists replace, they do not merge).
+An app’s `feature` must be active for it to install; `base` is unconditional. `requires` can add feature, development, app-dependency and preference conditions. App mappings merge across defaults → preset → local overrides, so presets disable individual apps with `enabled: false`. Dependency lists still replace earlier lists. Do not author the legacy boolean app format or `flatpak.applications`, `flatpak.background`, or `flatpak.overrides`; the loader translates them only for existing saved selections.
 
 ## Vendor installer (no suitable package)
+
+For GUI applications, declare `installer: vendor` and `vendor.task` in the app record, add the substantive installer to the applications role, and extend the supported task validation and installed-path verification. Dispatch from `selected.vendor_tasks`; do not add a parallel boolean selection. Native apps needing additional integration can declare a supported `integration` alongside their RPM packages. The workflow below is for development CLI/runtime installers, which remain development selections.
 
 ```
 - [ ] 1. Pin in catalog.yml

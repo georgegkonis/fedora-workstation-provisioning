@@ -80,7 +80,6 @@ def configure(config, local, engine):
     import copy
 
     local = copy.deepcopy(local)
-    defaults = engine.read_yaml(ROOT / "config/defaults.yml")
     enabled = choose("Features", list(engine.FEATURES),
                      [x for x in engine.FEATURES if config["features"][x]], multiple=True)
     local["features"] = {key: key in enabled for key in engine.FEATURES}
@@ -89,11 +88,6 @@ def configure(config, local, engine):
         for key in ("shell", "terminal", "editor", "browser"):
             local["preferences"][key] = choose(
                 key.capitalize(), list(engine.PREFERENCES[key]), [config["preferences"][key]])
-        apps = choose("Applications", list(config["apps"]),
-                      [key for key, value in config["apps"].items() if value], multiple=True)
-        local["apps"] = {key: key in apps for key in config["apps"]}
-        if local["preferences"]["editor"] == "vscode":
-            local["apps"]["vscode"] = True
     if "development" in enabled:
         development = dict(config["development"])
         components = ["dotnet", "java", "node", "python", "containers", "terraform",
@@ -116,35 +110,58 @@ def configure(config, local, engine):
         if development["containers"]:
             local.setdefault("preferences", {})["container_engine"] = choose(
                 "Container engine", ["podman", "docker"], [config["preferences"]["container_engine"]])
-    for group in ("desktop", "development", "work", "personal", "virtualization"):
-        selected = config["flatpak"]["applications"][group]
-        apps = list(dict.fromkeys(defaults["flatpak"]["applications"][group] + selected))
-        if group in enabled and apps:
-            local.setdefault("flatpak", {}).setdefault("applications", {})[group] = choose(
-                f"{group.capitalize()} Flatpaks", apps, selected, multiple=True)
+    app_definitions = engine.merge(config, local)["apps"]
+
+    def choose_apps(label, keys, selected):
+        names = [app_definitions[key]["name"] for key in keys]
+        labels = {name if names.count(name) == 1 else f"{name} ({key})": key
+                  for key, name in zip(keys, names)}
+        selected_labels = [label for label, key in labels.items() if key in selected]
+        return [labels[value] for value in choose(label, list(labels), selected_labels, multiple=True)]
+
+    available = engine.merge(config, local)
+    for app in available["apps"].values():
+        app["enabled"] = True
+    candidates = engine.active_apps(available)
+    for group in ("base", *engine.FEATURES):
+        keys = [key for key, app in candidates.items() if app["feature"] == group]
+        if not keys:
+            continue
+        wanted = choose_apps(f"{group.capitalize()} applications", keys,
+                             [key for key in keys if app_definitions[key]["enabled"]])
+        for key in keys:
+            local.setdefault("apps", {}).setdefault(key, {})["enabled"] = key in wanted
+    if "desktop" in enabled:
+        preferences = engine.merge(config, local)["preferences"]
+        required = [preferences["browser"], preferences["editor"], preferences["terminal"].replace("-", "_")]
+        for key in required:
+            local.setdefault("apps", {}).setdefault(key, {})["enabled"] = True
     updated = engine.merge(config, local)
-    candidates = engine.select(updated)["flatpaks"]
-    if candidates:
-        background = updated["flatpak"]["background"]
-        allowed = choose("Flatpaks allowed to run in the background", candidates,
-                         [item["application"] for item in background
-                          if item["allowed"] and item["application"] in candidates], multiple=True)
-        denied_candidates = [app for app in candidates if app not in allowed]
-        denied = choose("Flatpaks denied background execution", denied_candidates,
-                        [item["application"] for item in background
-                         if not item["allowed"] and item["application"] in candidates
-                         and item["application"] not in allowed], multiple=True) if denied_candidates else []
-        local.setdefault("flatpak", {})["background"] = (
-            [item for item in background if item["application"] not in candidates]
-            + [{"application": app, "allowed": True} for app in allowed]
-            + [{"application": app, "allowed": False} for app in denied])
+    active = engine.active_apps(updated)
+    keys = [key for key, app in active.items() if app["installer"] == "flatpak"]
+    if keys:
+        allowed = choose_apps("Flatpaks allowed to run in the background", keys,
+                              [key for key in keys if active[key]["flatpak"].get("background") is True])
+        denied_keys = [key for key in keys if key not in allowed]
+        denied = choose_apps("Flatpaks denied background execution", denied_keys,
+                             [key for key in denied_keys if active[key]["flatpak"].get("background") is False]) \
+            if denied_keys else []
+        for key in keys:
+            background = True if key in allowed else False if key in denied else None
+            local.setdefault("apps", {}).setdefault(key, {}).setdefault("flatpak", {})["background"] = background
+    startup_keys = [key for key, app in active.items() if "autostart" in app]
+    if "desktop" in enabled and startup_keys:
+        startup = choose_apps("Applications started at login", startup_keys,
+                              [key for key in startup_keys if active[key]["autostart"].get("enabled", True)])
+        for key in startup_keys:
+            local.setdefault("apps", {}).setdefault(key, {}).setdefault("autostart", {})["enabled"] = key in startup
     local["git"] = dict(config["git"])
     for key in ("name", "email"):
         local["git"][key] = text_input(f"Personal Git {key}", config["git"][key])
     if "work" in enabled:
         for key in ("work_name", "work_email"):
             local["git"][key] = text_input(f"Git {key}", config["git"][key])
-    if config["apps"]["onepassword"]:
+    if "onepassword" in engine.select(updated)["integrations"]:
         keys = ("signing_key", "work_signing_key") if "work" in enabled else ("signing_key",)
         for key in keys:
             local["git"][key] = text_input(f"1Password SSH {key.replace('_', ' ')} (public key)", config["git"][key])
@@ -289,7 +306,7 @@ def main():
             print("Set git.name and git.email in .local.yml before committing.")
         if config["features"]["work"] and not config["git"]["work_email"]:
             print("Set git.work_name and git.work_email in .local.yml before committing work projects.")
-        if config["apps"]["jetbrains"] and config["features"]["desktop"] and config["features"]["development"]:
+        if "jetbrains" in config["selected"]["vendor_tasks"]:
             print("Launch JetBrains Toolbox to install IDEs, then sign in to enable Settings Sync.")
 
 

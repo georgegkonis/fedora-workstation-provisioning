@@ -35,7 +35,7 @@ The interactive frontend uses [gum](https://github.com/charmbracelet/gum) when i
 
 Presets skip configuration questions and confirmation. A terminal run can still request the sudo password. Unattended execution requires working noninteractive sudo, or equivalent Ansible become configuration. `--yes` also skips configuration questions and confirmation when using saved selections/defaults.
 
-Without a preset, the shared defaults apply (the personal setup). `work` enables work and disables personal (software kept off the work laptop, e.g. Steam, qBittorrent, Zotero). `minimal` is a stripped-down desktop: 1Password, a short Flatpak list and a few GNOME extensions. Desktop and development are independently selectable. Personal and virtualization currently use package/Flatpak lists and service defaults; they do not need placeholder roles.
+Without a preset, the shared defaults apply (the personal setup). `work` enables work and disables personal (software kept off the work laptop, e.g. Steam, qBittorrent, Zotero). `minimal` is a stripped-down desktop: 1Password, a short Flatpak list and a few GNOME extensions. Desktop and development are independently selectable. Personal and virtualization select app records, dependency lists and service defaults; they do not need placeholder roles.
 
 For a minimal setup that ignores saved overrides:
 
@@ -168,27 +168,67 @@ Ansible's explicit user context targets the desktop account and its D-Bus sessio
 
 ## Extending the configuration
 
-Add ordinary RPMs to the appropriate `packages` group and Flatpak IDs to `flatpak.applications.<feature>` in `config/defaults.yml`. Add font RPMs to `fonts`. Lists are sufficient for ordinary applications; introduce dedicated options only for meaningful installation choices. Declare additional Flatpak remotes in `flatpak.remotes`; the existing application lists use Flathub.
-
-Flatpak background permissions use the same per-user portal permission store as Flatseal.
-Defaults allow LocalSend, Teams (when selected by the work feature), and Steam.
-Choose allowed and denied apps in the interactive setup, or declare them in a preset or `.local.yml`:
+Declare applications once under `apps` in `config/defaults.yml`, keyed by a stable name.
+Each record has a friendly `name`, an `enabled` flag, a `feature` (`base` or a feature name),
+and an `installer` (`flatpak`, `rpm`, or `vendor`). Installer-specific settings belong in its
+matching mapping. Presets and `.local.yml` override individual fields; app mappings merge.
 
 ```yaml
-flatpak:
-  background:
-  - application: org.localsend.localsend_app
-    allowed: true
-  - application: com.valvesoftware.Steam
-    allowed: false
+apps:
+  localsend:
+    name: LocalSend
+    enabled: true
+    feature: desktop
+    installer: flatpak
+    flatpak:
+      id: org.localsend.localsend_app
+      background: true
+    autostart:
+      enabled: true
+  vscode:
+    name: Visual Studio Code
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages: [code]
 ```
 
-This list replaces the earlier layer's list. Only apps selected for installation are managed;
-unlisted apps retain their current permissions. Removing an entry stops managing it but leaves
-its existing permission in place; use `allowed: false` to deny background execution explicitly.
-Reapplying restores declared permissions after edits in Flatseal. Background permission allows
-an app to keep running without windows; startup at login is configured separately under `gnome.autostart`.
-Apply just these permissions with `just run --yes --tags flatpak_background` after the apps are installed.
+For example, a local override can disable one app and deny another background execution
+without repeating the app metadata or other selections:
+
+```yaml
+apps:
+  spotify:
+    enabled: false
+  localsend:
+    flatpak:
+      background: false
+    autostart:
+      enabled: false
+```
+
+An app is active only when enabled and its feature and `requires` conditions are satisfied.
+`requires` can declare other `features`, boolean `development` selections, other `apps`,
+or preference values such as `browser`, `terminal`, and `container_engine`. Browser/editor/terminal
+preferences require their corresponding apps to be active. The resolver produces the RPM,
+Flatpak, integration, startup, and verification selections; roles consume those selections.
+Custom vendor installers currently support `vendor: {task: jetbrains}`. Native 1Password declares
+`integration: onepassword` alongside its RPM packages for desktop integration.
+
+Flatpak `background: true` allows background execution and `false` denies it through the same
+per-user portal permission store as Flatseal. Omission or `null` leaves the permission unmanaged;
+use `null` in an override to stop managing an inherited setting. Removing management leaves the
+existing permission in place. Defaults allow LocalSend, Teams when active, and Steam. Reapplying
+restores declared permissions after edits in Flatseal. Flatpak `own_names` lists per-app session-bus
+names (used by Teams for its tray icon). Other app permissions remain unchanged.
+Apply background permissions alone with `just run --yes --tags flatpak_background` after installation.
+
+Keep infrastructure and development dependencies in `packages.<feature>`, fonts in `fonts`,
+and hardware packages in `hardware.packages`. Shared Flatpak remotes remain in `flatpak.remotes`.
+Old saved boolean app selections and Flatpak application/background/override lists are translated
+by the configuration loader. Inspection and check mode leave `.local.yml` untouched; a normal apply
+saves converted overrides. Newly authored configuration should use app records.
 
 Declare RPM repositories under `repositories.rpm` with `name`, `description`, `baseurl`, and `gpgkey`, or COPR names under `repositories.copr`. Repository setup precedes dependent installations. Special vendor repositories live in the repositories role. Ordinary application RPMs and hardware packages live in the packages role; applications requiring custom installation or integration (1Password and JetBrains Toolbox) live in the applications role. Feature selections control tasks independently of role boundaries. Microsoft PowerShell/Azure CLI retain the vendor RHEL 9 channel, with .NET excluded so SDKs come from Fedora. AI CLI scripts, pinned Typst/Anaconda archives, and Toolbox's vendor API are isolated installation exceptions; they do not run on every reapply once installed. Their updates remain vendor-managed, or require an explicit pin change where supported.
 
@@ -209,9 +249,9 @@ Hardware-specific packages and services go under `hardware` in `.local.yml`. Gen
 
 GNOME settings are named declarations grouped under `ansible/roles/gnome/files/{interface,keyboard,input,extensions}.yml`. Each has a dconf `key`, GVariant `value`, and a description explaining intent. Discover settings with `gsettings list-recursively <schema>` and `dconf read <path>`; commit only deliberately selected values. GNOME extensions are UUID lists in defaults; incompatible/failed optional extensions are reported and other configuration continues. Unmanaged enabled extensions are preserved.
 
-Startup applications are the `gnome.autostart` list in defaults (`name`, `title`, `command`, optional `try_exec`). Each entry is written as `~/.config/autostart/<name>.desktop` by the gnome role; entries are only added or updated, so unlisted autostart files are preserved. Use `try_exec` for binaries that may be absent so GNOME skips them; Flatpak commands have no equivalent, so list only apps you install.
+Startup settings belong to the app’s `autostart` mapping (`enabled`, optional `name`, `command`, and `try_exec`). Flatpak commands and filenames are derived from the app ID; native/vendor apps declare a command. Disabling a declared app or its startup setting writes its managed desktop entry with autostart disabled, including entries left by earlier applies. Unrelated autostart files are preserved. `gnome.autostart` remains available for supplemental commands outside the app catalog, such as hardware helpers; names must not collide with app startup entries.
 
-For a new feature, add a default and validation, associate package/Flatpak lists with it, and add a role only when behavior is substantial. Extend the interactive frontend where useful; execution must work from configuration alone. Add validation tests and update this README when changing the public interface.
+For a new feature, add a default and validation, associate app records and dependency lists with it, and add a role only when behavior is substantial. Extend the interactive frontend where useful; execution must work from configuration alone. Add validation tests and update this README when changing the public interface.
 
 Keep credentials, tokens, private keys/certificates, and employer secrets out of Git and local configuration. Application authentication remains separate; password-manager integration can be added when a managed configuration actually needs a secret.
 

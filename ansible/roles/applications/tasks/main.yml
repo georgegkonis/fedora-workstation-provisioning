@@ -1,10 +1,10 @@
 ---
 - name: Configure 1Password
   ansible.builtin.import_tasks: onepassword/main.yml
-  when: workstation.features.desktop and workstation.apps.onepassword
+  when: "'onepassword' in workstation.selected.integrations"
   tags: onepassword
 
 - name: Configure JetBrains Toolbox
   ansible.builtin.import_tasks: jetbrains/main.yml
-  when: workstation.features.desktop and workstation.features.development and workstation.apps.jetbrains
+  when: "'jetbrains' in workstation.selected.vendor_tasks"
   tags: [jetbrains, development]

@@ -93,25 +93,63 @@ class BootstrapTests(unittest.TestCase):
         original = json.loads(json.dumps(config))
 
         def choose(label, values, selected, multiple=False):
-            if label == "Personal Flatpaks":
+            if label == "Personal applications":
                 return []
             if label == "Flatpaks allowed to run in the background":
-                self.assertNotIn("com.valvesoftware.Steam", values)
-                return ["org.localsend.localsend_app"]
+                self.assertNotIn("Steam", values)
+                return ["LocalSend"]
             if label == "Flatpaks denied background execution":
-                self.assertNotIn("org.localsend.localsend_app", values)
-                return ["com.spotify.Client"]
+                self.assertNotIn("LocalSend", values)
+                return ["Spotify"]
             return selected if multiple else selected[0]
 
         with patch.object(bootstrap, "choose", side_effect=choose), \
                 patch.object(bootstrap, "text_input", side_effect=lambda label, current: current):
             local = bootstrap.configure(config, {}, configuration)
         selected = configuration.resolve(local=local)[0]["selected"]["flatpak_background"]
-        self.assertEqual(selected, [{"application": "org.localsend.localsend_app", "allowed": True},
-                                    {"application": "com.spotify.Client", "allowed": False}])
+        self.assertCountEqual(selected, [{"application": "org.localsend.localsend_app", "allowed": True},
+                                        {"application": "com.spotify.Client", "allowed": False}])
         self.assertEqual(config, original)
-        self.assertIn({"application": "com.valvesoftware.Steam", "allowed": True},
-                      local["flatpak"]["background"], "inactive features must retain saved choices")
+        self.assertTrue(configuration.resolve(local=local)[0]["apps"]["steam"]["flatpak"]["background"],
+                        "inactive apps must retain saved background choices")
+
+    def test_check_normalizes_legacy_selections_without_writing_them(self):
+        content = "# Keep legacy choices\napps:\n  onepassword: false\nflatpak:\n  applications:\n    desktop:\n    - org.localsend.localsend_app\n"
+        self.local.write_text(content)
+        self.execute("--check", "--tags", "flatpak_background")
+        self.assertEqual(self.local.read_text(), content)
+        effective = configuration.read_yaml(self.root / ".workstation/effective.yml")
+        self.assertFalse(effective["apps"]["onepassword"]["enabled"])
+        self.assertNotIn("com.spotify.Client", effective["selected"]["flatpaks"])
+        self.assertNotIn("applications", effective["flatpak"])
+
+    def test_normal_apply_saves_only_the_normalized_override_format(self):
+        self.local.write_text("apps:\n  onepassword: false\n")
+        self.execute("--yes")
+        saved = configuration.read_yaml(self.local)
+        self.assertEqual(saved["apps"]["onepassword"], {"enabled": False})
+
+    def test_background_and_startup_choices_emit_app_overrides(self):
+        config = configuration.resolve(use_local=False)[0]
+        original = json.loads(json.dumps(config))
+
+        def choose(label, values, selected, multiple=False):
+            if label == "Flatpaks allowed to run in the background":
+                return list(values)
+            if label == "Applications started at login":
+                return []
+            self.assertNotEqual(label, "Flatpaks denied background execution",
+                                "an empty candidate set must not invoke the picker")
+            return selected if multiple else selected[0]
+
+        with patch.object(bootstrap, "choose", side_effect=choose), \
+                patch.object(bootstrap, "text_input", side_effect=lambda label, current: current):
+            local = bootstrap.configure(config, {}, configuration)
+        selected = configuration.resolve(local=local)[0]["selected"]
+        self.assertTrue(all(item["allowed"] for item in selected["flatpak_background"]))
+        for name in ("1password", "org.localsend.localsend_app", "jetbrains-toolbox"):
+            self.assertFalse(next(item for item in selected["autostart"] if item["name"] == name)["enabled"])
+        self.assertEqual(config, original)
 
     def test_unattended_apply_needs_explicit_intent(self):
         with self.assertRaisesRegex(ValueError, "unattended"):

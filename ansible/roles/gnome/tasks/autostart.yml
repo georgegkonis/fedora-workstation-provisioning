@@ -19,8 +19,8 @@
       {% if item.try_exec is defined %}
       TryExec={{ item.try_exec }}
       {% endif %}
-      X-GNOME-Autostart-enabled=true
-  loop: "{{ workstation.gnome.autostart }}"
+      X-GNOME-Autostart-enabled={{ 'true' if item.enabled else 'false' }}
+  loop: "{{ workstation.selected.autostart }}"
   loop_control:
     label: "{{ item.title }}"
   become: true

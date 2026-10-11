@@ -5,7 +5,7 @@
     state: present
   become: true
   when: workstation.selected.flatpaks | length > 0
-  tags: [desktop, development, work, personal, virtualization]
+  tags: [base, desktop, development, work, personal, virtualization]
 
 - name: Configure declared Flatpak remotes
   community.general.flatpak_remote:
@@ -16,40 +16,46 @@
   loop: "{{ workstation.flatpak.remotes }}"
   become: true
   when: workstation.selected.flatpaks | length > 0
-  tags: [desktop, development, work, personal, virtualization]
+  tags: [base, desktop, development, work, personal, virtualization]
+
+- name: Install base Flatpaks
+  ansible.builtin.import_tasks: applications.yml
+  vars:
+    selected_flatpaks: "{{ workstation.selected.flatpaks_by_feature.base }}"
+  tags: base
 
 - name: Install desktop Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation.selected.desktop_flatpaks }}"
+    selected_flatpaks: "{{ workstation.selected.flatpaks_by_feature.desktop }}"
   when: workstation.features.desktop
   tags: desktop
 
 - name: Install development Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation.selected.development_flatpaks }}"
+    selected_flatpaks: "{{ workstation.selected.flatpaks_by_feature.development }}"
   when: workstation.features.development
   tags: development
 
 - name: Install work Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation.flatpak.applications.work }}"
+    selected_flatpaks: "{{ workstation.selected.flatpaks_by_feature.work }}"
   when: workstation.features.work
   tags: work
 
 - name: Install personal Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation.flatpak.applications.personal }}"
+    selected_flatpaks: "{{ workstation.selected.flatpaks_by_feature.personal }}"
   when: workstation.features.personal
   tags: personal
 
 - name: Install virtualization Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation.flatpak.applications.virtualization }}"
+    selected_flatpaks: "{{ workstation.selected.flatpaks_by_feature.virtualization }}"
   when: workstation.features.virtualization
   tags: virtualization
 
@@ -61,9 +67,10 @@
     value: own
     no_extra_spaces: true
     mode: "0644"
-  loop: "{{ workstation.flatpak.overrides }}"
-  when: item.application in workstation.selected.flatpaks
-  tags: [desktop, development, work, personal, virtualization]
+  loop: "{{ workstation.selected.flatpak_overrides }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  tags: [base, desktop, development, work, personal, virtualization]
 
 - name: Configure per-user Flatpak background permissions
   ansible.builtin.include_tasks: background.yml
@@ -71,4 +78,4 @@
   loop_control:
     loop_var: flatpak_background_app
     label: "{{ flatpak_background_app.application }}"
-  tags: [desktop, development, work, personal, virtualization, flatpak_background]
+  tags: [base, desktop, development, work, personal, virtualization, flatpak_background]

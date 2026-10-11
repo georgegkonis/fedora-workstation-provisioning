@@ -6,10 +6,36 @@ features:
   personal: false
   virtualization: false
 apps:
-  onepassword: true
-  vscode: true
-  jetbrains: false
-  podman_desktop: false
+  ferdium:
+    enabled: false
+  spotify:
+    enabled: false
+  localsend:
+    enabled: false
+  gear_lever:
+    enabled: false
+  protonvpn:
+    enabled: false
+  bazaar:
+    enabled: false
+  list:
+    enabled: false
+  solaar:
+    enabled: false
+  metadata_cleaner:
+    enabled: false
+  galaxy_buds:
+    enabled: false
+  vlc:
+    enabled: false
+  speedtest:
+    enabled: false
+  jetbrains:
+    enabled: false
+  podman_desktop:
+    enabled: false
+  pods:
+    enabled: false
 preferences:
   editor: vscode
 packages:
@@ -17,13 +43,6 @@ packages:
   - git
   - curl
   - ripgrep
-flatpak:
-  applications:
-    desktop:
-    - md.obsidian.Obsidian
-    - com.github.tchx84.Flatseal
-    - com.mattjakeman.ExtensionManager
-    - io.missioncenter.MissionCenter
 gnome:
   system_extensions:
   - package: gnome-shell-extension-dash-to-dock
