@@ -88,6 +88,31 @@ class BootstrapTests(unittest.TestCase):
                 bootstrap.dependencies({"chezmoi": "chezmoi"}, readonly=True)
         run.assert_not_called()
 
+    def test_background_choices_follow_new_app_selections(self):
+        config = configuration.resolve(use_local=False)[0]
+        original = json.loads(json.dumps(config))
+
+        def choose(label, values, selected, multiple=False):
+            if label == "Personal Flatpaks":
+                return []
+            if label == "Flatpaks allowed to run in the background":
+                self.assertNotIn("com.valvesoftware.Steam", values)
+                return ["org.localsend.localsend_app"]
+            if label == "Flatpaks denied background execution":
+                self.assertNotIn("org.localsend.localsend_app", values)
+                return ["com.spotify.Client"]
+            return selected if multiple else selected[0]
+
+        with patch.object(bootstrap, "choose", side_effect=choose), \
+                patch.object(bootstrap, "text_input", side_effect=lambda label, current: current):
+            local = bootstrap.configure(config, {}, configuration)
+        selected = configuration.resolve(local=local)[0]["selected"]["flatpak_background"]
+        self.assertEqual(selected, [{"application": "org.localsend.localsend_app", "allowed": True},
+                                    {"application": "com.spotify.Client", "allowed": False}])
+        self.assertEqual(config, original)
+        self.assertIn({"application": "com.valvesoftware.Steam", "allowed": True},
+                      local["flatpak"]["background"], "inactive features must retain saved choices")
+
     def test_unattended_apply_needs_explicit_intent(self):
         with self.assertRaisesRegex(ValueError, "unattended"):
             self.execute()

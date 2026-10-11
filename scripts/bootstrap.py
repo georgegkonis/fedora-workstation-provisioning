@@ -122,6 +122,22 @@ def configure(config, local, engine):
         if group in enabled and apps:
             local.setdefault("flatpak", {}).setdefault("applications", {})[group] = choose(
                 f"{group.capitalize()} Flatpaks", apps, selected, multiple=True)
+    updated = engine.merge(config, local)
+    candidates = engine.select(updated)["flatpaks"]
+    if candidates:
+        background = updated["flatpak"]["background"]
+        allowed = choose("Flatpaks allowed to run in the background", candidates,
+                         [item["application"] for item in background
+                          if item["allowed"] and item["application"] in candidates], multiple=True)
+        denied_candidates = [app for app in candidates if app not in allowed]
+        denied = choose("Flatpaks denied background execution", denied_candidates,
+                        [item["application"] for item in background
+                         if not item["allowed"] and item["application"] in candidates
+                         and item["application"] not in allowed], multiple=True) if denied_candidates else []
+        local.setdefault("flatpak", {})["background"] = (
+            [item for item in background if item["application"] not in candidates]
+            + [{"application": app, "allowed": True} for app in allowed]
+            + [{"application": app, "allowed": False} for app in denied])
     local["git"] = dict(config["git"])
     for key in ("name", "email"):
         local["git"][key] = text_input(f"Personal Git {key}", config["git"][key])

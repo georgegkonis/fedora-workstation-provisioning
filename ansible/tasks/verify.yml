@@ -40,6 +40,13 @@
   loop: "{{ verify_expected_paths }}"
   register: verify_user_paths
 
+- name: Verify declared Flatpak background permissions
+  ansible.builtin.include_tasks: verify-flatpak-background.yml
+  loop: "{{ workstation.selected.flatpak_background }}"
+  loop_control:
+    loop_var: verify_flatpak_background_app
+    label: "{{ verify_flatpak_background_app.application }}"
+
 - name: Check selected user-installed CLIs
   ansible.builtin.command:
     argv: [which, "{{ item }}"]

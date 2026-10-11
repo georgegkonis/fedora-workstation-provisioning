@@ -148,6 +148,16 @@ def validate(config):
     require(len({x["name"] for x in config["flatpak"]["remotes"]}) ==
             len(config["flatpak"]["remotes"]), "flatpak.remotes: duplicate names")
     records(config["flatpak"]["overrides"], "flatpak.overrides", ("application", "own_name"))
+    background = config["flatpak"]["background"]
+    records(background, "flatpak.background", ("application",), ("allowed",))
+    require(len({item["application"] for item in background}) == len(background),
+            "flatpak.background: duplicate applications")
+    for item in background:
+        require(type(item.get("allowed")) is bool,
+                "flatpak.background.allowed: expected bool")
+        require(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]*(?:\.[A-Za-z_][A-Za-z0-9_-]*){2,}",
+                             item["application"]) is not None,
+                "flatpak.background: invalid application ID")
     gnome = config["gnome"]
     records(gnome["system_extensions"], "gnome.system_extensions", ("package", "uuid"))
     for key in ("user_extensions", "enabled_extensions"):
@@ -253,7 +263,10 @@ def select(config):
         + when(features["development"], toolchains))
     return {"desktop_packages": desktop_packages, "desktop_flatpaks": desktop_flatpaks,
             "development_flatpaks": development_flatpaks, "packages": selected_packages,
-            "flatpaks": selected_flatpaks, "system_services": system_services,
+            "flatpaks": selected_flatpaks,
+            "flatpak_background": [item for item in config["flatpak"]["background"]
+                                   if item["application"] in selected_flatpaks],
+            "system_services": system_services,
             "expected_rpms": expected_rpms}
 
 

@@ -1,0 +1,44 @@
+---
+- name: Read current Flatpak portal permissions
+  ansible.builtin.command:
+    argv: [flatpak, permission-show, "{{ flatpak_background_app.application }}"]
+  register: flatpak_background_permissions
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env | combine({'LC_ALL': 'C'}) }}"
+  tags: [desktop, development, work, personal, virtualization, flatpak_background]
+
+- name: Set the declared Flatpak background permission
+  ansible.builtin.command:
+    argv:
+      - flatpak
+      - permission-set
+      - background
+      - background
+      - "{{ flatpak_background_app.application }}"
+      - "{{ 'yes' if flatpak_background_app.allowed else 'no' }}"
+  when:
+    - not ansible_check_mode
+    - flatpak_background_permissions.stdout is not search(flatpak_background_pattern)
+  vars:
+    flatpak_background_pattern: >-
+      (?m)^background\s+background\s+{{ flatpak_background_app.application | regex_escape }}\s+{{ 'yes' if flatpak_background_app.allowed else 'no' }}(?:\s|$)
+  changed_when: true
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+  tags: [desktop, development, work, personal, virtualization, flatpak_background]
+
+- name: Preview the Flatpak background permission change
+  ansible.builtin.debug:
+    msg: "Would set {{ flatpak_background_app.application }} background permission to {{ 'yes' if flatpak_background_app.allowed else 'no' }}"
+  when:
+    - ansible_check_mode
+    - flatpak_background_permissions.stdout is not search(flatpak_background_pattern)
+  vars:
+    flatpak_background_pattern: >-
+      (?m)^background\s+background\s+{{ flatpak_background_app.application | regex_escape }}\s+{{ 'yes' if flatpak_background_app.allowed else 'no' }}(?:\s|$)
+  changed_when: true
+  tags: [desktop, development, work, personal, virtualization, flatpak_background]

@@ -170,6 +170,26 @@ Ansible's explicit user context targets the desktop account and its D-Bus sessio
 
 Add ordinary RPMs to the appropriate `packages` group and Flatpak IDs to `flatpak.applications.<feature>` in `config/defaults.yml`. Add font RPMs to `fonts`. Lists are sufficient for ordinary applications; introduce dedicated options only for meaningful installation choices. Declare additional Flatpak remotes in `flatpak.remotes`; the existing application lists use Flathub.
 
+Flatpak background permissions use the same per-user portal permission store as Flatseal.
+Defaults allow LocalSend, Teams (when selected by the work feature), and Steam.
+Choose allowed and denied apps in the interactive setup, or declare them in a preset or `.local.yml`:
+
+```yaml
+flatpak:
+  background:
+  - application: org.localsend.localsend_app
+    allowed: true
+  - application: com.valvesoftware.Steam
+    allowed: false
+```
+
+This list replaces the earlier layer's list. Only apps selected for installation are managed;
+unlisted apps retain their current permissions. Removing an entry stops managing it but leaves
+its existing permission in place; use `allowed: false` to deny background execution explicitly.
+Reapplying restores declared permissions after edits in Flatseal. Background permission allows
+an app to keep running without windows; startup at login is configured separately under `gnome.autostart`.
+Apply just these permissions with `just run --yes --tags flatpak_background` after the apps are installed.
+
 Declare RPM repositories under `repositories.rpm` with `name`, `description`, `baseurl`, and `gpgkey`, or COPR names under `repositories.copr`. Repository setup precedes dependent installations. Special vendor repositories live in the repositories role. Ordinary application RPMs and hardware packages live in the packages role; applications requiring custom installation or integration (1Password and JetBrains Toolbox) live in the applications role. Feature selections control tasks independently of role boundaries. Microsoft PowerShell/Azure CLI retain the vendor RHEL 9 channel, with .NET excluded so SDKs come from Fedora. AI CLI scripts, pinned Typst/Anaconda archives, and Toolbox's vendor API are isolated installation exceptions; they do not run on every reapply once installed. Their updates remain vendor-managed, or require an explicit pin change where supported.
 
 Declare services under `services.system` or `services.user`:

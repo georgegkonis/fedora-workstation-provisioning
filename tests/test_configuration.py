@@ -76,6 +76,37 @@ class ConfigurationTests(unittest.TestCase):
             with self.subTest(preset=preset), self.assertRaises(engine.ConfigurationError):
                 self.resolve(preset=preset)
 
+    def test_background_permissions_follow_selected_features(self):
+        personal = self.resolve(use_local=False)["selected"]["flatpak_background"]
+        self.assertEqual([item["application"] for item in personal],
+                         ["org.localsend.localsend_app", "com.valvesoftware.Steam"])
+        work = self.resolve(preset="work", use_local=False)["selected"]["flatpak_background"]
+        self.assertEqual([item["application"] for item in work],
+                         ["org.localsend.localsend_app", "com.github.IsmaelMartinez.teams_for_linux"])
+        inactive = self.resolve(local={"features": {key: False for key in engine.FEATURES}})
+        self.assertEqual(inactive["selected"]["flatpak_background"], [])
+
+    def test_background_permission_overrides_replace_the_list(self):
+        declaration = [{"application": "com.valvesoftware.Steam", "allowed": False}]
+        config = self.resolve(local={"flatpak": {"background": declaration}})
+        self.assertEqual(config["selected"]["flatpak_background"], declaration)
+        self.assertEqual(self.resolve(local={"flatpak": {"background": []}})
+                         ["selected"]["flatpak_background"], [])
+
+    def test_background_permissions_reject_invalid_declarations(self):
+        invalid = [
+            [{"application": "org.example.App"}],
+            [{"application": "org.example.App", "allowed": "true"}],
+            [{"application": "org.example.App", "allowed": 1}],
+            [{"application": "../App", "allowed": True}],
+            [{"application": "org.example.App", "allowed": True, "extra": "yes"}],
+            [{"application": "org.example.App", "allowed": True},
+             {"application": "org.example.App", "allowed": False}],
+        ]
+        for declarations in invalid:
+            with self.subTest(declarations=declarations), self.assertRaises(engine.ConfigurationError):
+                self.resolve(local={"flatpak": {"background": declarations}})
+
     def test_duplicate_and_malformed_yaml(self):
         path = self.root / ".local.yml"
         for value in ("features: {}\nfeatures: {}\n", "features: [\n", "- list\n"):

@@ -1,0 +1,20 @@
+---
+- name: Read installed Flatpak background permission
+  ansible.builtin.command:
+    argv: [flatpak, permission-show, "{{ verify_flatpak_background_app.application }}"]
+  register: verify_flatpak_background_permissions
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env | combine({'LC_ALL': 'C'}) }}"
+
+- name: Require the declared Flatpak background permission
+  ansible.builtin.assert:
+    that:
+      - verify_flatpak_background_permissions.stdout is search(verify_flatpak_background_pattern)
+    fail_msg: "Background permission does not match the declaration for {{ verify_flatpak_background_app.application }}"
+  vars:
+    verify_flatpak_background_pattern: >-
+      (?m)^background\s+background\s+{{ verify_flatpak_background_app.application | regex_escape
+      }}\s+{{ 'yes' if verify_flatpak_background_app.allowed else 'no' }}(?:\s|$)
