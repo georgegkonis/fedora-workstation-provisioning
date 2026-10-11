@@ -58,6 +58,7 @@ packages:
   - jq
   - bat
   - ripgrep
+  - just
   desktop:
   - gnome-tweaks
   - neovim
@@ -76,7 +77,6 @@ packages:
   - strace
   - valgrind
   - python3-ansible-lint
-  - just
   - gh
   - git-subtree
   work: []
