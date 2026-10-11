@@ -6,7 +6,7 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 
 - Ansible owns Fedora machine state: packages, repositories/COPRs, Flatpak, GNOME, installation, hardware and system/user services.
 - Chezmoi owns home configuration: shell hooks, Git, editor/CLI/application preferences. Custom systemd user units are deployed by Ansible with their service lifecycle.
-- Git is the source of truth. Never commit credentials, `.local.yml`, legacy `profile.local.yml`, or generated `.workstation/` state.
+- Git is the source of truth. Never commit credentials, `.local.yml`, or generated `.workstation/` state.
 - `bootstrap.sh` delegates orchestration to `scripts/bootstrap.py`; UI emits configuration and never performs feature installation directly.
 - `scripts/configuration.py` is the only precedence/validation implementation: defaults → preset → machine → local overrides. Mappings merge; lists/scalars replace.
 - Machine definition, feature selection and implementation preferences are independent. Machine files contain only hardware options and machine metadata.

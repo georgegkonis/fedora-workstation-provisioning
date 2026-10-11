@@ -6,7 +6,6 @@ import copy
 import json
 from pathlib import Path
 import re
-import sys
 
 import yaml
 
@@ -76,38 +75,10 @@ def named_file(directory, name):
     return path
 
 
-def migrate_profile(path):
-    old = read_yaml(path).get("profile")
-    if not isinstance(old, dict):
-        raise ConfigurationError(f"{path}: expected the legacy profile mapping")
-    known = {"work_machine", "install_anaconda", "toolchains", "git",
-             "jetbrains_versions", "obsidian_vaults"}
-    if set(old) - known:
-        raise ConfigurationError(f"{path}: unknown legacy profile keys: {set(old) - known}")
-    result = {}
-    if "work_machine" in old:
-        result["features"] = {"work": old["work_machine"]}
-    if "toolchains" in old:
-        result["development"] = old["toolchains"]
-    if "install_anaconda" in old:
-        result.setdefault("development", {})["anaconda"] = old["install_anaconda"]
-    for key in ("git", "jetbrains_versions", "obsidian_vaults"):
-        if key in old:
-            result[key] = old[key]
-    return result
-
-
 def local_configuration(path, use_local=True):
     if not use_local:
         return {}
-    if path.exists():
-        return read_yaml(path)
-    legacy = ROOT / "profile.local.yml"
-    if path == ROOT / ".local.yml" and legacy.is_file():
-        print("Using legacy profile.local.yml; the next apply saves it as .local.yml.",
-              file=sys.stderr)
-        return migrate_profile(legacy)
-    return {}
+    return read_yaml(path) if path.exists() else {}
 
 
 def require(condition, message):

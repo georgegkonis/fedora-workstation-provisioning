@@ -86,8 +86,6 @@ Explicit `--preset`/`--machine` flags select their respective layers, while loca
 
 Inspection/validation does not install dependencies or write configuration. Execution writes an ignored `.workstation/effective.yml` snapshot and `.workstation/chezmoi.json`; both engines consume that resolved state. Direct Ansible usage invokes the same loader. Do not edit generated files.
 
-Existing `profile.local.yml` is automatically translated when `.local.yml` is absent. The next apply saves the translated overrides in `.local.yml`; the old file is preserved. Once migration is verified, the legacy file can be removed.
-
 ## Reapplying and updating
 
 ```bash

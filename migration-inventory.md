@@ -2,7 +2,7 @@
 
 The original migration inventory was collected from a Fedora 44 work laptop. It is historical context, not a complete backup or a declaration that every exported value should be managed.
 
-The current architecture uses `config/defaults.yml`, presets and ignored `.local.yml` selections. The legacy `profile.local.yml` is translated on the next bootstrap apply when `.local.yml` does not exist.
+The current architecture uses `config/defaults.yml`, presets and ignored `.local.yml` selections.
 
 ## Intentionally retained state
 

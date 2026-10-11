@@ -51,16 +51,6 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(self.resolve()["features"]["work"])
         self.assertFalse(self.resolve(use_local=False)["features"]["work"])
 
-    def test_legacy_profile_is_translated_without_writing(self):
-        (self.root / "profile.local.yml").write_text(
-            "profile:\n  work_machine: true\n  install_anaconda: true\n"
-            "  toolchains:\n    dotnet: ['9.0']\n    java: []\n    node: []\n    python: [system]\n")
-        config = self.resolve()
-        self.assertTrue(config["features"]["work"])
-        self.assertTrue(config["development"]["anaconda"])
-        self.assertEqual(config["development"]["dotnet"], ["9.0"])
-        self.assertFalse((self.root / ".local.yml").exists())
-
     def test_machine_definition_cannot_select_general_apps(self):
         machines = self.root / "config/machines"
         machines.mkdir()
