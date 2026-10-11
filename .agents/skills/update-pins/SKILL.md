@@ -9,11 +9,13 @@ description: Update the pinned upstream versions, revisions and checksums in ans
 
 ## Workflow
 
-1. Dry run (writes nothing): `python3 .agents/skills/update-pins/scripts/update_pins.py [typst|gcm|morewaita|anaconda ...]`. No names = all pins. Add `--json` for machine-readable output. Set `GITHUB_TOKEN` if rate-limited.
-2. Show the user current → latest. If nothing changed, stop.
-3. Apply, restricted to what the user wants bumped: same command plus `--apply`.
-4. Verify: `just check`, then `just lint`. Never run `just run` or otherwise provision.
-5. Show `git diff ansible/vars/catalog.yml`. Commit only if asked, using the repo's commit workflow, scoped by what was bumped (e.g. `chore(development): bump Typst to 0.15.1`).
+1. Baseline: run `just lint` before changing anything and note any existing failures. They are not caused by the bump; do not fix them here, but report them.
+2. Dry run (writes nothing): `python3 .agents/skills/update-pins/scripts/update_pins.py [typst|gcm|morewaita|anaconda ...]`. No names = all pins. `--json` for machine-readable output. `GITHUB_TOKEN` avoids API rate limits. The script retries network calls itself; if it still exits with a network error, rerun once before reporting.
+3. Show current → latest. Nothing changed: stop. If the user only asked to check, stop here. Otherwise continue without asking again, restricted to the pins they named (default all).
+4. Apply: same command plus `--apply`.
+5. Verify: `just check` (must pass) and `just lint` (must not be worse than the baseline). Never run `just run` or otherwise provision. On a new failure, revert with `git checkout ansible/vars/catalog.yml` and report.
+6. Review `git diff ansible/vars/catalog.yml`: only the intended pins changed.
+7. Commit with the repo's commit workflow, staging only `ansible/vars/catalog.yml`. One commit per run, subject scoped to what moved, e.g. `chore(development): bump Typst to 0.15.1` or `chore: bump Typst and MoreWaita pins` for several; list old → new in the body for multiple pins. Leave unrelated working-tree changes uncommitted and mention them. Do not push.
 
 ## What the script guarantees
 

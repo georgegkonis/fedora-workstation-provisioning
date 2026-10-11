@@ -12,6 +12,7 @@ import os
 import re
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -21,6 +22,15 @@ GCM_ARCH = {"x86_64": "x64", "aarch64": "arm64"}
 
 
 def fetch(url, accept=None):
+    for attempt in range(3):
+        try:
+            return _open(url, accept)
+        except (OSError, urllib.error.URLError) as exc:
+            if attempt == 2:
+                raise SystemExit(f"network error fetching {url}: {exc}")
+
+
+def _open(url, accept=None):
     headers = {"User-Agent": "update-pins"}
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if token and "api.github.com" in url:
@@ -36,11 +46,16 @@ def latest_release(repo):
 
 
 def sha256_of_url(url):
-    h = hashlib.sha256()
-    with fetch(url) as r:
-        for chunk in iter(lambda: r.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    for attempt in range(3):
+        h = hashlib.sha256()
+        try:
+            with fetch(url) as r:
+                for chunk in iter(lambda: r.read(1 << 20), b""):
+                    h.update(chunk)
+            return h.hexdigest()
+        except OSError as exc:
+            if attempt == 2:
+                raise SystemExit(f"network error downloading {url}: {exc}")
 
 
 def typst():
