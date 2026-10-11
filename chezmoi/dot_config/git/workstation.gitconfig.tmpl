@@ -10,6 +10,12 @@
     name = {{ .workstation.git.name | quote }}
     email = {{ .workstation.git.email | quote }}
 {{ end }}
+{{ if and .workstation.features.development .workstation.development.git_credential_manager }}
+[credential]
+    helper = {{ .chezmoi.homeDir }}/.local/bin/git-credential-manager
+    credentialStore = secretservice
+    cacheOptions = --timeout 43200
+{{ end }}
 {{ if and .workstation.git.signing_key .workstation.apps.onepassword }}
 [user]
     signingkey = {{ .workstation.git.signing_key | quote }}

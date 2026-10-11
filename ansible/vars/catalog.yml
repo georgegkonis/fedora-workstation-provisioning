@@ -1,6 +1,10 @@
 ---
 # Upstream release pins, not machine selections.
 provision_typst_version: 0.15.0
+provision_gcm_version: 3.0.1
+provision_gcm_sha256:
+  x86_64: f35e2b5a819b52bee2eaeed7da7226a3c04c75a3b3d23052580c2240f9029981
+  aarch64: e211d6fcda12ac1e2ca4ff634eeedc8da792fa80e66d009b5de34f81c7516dce
 provision_morewaita_revision: 7415d0e7664027d1294235cb96041e9cfacfca8a
 provision_anaconda_release: 2026.07-1
 provision_anaconda_sha256:

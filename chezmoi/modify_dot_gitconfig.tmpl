@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 
+gcm = {{ if and .workstation.features.development .workstation.development.git_credential_manager }}True{{ else }}False{{ end }}
 work = {{ if .workstation.features.work }}True{{ else }}False{{ end }}
 with tempfile.TemporaryDirectory() as directory:
     path = Path(directory) / "gitconfig"
@@ -20,6 +21,9 @@ with tempfile.TemporaryDirectory() as directory:
     if work:
         for key in ("user.name", "user.email"):
             git("--unset-all", key, allowed=(0, 5))
+    if gcm:
+        # Retire the hand-installed helper; the managed include configures the pinned one.
+        git("--fixed-value", "--unset-all", "credential.helper", "/usr/local/bin/git-credential-manager", allowed=(0, 5))
     # Azure DevOps path-scoped credentials are owned by the work identity file.
     git("--unset-all", "credential.https://dev.azure.com.useHttpPath", allowed=(0, 5))
     # Keep this include last, so the repository's explicitly owned defaults win.

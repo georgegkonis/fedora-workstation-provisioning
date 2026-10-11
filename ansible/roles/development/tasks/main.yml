@@ -44,6 +44,11 @@
   when: workstation.development.terraform
   tags: terraform
 
+- name: Install Git Credential Manager
+  ansible.builtin.import_tasks: git_credential_manager.yml
+  when: workstation.development.git_credential_manager
+  tags: git_credential_manager
+
 - name: Install Typst
   ansible.builtin.import_tasks: typst.yml
   when: workstation.development.typst

@@ -97,7 +97,7 @@ def configure(config, local, engine):
     if "development" in enabled:
         development = dict(config["development"])
         components = ["dotnet", "java", "node", "python", "containers", "terraform",
-                      "powershell", "typst", "anaconda", "ai_clis"]
+                      "powershell", "typst", "git_credential_manager", "anaconda", "ai_clis"]
         wanted = choose("Development tooling", components,
                         [key for key in components if development[key]], multiple=True)
         for key in components:

@@ -25,6 +25,7 @@ development:
   terraform: true
   powershell: true
   typst: true
+  git_credential_manager: true
   anaconda: false
   ai_clis:
   - antigravity
