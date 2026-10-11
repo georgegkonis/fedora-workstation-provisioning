@@ -1,5 +1,8 @@
 ---
 gnome_keyboard_settings:
+- key: /org/gnome/shell/keybindings/toggle-message-tray
+  value: '[''<Super>m'']'
+  description: Open notifications with Super+M and reserve Super+V for clipboard history
 - key: /org/gnome/desktop/input-sources/sources
   value: '[(''xkb'', ''us+altgr-intl''), (''xkb'', ''gr'')]'
   description: Use US international AltGr and Greek layouts
