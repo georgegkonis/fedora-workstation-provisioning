@@ -1,19 +1,39 @@
 ---
 features:
-  desktop: false
+  desktop: true
   development: false
   work: false
-  gaming: false
+  personal: false
   virtualization: false
 apps:
-  onepassword: false
-  vscode: false
+  onepassword: true
+  vscode: true
   jetbrains: false
   podman_desktop: false
 preferences:
-  editor: neovim
+  editor: vscode
 packages:
   base:
   - git
   - curl
   - ripgrep
+flatpak:
+  applications:
+    desktop:
+    - md.obsidian.Obsidian
+    - com.github.tchx84.Flatseal
+    - com.mattjakeman.ExtensionManager
+    - io.missioncenter.MissionCenter
+gnome:
+  system_extensions:
+  - package: gnome-shell-extension-dash-to-dock
+    uuid: dash-to-dock@micxgx.gmail.com
+  - package: gnome-shell-extension-appindicator
+    uuid: appindicatorsupport@rgcjonas.gmail.com
+  - package: gnome-shell-extension-caffeine
+    uuid: caffeine@patapon.info
+  user_extensions: []
+  enabled_extensions:
+  - dash-to-dock@micxgx.gmail.com
+  - appindicatorsupport@rgcjonas.gmail.com
+  - caffeine@patapon.info

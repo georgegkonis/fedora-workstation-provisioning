@@ -11,7 +11,7 @@ import sys
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-FEATURES = ("desktop", "development", "work", "gaming", "virtualization")
+FEATURES = ("desktop", "development", "work", "personal", "virtualization")
 PREFERENCES = {
     "shell": ("bash", "zsh"),
     "terminal": ("ptyxis", "gnome-terminal"),

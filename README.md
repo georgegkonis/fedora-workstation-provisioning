@@ -35,7 +35,7 @@ The interactive frontend uses [gum](https://github.com/charmbracelet/gum) when i
 
 Presets skip configuration questions and confirmation. A terminal run can still request the sudo password. Unattended execution requires working noninteractive sudo, or equivalent Ansible become configuration. `--yes` also skips configuration questions and confirmation when using saved selections/defaults.
 
-`personal` uses the shared defaults. `work` enables work and disables gaming. `minimal` selects base packages and disables optional feature groups. Desktop and development are independently selectable. Gaming and virtualization currently use package/Flatpak lists and service defaults; they do not need placeholder roles.
+`personal` uses the shared defaults. `work` enables work and disables personal (software kept off the work laptop, e.g. Steam, qBittorrent, Zotero). `minimal` is a stripped-down desktop: 1Password, a short Flatpak list and a few GNOME extensions. Desktop and development are independently selectable. Personal and virtualization currently use package/Flatpak lists and service defaults; they do not need placeholder roles.
 
 For saved configurations using the former presets, change `_selection.preset` from `personal-desktop`/`personal-laptop` to `personal`, or from `work-laptop` to `work`, and remove any `machine.type` override.
 

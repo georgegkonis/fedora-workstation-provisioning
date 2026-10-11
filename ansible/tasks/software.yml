@@ -21,14 +21,14 @@
          + (workstation_desktop_packages if workstation.features.desktop else [])
          + (workstation.packages.development if workstation.features.development else [])
          + (workstation.packages.work if workstation.features.work else [])
-         + (workstation.packages.gaming if workstation.features.gaming else [])
+         + (workstation.packages.personal if workstation.features.personal else [])
          + (workstation.packages.virtualization if workstation.features.virtualization else [])
          + workstation.fonts) | unique | list }}
     workstation_flatpaks: >-
       {{ ((workstation_desktop_flatpaks if workstation.features.desktop else [])
          + (workstation_development_flatpaks if workstation.features.development else [])
          + (workstation.flatpak.applications.work if workstation.features.work else [])
-         + (workstation.flatpak.applications.gaming if workstation.features.gaming else [])
+         + (workstation.flatpak.applications.personal if workstation.features.personal else [])
          + (workstation.flatpak.applications.virtualization if workstation.features.virtualization else [])) | unique | list }}
 
 - name: Select declared services and feature service defaults

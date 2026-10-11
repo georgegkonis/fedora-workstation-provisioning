@@ -30,12 +30,12 @@ class ConfigurationTests(unittest.TestCase):
         machines.mkdir()
         (machines / "example.yml").write_text("hardware:\n  packages: [hardware-package]\n")
         config = self.resolve(preset="work", machine="example", local={
-            "features": {"gaming": True}, "hardware": {"packages": ["local-package"]},
+            "features": {"personal": True}, "hardware": {"packages": ["local-package"]},
             "packages": {"base": ["git"]},
         })
         self.assertEqual(config["machine"], {"id": "example"})
         self.assertTrue(config["features"]["work"])
-        self.assertTrue(config["features"]["gaming"])
+        self.assertTrue(config["features"]["personal"])
         self.assertEqual(config["hardware"]["packages"], ["local-package"])
         self.assertEqual(config["packages"]["base"], ["git"])
         self.assertIn("gcc", config["packages"]["development"])

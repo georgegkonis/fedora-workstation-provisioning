@@ -116,7 +116,7 @@ def configure(config, local, engine):
         if development["containers"]:
             local.setdefault("preferences", {})["container_engine"] = choose(
                 "Container engine", ["podman", "docker"], [config["preferences"]["container_engine"]])
-    for group in ("desktop", "development", "work", "gaming", "virtualization"):
+    for group in ("desktop", "development", "work", "personal", "virtualization"):
         selected = config["flatpak"]["applications"][group]
         apps = list(dict.fromkeys(defaults["flatpak"]["applications"][group] + selected))
         if group in enabled and apps:

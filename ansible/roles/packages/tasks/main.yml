@@ -30,13 +30,13 @@
   become: true
   tags: work
 
-- name: Install gaming Fedora packages
+- name: Install personal Fedora packages
   ansible.builtin.dnf:
-    name: "{{ workstation.packages.gaming }}"
+    name: "{{ workstation.packages.personal }}"
     state: present
-  when: workstation.features.gaming and workstation.packages.gaming | length > 0
+  when: workstation.features.personal and workstation.packages.personal | length > 0
   become: true
-  tags: gaming
+  tags: personal
 
 - name: Install virtualization Fedora packages
   ansible.builtin.dnf:

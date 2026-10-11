@@ -106,7 +106,7 @@ class DotfileTests(unittest.TestCase):
                     self.assertEqual(user_js.read_text(), '// Keep\nuser_pref("custom.example", true);\n')
                     self.assertFalse((personal_profile / "user.js").exists())
                 if preset == "minimal":
-                    self.assertFalse((home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh").exists())
+                    self.assertTrue((home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh").exists())
                 if preset == "work":
                     self.assertNotIn("Old Name", (home / ".gitconfig").read_text())
                     self.assertIn("work@example.test", (home / ".config/git/work.gitconfig").read_text())

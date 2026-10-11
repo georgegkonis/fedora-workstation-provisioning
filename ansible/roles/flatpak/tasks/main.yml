@@ -5,7 +5,7 @@
     state: present
   become: true
   when: workstation_flatpaks | length > 0
-  tags: [desktop, development, work, gaming, virtualization]
+  tags: [desktop, development, work, personal, virtualization]
 
 - name: Configure declared Flatpak remotes
   community.general.flatpak_remote:
@@ -16,7 +16,7 @@
   loop: "{{ workstation.flatpak.remotes }}"
   become: true
   when: workstation_flatpaks | length > 0
-  tags: [desktop, development, work, gaming, virtualization]
+  tags: [desktop, development, work, personal, virtualization]
 
 - name: Install desktop Flatpaks
   ansible.builtin.import_tasks: applications.yml
@@ -39,12 +39,12 @@
   when: workstation.features.work
   tags: work
 
-- name: Install gaming Flatpaks
+- name: Install personal Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation.flatpak.applications.gaming }}"
-  when: workstation.features.gaming
-  tags: gaming
+    selected_flatpaks: "{{ workstation.flatpak.applications.personal }}"
+  when: workstation.features.personal
+  tags: personal
 
 - name: Install virtualization Flatpaks
   ansible.builtin.import_tasks: applications.yml
@@ -63,4 +63,4 @@
     mode: "0644"
   loop: "{{ workstation.flatpak.overrides }}"
   when: item.application in workstation_flatpaks
-  tags: [desktop, development, work, gaming, virtualization]
+  tags: [desktop, development, work, personal, virtualization]

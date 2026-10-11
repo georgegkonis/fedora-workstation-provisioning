@@ -6,7 +6,7 @@ features:
   desktop: true
   development: true
   work: false
-  gaming: true
+  personal: true
   virtualization: false
 preferences:
   shell: bash
@@ -77,7 +77,7 @@ packages:
   - gh
   - git-subtree
   work: []
-  gaming: []
+  personal: []
   virtualization:
   - qemu-kvm
   - libvirt
@@ -103,24 +103,24 @@ flatpak:
     - it.mijorus.gearlever
     - com.protonvpn.www
     - io.github.kolunmi.Bazaar
-    - io.github.mfat.sshpilot
     - io.github.mrvladus.List
     - io.github.pwr_solaar.solaar
     - io.gitlab.metadatacleaner.metadatacleaner
     - md.obsidian.Obsidian
     - me.timschneeberger.GalaxyBudsClient
-    - org.gimp.GIMP
-    - org.qbittorrent.qBittorrent
     - org.videolan.VLC
-    - org.zotero.Zotero
     - xyz.ketok.Speedtest
     development:
     - org.zaproxy.ZAP
     - com.getpostman.Postman
+    - io.github.mfat.sshpilot
     work:
     - com.github.IsmaelMartinez.teams_for_linux
-    gaming:
+    personal:
     - com.valvesoftware.Steam
+    - org.qbittorrent.qBittorrent
+    - org.zotero.Zotero
+    - org.gimp.GIMP
     virtualization: []
 gnome:
   # Packaged by Fedora: installed system-wide through DNF.
