@@ -128,6 +128,10 @@ def configure(config, local, engine):
     if "work" in enabled:
         for key in ("work_name", "work_email"):
             local["git"][key] = text_input(f"Git {key}", config["git"][key])
+    if config["apps"]["onepassword"]:
+        keys = ("signing_key", "work_signing_key") if "work" in enabled else ("signing_key",)
+        for key in keys:
+            local["git"][key] = text_input(f"1Password SSH {key.replace('_', ' ')} (public key)", config["git"][key])
     return local
 
 

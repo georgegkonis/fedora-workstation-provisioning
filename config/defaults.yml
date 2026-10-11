@@ -40,6 +40,8 @@ git:
   email: ''
   work_name: ''
   work_email: ''
+  signing_key: ''
+  work_signing_key: ''
 work:
   azure_cli: true
 packages:
