@@ -96,7 +96,7 @@ just run --verify
 
 Repeat runs preserve unrelated packages, settings, shell startup code, Git configuration, and application configuration. Repository-owned keys converge to their declared values. Tagged runs can require prerequisites from a full run. GNOME extensions may require logout/login; authenticate applications separately.
 
-Work identities are scoped to `~/Projects/Personal` and `~/Projects/Work`. A work machine has no global Git identity; commits elsewhere require an explicit identity. Set both `git.work_name` and `git.work_email` before committing work projects. Blank identities are allowed for machines where Git identity will be configured later; partially supplied identities fail validation.
+The personal Git identity is the global default. On a work machine, repositories under `~/Projects/Work` override it with `git.work_name` and `git.work_email`; set both before committing work projects. Blank identities are allowed for machines where Git identity will be configured later; partially supplied identities fail validation.
 
 Podman is the default container engine. Select `preferences.container_engine: docker` when Docker is required. The engine and Podman Desktop are separately selectable. Language lists use Fedora packages; availability depends on the destination Fedora release. An empty version list skips that ecosystem. Anaconda is optional and uses a pinned installer/checksum; batch installation accepts its installer terms.
 

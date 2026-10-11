@@ -11,6 +11,5 @@ firefox-preferences.py
 .zshrc
 {{ end }}
 {{ if not .workstation.features.work }}
-.config/git/personal.gitconfig
 .config/git/work.gitconfig
 {{ end }}
