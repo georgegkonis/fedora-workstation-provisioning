@@ -90,10 +90,9 @@ just run --yes --tags gnome
 just run --yes --tags development
 just run --yes --dotfiles
 just run --verify
-just update                   # update RPMs and system Flatpaks
 ```
 
-`just run` forwards bootstrap arguments; without arguments it opens interactive setup. `just --usage run` summarizes common flags; `just run --help` lists all bootstrap options. `just update`, `just test`, and `just lint` also forward arguments to their underlying tools.
+`just run` forwards bootstrap arguments; without arguments it opens interactive setup. `just --usage run` summarizes common flags; `just run --help` lists all bootstrap options. `just test` and `just lint` also forward arguments to their underlying tools.
 
 Repeat runs preserve unrelated packages, settings, shell startup code, Git configuration, and application configuration. Repository-owned keys converge to their declared values. Tagged runs can require prerequisites from a full run. GNOME extensions may require logout/login; authenticate applications separately.
 

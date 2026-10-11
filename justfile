@@ -1,7 +1,7 @@
 export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 set positional-arguments
 
-playbooks := "ansible/playbook.yml ansible/verify.yml ansible/playbooks/update.yml"
+playbooks := "ansible/playbook.yml ansible/verify.yml"
 
 # Configure the workstation (e.g. `just run --yes --tags gnome`)
 [arg('preset', long, help='Preset from config/presets')]
@@ -24,11 +24,6 @@ run preset='' local='' tags='' no_local='' yes='' configure='' show_config='' va
         {{ if local == '' { '' } else { '--local=' + quote(local) } }} \
         {{ if tags == '' { '' } else { '--tags=' + quote(tags) } }} \
         {{ no_local }} {{ yes }} {{ configure }} {{ show_config }} {{ validate }} {{ syntax_check }} {{ check }} {{ verify }} {{ diff }} {{ dotfiles }} {{ help }}
-
-# Update installed RPM and system Flatpak packages
-[arg('args', help='Ansible options, e.g. --check --diff --tags TAGS')]
-update *args:
-    ansible-playbook -K -i ansible/intentory.ini ansible/playbooks/update.yml "$@"
 
 # Validate configuration, syntax, and tests without provisioning
 check:
