@@ -140,5 +140,18 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(self.resolve(use_local=False), original)
 
 
+class GnomeSettingsTests(unittest.TestCase):
+    def test_declarations_are_well_formed(self):
+        for path in sorted((engine.ROOT / "ansible/roles/gnome/files").glob("*.yml")):
+            with self.subTest(path=path.name):
+                (variable, items), = engine.read_yaml(path).items()
+                self.assertTrue(variable.startswith("gnome_"))
+                keys = [item["key"] for item in items]
+                self.assertEqual(len(keys), len(set(keys)), "duplicate dconf keys")
+                for item in items:
+                    self.assertEqual(set(item), {"key", "value", "description"})
+                    self.assertTrue(all(isinstance(item[k], str) and item[k] for k in item))
+
+
 if __name__ == "__main__":
     unittest.main()
