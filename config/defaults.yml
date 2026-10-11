@@ -164,6 +164,7 @@ gnome:
   - docker-manager@omerfarukgungor
   - dynamic-music-pill@andbal
   - launch-new-instance@gnome-shell-extensions.gcampax.github.com
+  - rounded-window-corners@fxgn
   - tilingshell@ferrarodomenico.com
   - wack-lockscreen-clock@rinzler69-wastaken.github.com
   - weatheroclock@CleoMenezesJr.github.io
