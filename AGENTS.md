@@ -17,8 +17,8 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 - `config/presets/`: reusable profiles.
 - `.local.yml`: ignored selections/overrides, with `_selection` remembering the preset name.
 - `ansible/playbook.yml`: primary readable role sequence. `ansible/verify.yml` verifies installed state.
-- `ansible/intentory.ini`: intentional inventory filename; preserve it.
-- `ansible/tasks/{configuration,user_context,software}.yml`: shared validation, desktop account/session and selected-state resolution.
+- `ansible/inventory.ini`: local inventory.
+- `ansible/tasks/{configuration,user_context}.yml`: shared configuration loading and desktop account/session.
 - `ansible/roles/`: substantive machine-state components. Do not create empty roles just to match a diagram.
 - `ansible/vars/catalog.yml`: upstream installer/version pins.
 - `chezmoi/`: home state, using templates only where selections vary; modification scripts preserve unrelated state.

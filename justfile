@@ -28,7 +28,7 @@ run preset='' local='' tags='' no_local='' yes='' configure='' show_config='' va
 # Validate configuration, syntax, and tests without provisioning
 check:
     ./bootstrap.sh --validate
-    for playbook in {{ playbooks }}; do ansible-playbook -i ansible/intentory.ini "$playbook" --syntax-check || exit; done
+    for playbook in {{ playbooks }}; do ansible-playbook -i ansible/inventory.ini "$playbook" --syntax-check || exit; done
     python3 -m unittest discover -s tests
 
 # Run configuration and isolated dotfile tests

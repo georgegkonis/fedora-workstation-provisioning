@@ -136,14 +136,14 @@ Direct debugging is supported:
 
 ```bash
 export ANSIBLE_CONFIG="$PWD/ansible/ansible.cfg"
-ansible-playbook -K -i ansible/intentory.ini ansible/playbook.yml --check --diff
-ansible-playbook -K -i ansible/intentory.ini ansible/playbook.yml --tags gnome
-ansible-playbook -i ansible/intentory.ini ansible/playbook.yml --tags profile_check
-ansible-playbook -i ansible/intentory.ini ansible/playbook.yml \
+ansible-playbook -K -i ansible/inventory.ini ansible/playbook.yml --check --diff
+ansible-playbook -K -i ansible/inventory.ini ansible/playbook.yml --tags gnome
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --tags profile_check
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml \
   -e workstation_preset=minimal -e workstation_ignore_local=true --check
 ```
 
-Direct Ansible applies only machine state; bootstrap applies chezmoi afterward. `dotfiles` is a bootstrap selection (`--tags dotfiles` or `--dotfiles`). The inventory name `ansible/intentory.ini` is intentional.
+Direct Ansible applies only machine state; bootstrap applies chezmoi afterward. `dotfiles` is a bootstrap selection (`--tags dotfiles` or `--dotfiles`).
 
 ## Repository architecture
 
