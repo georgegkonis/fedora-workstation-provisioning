@@ -1,3 +1,6 @@
 ---
 - name: Install JetBrains Toolbox
   ansible.builtin.import_tasks: install.yml
+
+- name: Configure inotify limits
+  ansible.builtin.import_tasks: inotify.yml

@@ -1,0 +1,12 @@
+---
+- name: Raise inotify limits for IDE file watching
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-inotify.conf
+    content: |
+      fs.inotify.max_user_watches = 1048576
+      fs.inotify.max_user_instances = 1024
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Reload inotify sysctl
