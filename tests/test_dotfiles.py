@@ -43,9 +43,6 @@ class DotfileTests(unittest.TestCase):
                 editor.mkdir(parents=True)
                 settings = editor / "settings.json"
                 settings.write_text('// JSONC\n{"custom.example": true, "editor.inlineSuggest.enabled": false,}\n')
-                rider = home / ".config/JetBrains/Rider2026.2/options"
-                rider.mkdir(parents=True)
-                (rider / "editor.xml").write_text('<application><component name="Unrelated"/></application>')
                 firefox = home / ".config/mozilla/firefox"
                 firefox_profile = firefox / "random.Profile 1"
                 firefox_profile.mkdir(parents=True)
@@ -109,7 +106,6 @@ class DotfileTests(unittest.TestCase):
                 if preset == "work":
                     self.assertNotIn("Old Name", (home / ".gitconfig").read_text())
                     self.assertIn("work@example.test", (home / ".config/git/work.gitconfig").read_text())
-                    self.assertIn("Unrelated", (rider / "editor.xml").read_text())
                     self.assertTrue((home / ".zshrc").exists())
                     self.assertIn("conda.sh", (home / ".config/shell/workstation.sh").read_text())
 

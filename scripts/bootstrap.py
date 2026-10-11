@@ -260,7 +260,7 @@ def main():
         if config["features"]["work"] and not config["git"]["work_email"]:
             print("Set git.work_name and git.work_email in .local.yml before committing work projects.")
         if config["apps"]["jetbrains"] and config["features"]["desktop"] and config["features"]["development"]:
-            print("Launch JetBrains Toolbox to install/authenticate IDEs; preferences apply to the newest launched IDE version on the next dotfiles run.")
+            print("Launch JetBrains Toolbox to install IDEs, then sign in to enable Settings Sync.")
 
 
 if __name__ == "__main__":

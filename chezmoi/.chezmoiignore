@@ -1,16 +1,11 @@
 {{ if not .workstation.features.desktop }}
-.config/JetBrains
 .var/app/org.mozilla.firefox
-jetbrains-preferences.py
 {{ end }}
 {{ if or (not .workstation.apps.onepassword) (ne .workstation.preferences.browser "firefox") }}
 .var/app/org.mozilla.firefox
 {{ end }}
 {{ if or (not .workstation.features.desktop) (ne .workstation.preferences.browser "firefox") }}
 firefox-preferences.py
-{{ end }}
-{{ if or (not .workstation.apps.jetbrains) (not .workstation.features.development) }}
-jetbrains-preferences.py
 {{ end }}
 {{ if ne .workstation.preferences.shell "zsh" }}
 .zshrc
