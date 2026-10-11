@@ -21,6 +21,7 @@ class DotfileTests(unittest.TestCase):
     def test_profiles_preserve_existing_state_and_converge(self):
         profiles = [
             ("", {}),
+            ("", {"git": {"signing_key": "ssh-ed25519 example-test-key"}}),
             ("", {"apps": {"onepassword": False}}),
             ("", {"features": {"work": True}}),
             ("", {"preferences": {"browser": "chrome"}}),
@@ -84,6 +85,9 @@ class DotfileTests(unittest.TestCase):
                 self.assertIn("CUSTOM=kept", (home / ".bashrc").read_text())
                 self.assertEqual((home / ".bashrc").read_text().count("# BEGIN CHEZMOI MANAGED WORKSTATION"), 1)
                 self.assertIn("st = status", (home / ".gitconfig").read_text())
+                if config["git"]["signing_key"] and config["apps"]["onepassword"]:
+                    self.assertIn("program = /opt/1Password/op-ssh-sign",
+                                  (home / ".config/git/workstation.gitconfig").read_text())
                 self.assertTrue(user_js.read_text().startswith('// Keep\nuser_pref("custom.example", true);\n'))
                 if config["features"]["desktop"] and config["preferences"]["browser"] == "firefox":
                     if config["features"]["work"]:
