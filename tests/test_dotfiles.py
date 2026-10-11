@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 from contextlib import closing
 from pathlib import Path
 import shutil
@@ -106,7 +107,18 @@ class DotfileTests(unittest.TestCase):
                     self.assertEqual(user_js.read_text(), '// Keep\nuser_pref("custom.example", true);\n')
                     self.assertFalse((personal_profile / "user.js").exists())
                 if preset == "minimal":
-                    self.assertTrue((home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh").exists())
+                    wrapper = home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh"
+                    self.assertTrue(wrapper.exists())
+                    mock_bin = base / "bin"
+                    mock_bin.mkdir()
+                    spawn = mock_bin / "flatpak-spawn"
+                    spawn.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\n')
+                    spawn.chmod(0o755)
+                    result = subprocess.run([str(wrapper), "browser argument"], check=True,
+                                            capture_output=True, text=True,
+                                            env={**os.environ, "PATH": f"{mock_bin}:{os.environ['PATH']}"})
+                    self.assertEqual(result.stdout.splitlines(),
+                                     ["--host", "/opt/1Password/1Password-BrowserSupport", "browser argument"])
                 if preset == "work":
                     self.assertNotIn("Old Name", (home / ".gitconfig").read_text())
                     self.assertIn("work@example.test", (home / ".config/git/work.gitconfig").read_text())

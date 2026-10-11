@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec flatpak-spawn --host /usr/libexec/1Password-BrowserSupport "$@"
+exec flatpak-spawn --host /opt/1Password/1Password-BrowserSupport "$@"

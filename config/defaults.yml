@@ -170,8 +170,8 @@ gnome:
   autostart:
   - name: 1password
     title: 1Password
-    command: /usr/share/1password/1password --silent
-    try_exec: /usr/share/1password/1password
+    command: /opt/1Password/1password --silent
+    try_exec: /opt/1Password/1password
   - name: ckb-next
     title: ckb-next
     command: /usr/bin/ckb-next --background
