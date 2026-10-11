@@ -12,6 +12,31 @@
   become: true
   when: workstation.gnome.system_extensions | length > 0
 
+# Blur my Shell needs gnome-rounded-blur for rounded dynamic blur (Fedora 44 route in
+# https://github.com/aunetx/blur-my-shell/blob/master/scripts/GUIDE.md). The COPR is kept
+# disabled so it cannot override main-repo packages; it is enabled for this install only.
+- name: Enable ublue-os COPR for gnome-rounded-blur
+  community.general.copr:
+    name: ublue-os/packages
+    state: enabled
+  become: true
+  when: "'blur-my-shell@aunetx' in workstation.gnome.enabled_extensions"
+
+- name: Disable ublue-os COPR globally
+  ansible.builtin.command: dnf config-manager setopt copr:copr.fedorainfracloud.org:ublue-os:packages.enabled=0
+  changed_when: false
+  check_mode: false
+  become: true
+  when: "'blur-my-shell@aunetx' in workstation.gnome.enabled_extensions"
+
+- name: Install gnome-rounded-blur for Blur my Shell
+  ansible.builtin.dnf:
+    name: gnome-rounded-blur
+    enablerepo: copr:copr.fedorainfracloud.org:ublue-os:packages
+    state: present
+  become: true
+  when: "'blur-my-shell@aunetx' in workstation.gnome.enabled_extensions"
+
 - name: Initialize extension installation results
   ansible.builtin.set_fact:
     gnome_system_extension_uuids: "{{ workstation.gnome.system_extensions | map(attribute='uuid') | list }}"
