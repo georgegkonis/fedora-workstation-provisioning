@@ -23,6 +23,14 @@ The group is the feature that must be enabled for the item to install. Pick the 
 
 ## Vendor installer (no suitable package)
 
+```
+- [ ] 1. Pin in catalog.yml
+- [ ] 2. Add the installer task
+- [ ] 3. Add the selection key and UI entry
+- [ ] 4. Add the verify check
+- [ ] 5. Tests if validation changed
+```
+
 1. Pin version and checksums in `ansible/vars/catalog.yml` as `provision_<name>_*`. Use the `update-pins` skill to register the pin in `update_pins.py`.
 2. Add `ansible/roles/development/tasks/<name>.yml`, modelled on `typst.yml` (architecture `assert`, guarded download, checksum, idempotent extract) and `anaconda.yml` (validating `assert`).
 3. Add a boolean under `development` in `config/defaults.yml`, import the task in `ansible/roles/development/tasks/main.yml` with `when` and a tag, and add the key to `components` in `scripts/bootstrap.py` so the UI can select it.
