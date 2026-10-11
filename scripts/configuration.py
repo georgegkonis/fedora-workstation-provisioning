@@ -285,7 +285,9 @@ def main():
     try:
         if args.effective:
             config = read_yaml(Path(args.effective))
+            config.pop("selected", None)
             validate(config)
+            config["selected"] = select(config)
         else:
             config, _, _ = resolve(args.preset, args.local, not args.no_local)
     except ConfigurationError as exc:
