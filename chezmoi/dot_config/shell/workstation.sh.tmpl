@@ -9,3 +9,6 @@ if [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
     . "$HOME/anaconda3/etc/profile.d/conda.sh"
 fi
 {{ end }}
+{{ if .workstation.features.development }}
+export MSBUILDDISABLENODEREUSE=1
+{{ end }}
