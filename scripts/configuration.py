@@ -184,13 +184,6 @@ def validate(config):
     if config["features"]["desktop"]:
         require(config["preferences"]["editor"] != "vscode" or config["apps"]["vscode"],
                 "preferences.editor=vscode requires apps.vscode=true")
-    records(config["obsidian_vaults"], "obsidian_vaults", ("name", "repo"), ("version",))
-    for vault in config["obsidian_vaults"]:
-        require(vault["name"] not in (".", "..") and
-                re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._ -]*", vault["name"]),
-                "obsidian_vaults.name must be a single safe directory name")
-        require(isinstance(vault.get("version", "HEAD"), str),
-                "obsidian_vaults.version: expected string")
     records(config["repositories"]["rpm"], "repositories.rpm",
             ("name", "description", "baseurl", "gpgkey"))
     string_list(config["repositories"]["copr"], "repositories.copr")

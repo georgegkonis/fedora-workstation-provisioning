@@ -5,8 +5,3 @@
 - name: Create project directories
   ansible.builtin.import_tasks: directories.yml
   tags: directories
-
-- name: Clone configured Obsidian vaults
-  ansible.builtin.import_tasks: obsidian.yml
-  when: workstation.obsidian_vaults | length > 0
-  tags: obsidian

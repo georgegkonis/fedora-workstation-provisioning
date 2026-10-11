@@ -194,7 +194,6 @@ gnome:
   - name: org.localsend.localsend_app
     title: LocalSend
     command: flatpak run org.localsend.localsend_app
-obsidian_vaults: []
 repositories:
   rpm: []
   copr: []

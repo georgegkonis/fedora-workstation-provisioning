@@ -57,7 +57,6 @@ class ConfigurationTests(unittest.TestCase):
             {"machine": {"id": "example"}},
             {"apps": {"vscode": False}},
             {"git": {"work_name": "Name"}},
-            {"obsidian_vaults": [{"name": "../outside", "repo": "example"}]},
             {"services": {"user": [{"name": "bad/unit"}]}},
             {"services": {"system": [{"name": "docker", "state": "restarted"}]}},
             {"services": {"system": [{"name": "example", "unit": "../outside"}]}},
