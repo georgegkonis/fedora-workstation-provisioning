@@ -4,7 +4,7 @@
     name: flatpak
     state: present
   become: true
-  when: workstation_flatpaks | length > 0
+  when: workstation.selected.flatpaks | length > 0
   tags: [desktop, development, work, personal, virtualization]
 
 - name: Configure declared Flatpak remotes
@@ -15,20 +15,20 @@
     state: present
   loop: "{{ workstation.flatpak.remotes }}"
   become: true
-  when: workstation_flatpaks | length > 0
+  when: workstation.selected.flatpaks | length > 0
   tags: [desktop, development, work, personal, virtualization]
 
 - name: Install desktop Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation_desktop_flatpaks }}"
+    selected_flatpaks: "{{ workstation.selected.desktop_flatpaks }}"
   when: workstation.features.desktop
   tags: desktop
 
 - name: Install development Flatpaks
   ansible.builtin.import_tasks: applications.yml
   vars:
-    selected_flatpaks: "{{ workstation_development_flatpaks }}"
+    selected_flatpaks: "{{ workstation.selected.development_flatpaks }}"
   when: workstation.features.development
   tags: development
 
@@ -62,5 +62,5 @@
     no_extra_spaces: true
     mode: "0644"
   loop: "{{ workstation.flatpak.overrides }}"
-  when: item.application in workstation_flatpaks
+  when: item.application in workstation.selected.flatpaks
   tags: [desktop, development, work, personal, virtualization]

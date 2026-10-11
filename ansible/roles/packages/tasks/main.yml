@@ -8,7 +8,7 @@
 
 - name: Install desktop Fedora packages
   ansible.builtin.dnf:
-    name: "{{ workstation_desktop_packages | unique | list }}"
+    name: "{{ workstation.selected.desktop_packages | unique | list }}"
     state: present
   when: workstation.features.desktop
   become: true

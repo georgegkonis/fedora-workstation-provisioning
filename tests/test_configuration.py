@@ -95,6 +95,39 @@ class ConfigurationTests(unittest.TestCase):
             with self.subTest(preset=path.stem):
                 self.resolve(preset=path.stem, use_local=False)
 
+    def test_selected_software_follows_features(self):
+        personal = self.resolve(use_local=False)["selected"]
+        work = self.resolve(preset="work", use_local=False)["selected"]
+        minimal = self.resolve(preset="minimal", use_local=False)["selected"]
+        self.assertIn("com.valvesoftware.Steam", personal["flatpaks"])
+        self.assertNotIn("com.valvesoftware.Steam", work["flatpaks"])
+        self.assertIn("com.github.IsmaelMartinez.teams_for_linux", work["flatpaks"])
+        self.assertEqual(minimal["flatpaks"][-1], "org.mozilla.firefox")
+        self.assertNotIn("dotnet-sdk-8.0", minimal["expected_rpms"])
+        self.assertIn("dotnet-sdk-10.0", personal["expected_rpms"])
+        self.assertNotIn("dotnet-sdk-10.0", work["expected_rpms"])
+        self.assertEqual(len(personal["packages"]), len(set(personal["packages"])))
+
+    def test_container_engine_selects_services_and_flatpaks(self):
+        podman = self.resolve(use_local=False)["selected"]
+        self.assertEqual(podman["system_services"], [])
+        self.assertIn("io.podman_desktop.PodmanDesktop", podman["development_flatpaks"])
+        docker = self.resolve(local={"preferences": {"container_engine": "docker"}})["selected"]
+        self.assertEqual([x["name"] for x in docker["system_services"]], ["docker.service"])
+        self.assertNotIn("io.podman_desktop.PodmanDesktop", docker["development_flatpaks"])
+        self.assertIn("docker-ce", docker["expected_rpms"])
+        declared = self.resolve(local={"preferences": {"container_engine": "docker"},
+                                       "services": {"system": [{"name": "docker", "state": "stopped"}]}})
+        self.assertEqual([x["name"] for x in declared["selected"]["system_services"]], ["docker"])
+
+    def test_virtualization_adds_libvirt_socket_once(self):
+        local = {"features": {"virtualization": True}}
+        services = self.resolve(local=local)["selected"]["system_services"]
+        self.assertEqual([x["name"] for x in services], ["virtqemud.socket"])
+        local["services"] = {"system": [{"name": "virtqemud.socket", "enabled": False}]}
+        services = self.resolve(local=local)["selected"]["system_services"]
+        self.assertEqual(services, [{"name": "virtqemud.socket", "enabled": False}])
+
     def test_effective_configuration_does_not_share_mutable_defaults(self):
         first = self.resolve(use_local=False)
         original = copy.deepcopy(first)

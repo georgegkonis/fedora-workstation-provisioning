@@ -194,6 +194,68 @@ def validate(config):
     require(len(names) == len(set(names)), "system and hardware services must not declare the same unit twice")
 
 
+def select(config):
+    """Resolve what the selected features install; shared by apply and verification."""
+    features, development, apps = config["features"], config["development"], config["apps"]
+    preferences, work = config["preferences"], config["work"]
+    flatpaks, packages = config["flatpak"]["applications"], config["packages"]
+
+    def unique(items):
+        return list(dict.fromkeys(items))
+
+    def when(condition, items):
+        return list(items) if condition else []
+
+    desktop_packages = (packages["desktop"] + [preferences["shell"], preferences["terminal"]]
+                        + when(preferences["editor"] == "neovim", ["neovim"]))
+    desktop_flatpaks = flatpaks["desktop"] + [
+        "org.mozilla.firefox" if preferences["browser"] == "firefox" else "com.google.Chrome"]
+    podman_desktop = (features["desktop"] and features["development"] and development["containers"]
+                      and apps["podman_desktop"] and preferences["container_engine"] == "podman")
+    development_flatpaks = flatpaks["development"] + when(
+        podman_desktop, ["io.podman_desktop.PodmanDesktop", "com.github.marhkb.Pods"])
+    selected_packages = unique(
+        packages["base"] + when(features["desktop"], desktop_packages)
+        + when(features["development"], packages["development"])
+        + when(features["work"], packages["work"]) + when(features["personal"], packages["personal"])
+        + when(features["virtualization"], packages["virtualization"]) + config["fonts"])
+    selected_flatpaks = unique(
+        when(features["desktop"], desktop_flatpaks) + when(features["development"], development_flatpaks)
+        + when(features["work"], flatpaks["work"]) + when(features["personal"], flatpaks["personal"])
+        + when(features["virtualization"], flatpaks["virtualization"]))
+
+    services = config["services"]["system"] + config["hardware"]["services"]
+    declared = {service["name"] for service in services}
+    docker = (features["development"] and development["containers"]
+              and preferences["container_engine"] == "docker"
+              and not declared & {"docker.service", "docker"})
+    system_services = services + when(docker, [{"name": "docker.service", "enabled": True, "state": "started"}]) \
+        + when(features["virtualization"] and "virtqemud.socket" not in declared,
+               [{"name": "virtqemud.socket", "enabled": True, "state": "started"}])
+
+    containers = (["podman"] if preferences["container_engine"] == "podman" else
+                  ["docker-ce", "docker-ce-cli", "containerd.io", "docker-buildx-plugin",
+                   "docker-compose-plugin"])
+    toolchains = (
+        [f"dotnet-sdk-{v}" for v in development["dotnet"]]
+        + [f"java-{v}-openjdk-devel" for v in development["java"]]
+        + [f"nodejs{v}" for v in development["node"]] + [f"nodejs{v}-npm" for v in development["node"]]
+        + when("system" in development["python"], ["python3", "python3-pip"])
+        + [f"python{v}" for v in development["python"] if v != "system"]
+        + when(development["terraform"], ["terraform"]) + when(development["powershell"], ["powershell"])
+        + when(development["containers"], containers))
+    expected_rpms = unique(
+        selected_packages + config["hardware"]["packages"] + when(selected_flatpaks, ["flatpak"])
+        + when(features["desktop"] and apps["vscode"], ["code"])
+        + when(features["desktop"] and apps["onepassword"], ["1password", "1password-cli"])
+        + when(features["work"] and work["azure_cli"], ["azure-cli"])
+        + when(features["development"], toolchains))
+    return {"desktop_packages": desktop_packages, "desktop_flatpaks": desktop_flatpaks,
+            "development_flatpaks": development_flatpaks, "packages": selected_packages,
+            "flatpaks": selected_flatpaks, "system_services": system_services,
+            "expected_rpms": expected_rpms}
+
+
 def resolve(preset=None, local_path=None, use_local=True, local=None):
     path = Path(local_path).resolve() if local_path else ROOT / ".local.yml"
     local = copy.deepcopy(local if local is not None else local_configuration(path, use_local))
@@ -208,6 +270,7 @@ def resolve(preset=None, local_path=None, use_local=True, local=None):
     config = merge(config, local)
     validate_shape(config, read_yaml(ROOT / "config/defaults.yml"))
     validate(config)
+    config["selected"] = select(config)
     return config, {"preset": preset}, local
 
 

@@ -10,8 +10,6 @@
       ansible.builtin.import_tasks: tasks/configuration.yml
     - name: Resolve the desktop account
       ansible.builtin.import_tasks: tasks/user_context.yml
-    - name: Resolve selected software
-      ansible.builtin.import_tasks: tasks/software.yml
 
   tasks:
     - name: Verify machine state

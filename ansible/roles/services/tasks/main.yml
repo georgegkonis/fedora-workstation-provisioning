@@ -6,7 +6,7 @@
     owner: root
     group: root
     mode: '0644'
-  loop: "{{ workstation_system_services }}"
+  loop: "{{ workstation.selected.system_services }}"
   when: item.unit is defined
   become: true
   notify: Reload system units
@@ -39,7 +39,7 @@
     name: "{{ item.name }}"
     enabled: "{{ item.enabled | default(true) }}"
     state: "{{ item.state | default('started') }}"
-  loop: "{{ workstation_system_services }}"
+  loop: "{{ workstation.selected.system_services }}"
   become: true
 
 - name: Configure declared user services

@@ -14,10 +14,6 @@
       ansible.builtin.import_tasks: tasks/user_context.yml
       tags: always
 
-    - name: Resolve selected software
-      ansible.builtin.import_tasks: tasks/software.yml
-      tags: always
-
   roles:
     - role: base
       tags: base

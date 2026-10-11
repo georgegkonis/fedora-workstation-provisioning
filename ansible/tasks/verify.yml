@@ -3,29 +3,8 @@
   ansible.builtin.package_facts:
     manager: rpm
 
-- name: Build expected machine software from enabled selections
+- name: Build expected user paths and CLIs from enabled selections
   ansible.builtin.set_fact:
-    verify_expected_rpms: >-
-      {{ workstation_packages + workstation.hardware.packages
-         + (['flatpak'] if workstation_flatpaks | length > 0 else [])
-         + (['code'] if workstation.features.desktop and workstation.apps.vscode else [])
-         + (['1password', '1password-cli'] if workstation.features.desktop and workstation.apps.onepassword else [])
-         + (['azure-cli'] if workstation.features.work and workstation.work.azure_cli else [])
-         + ((workstation.development.dotnet | map('regex_replace', '^', 'dotnet-sdk-') | list)
-            + (workstation.development.java | map('regex_replace', '^', 'java-')
-               | map('regex_replace', '$', '-openjdk-devel') | list)
-            + (workstation.development.node | map('regex_replace', '^', 'nodejs') | list)
-            + (workstation.development.node | map('regex_replace', '^', 'nodejs')
-               | map('regex_replace', '$', '-npm') | list)
-            + (['python3', 'python3-pip'] if 'system' in workstation.development.python else [])
-            + (workstation.development.python | reject('equalto', 'system')
-               | map('regex_replace', '^', 'python') | list)
-            + (['terraform'] if workstation.development.terraform else [])
-            + (['powershell'] if workstation.development.powershell else [])
-            + ((['podman'] if workstation.preferences.container_engine == 'podman'
-                else ['docker-ce', 'docker-ce-cli', 'containerd.io', 'docker-buildx-plugin', 'docker-compose-plugin'])
-               if workstation.development.containers else [])
-            if workstation.features.development else []) | unique | list }}
     verify_expected_paths: >-
       {{ [desktop_personal_projects_path]
          + ([desktop_work_projects_path] if workstation.features.work else [])
@@ -47,7 +26,7 @@
   failed_when: false
   changed_when: false
   check_mode: false
-  when: workstation_flatpaks | length > 0
+  when: workstation.selected.flatpaks | length > 0
 
 - name: Check declared user installation paths
   ansible.builtin.stat:
@@ -69,8 +48,8 @@
 
 - name: Compare selected software with installed state
   ansible.builtin.set_fact:
-    verify_missing_rpms: "{{ verify_expected_rpms | difference(ansible_facts.packages.keys() | list) }}"
-    verify_missing_flatpaks: "{{ workstation_flatpaks | difference(verify_installed_flatpaks.stdout_lines | default([])) }}"
+    verify_missing_rpms: "{{ workstation.selected.expected_rpms | difference(ansible_facts.packages.keys() | list) }}"
+    verify_missing_flatpaks: "{{ workstation.selected.flatpaks | difference(verify_installed_flatpaks.stdout_lines | default([])) }}"
     verify_missing_paths: "{{ verify_user_paths.results | rejectattr('stat.exists') | map(attribute='item') | list }}"
     verify_missing_clis: "{{ verify_cli_tools.results | rejectattr('rc', 'equalto', 0) | map(attribute='item') | list }}"
 
@@ -90,7 +69,7 @@
 
 - name: Verify declared system services
   ansible.builtin.include_tasks: verify-service.yml
-  loop: "{{ workstation_system_services }}"
+  loop: "{{ workstation.selected.system_services }}"
   loop_control:
     loop_var: verify_service
   vars:
