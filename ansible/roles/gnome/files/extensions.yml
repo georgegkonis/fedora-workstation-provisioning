@@ -18,3 +18,66 @@ gnome_extensions_settings:
 - key: /org/gnome/shell/extensions/tilingshell/outer-gaps
   value: uint32 5
   description: Use five-pixel outer tiling gaps
+- key: /org/gnome/shell/extensions/dash-to-dock/background-opacity
+  value: '0.8'
+  description: Use 80% dock background opacity
+- key: /org/gnome/shell/extensions/dash-to-dock/dash-max-icon-size
+  value: '46'
+  description: Cap dock icons at 46 pixels
+- key: /org/gnome/shell/extensions/dash-to-dock/height-fraction
+  value: '0.9'
+  description: Use 90% of the screen for the dock
+- key: /org/gnome/shell/extensions/dash-to-dock/hot-keys
+  value: 'true'
+  description: Enable Super+number dock shortcuts
+- key: /org/gnome/shell/extensions/clipboard-indicator/display-mode
+  value: '3'
+  description: Show only the clipboard icon in the panel
+- key: /org/gnome/shell/extensions/clipboard-indicator/open-at-cursor
+  value: 'true'
+  description: Open clipboard history at the cursor
+- key: /org/gnome/shell/extensions/clipboard-indicator/paste-on-select
+  value: 'true'
+  description: Paste immediately when a history entry is selected
+- key: /org/gnome/shell/extensions/clipboard-indicator/move-item-first
+  value: 'true'
+  description: Move reused clipboard entries to the top
+- key: /org/gnome/shell/extensions/clipboard-indicator/show-search-bar
+  value: 'true'
+  description: Show the clipboard history search bar
+- key: /org/gnome/shell/extensions/tilingshell/enable-snap-assist
+  value: 'false'
+  description: Disable the tiling snap assistant
+- key: /org/gnome/shell/extensions/tilingshell/enable-autotiling
+  value: 'false'
+  description: Disable automatic tiling
+- key: /org/gnome/shell/extensions/tilingshell/show-indicator
+  value: 'true'
+  description: Show the tiling layout indicator in the panel
+- key: /org/gnome/shell/extensions/tilingshell/top-edge-maximize
+  value: 'true'
+  description: Maximize windows dragged to the top edge
+- key: /org/gnome/shell/extensions/tilingshell/layouts-json
+  value: ''[{"id":"Layout 2","tiles":[{"x":0,"y":0,"width":0.22,"height":1,"groups":[1]},{"x":0.22,"y":0,"width":0.56,"height":1,"groups":[1,2]},{"x":0.78,"y":0,"width":0.22,"height":1,"groups":[2]}]},{"id":"Layout 3","tiles":[{"x":0,"y":0,"width":0.33,"height":1,"groups":[1]},{"x":0.33,"y":0,"width":0.67,"height":1,"groups":[1]}]},{"id":"Layout 4","tiles":[{"x":0,"y":0,"width":0.67,"height":1,"groups":[1]},{"x":0.67,"y":0,"width":0.33,"height":1,"groups":[1]}]},{"id":"Layout 1","tiles":[{"x":0,"y":0,"width":0.22,"height":0.5,"groups":[1,2]},{"x":0,"y":0.5,"width":0.22,"height":0.5,"groups":[1,2]},{"x":0.22,"y":0,"width":0.56,"height":1,"groups":[2,3]},{"x":0.78,"y":0,"width":0.22,"height":0.5,"groups":[3,4]},{"x":0.78,"y":0.5,"width":0.22,"height":0.5,"groups":[3,4]}]},{"id":"42593092","tiles":[{"x":0,"y":0,"width":1,"height":0.5005387931034483,"groups":[1]},{"x":0,"y":0.5005387931034483,"width":1,"height":0.49946120689655177,"groups":[1]}]}]''
+  description: Define the custom tiling layouts
+- key: /org/gnome/shell/extensions/tilingshell/selected-layouts
+  value: '[[''Layout 3'', ''Layout 2'', ''Layout 2''], [''Layout 3'', ''Layout 2'', ''Layout 2''], [''Layout 3'', ''Layout 2'', ''Layout 2'']]'
+  description: Select tiling layouts per workspace and monitor
+- key: /org/gnome/shell/extensions/weather-oclock/weather-after-clock
+  value: 'true'
+  description: Show the weather after the clock
+- key: /org/gnome/shell/extensions/wack-lockscreen-clock/lockscreen-mode
+  value: '''cupertino'''
+  description: Use the Cupertino lock screen clock
+- key: /org/gnome/shell/extensions/wack-lockscreen-clock/date-style
+  value: '''full'''
+  description: Show the full date on the lock screen clock
+- key: /org/gnome/shell/extensions/appindicator/tray-pos
+  value: '''left'''
+  description: Place tray icons on the left of the panel
+- key: /org/gnome/shell/extensions/rounded-window-corners-reborn/blacklist
+  value: '[''jetbrains-rider'', ''jetbrains-pycharm'', ''jetbrains-webstorm'', ''jetbrains-datagrip'']'
+  description: Skip rounded corners for JetBrains IDEs
+- key: /org/gnome/shell/extensions/rounded-window-corners-reborn/border-width
+  value: '1'
+  description: Use a one-pixel window border

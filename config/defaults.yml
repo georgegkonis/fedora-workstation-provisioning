@@ -152,7 +152,6 @@ gnome:
   - rounded-window-corners@fxgn
   - weatheroclock@CleoMenezesJr.github.io
   - dynamic-music-pill@andbal
-  - advanced-media-controller@sanjai.com
   - docker-manager@omerfarukgungor
   - wack-lockscreen-clock@rinzler69-wastaken.github.com
   enabled_extensions:
@@ -161,6 +160,7 @@ gnome:
   - caffeine@patapon.info
   - clipboard-indicator@tudmotu.com
   - dash-to-dock@micxgx.gmail.com
+  - docker-manager@omerfarukgungor
   - dynamic-music-pill@andbal
   - launch-new-instance@gnome-shell-extensions.gcampax.github.com
   - tilingshell@ferrarodomenico.com
