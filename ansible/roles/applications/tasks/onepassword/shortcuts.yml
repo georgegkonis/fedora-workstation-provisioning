@@ -8,8 +8,8 @@
 
 - name: Run 1Password GNOME shortcut script
   ansible.builtin.command: bash /tmp/1password-gnome-shortcut.sh
-  register: onepassword_shortcut_result
+  register: applications_onepassword_shortcut_result
   become: true
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env }}"
-  changed_when: "'CHANGED' in onepassword_shortcut_result.stdout"
+  changed_when: "'CHANGED' in applications_onepassword_shortcut_result.stdout"

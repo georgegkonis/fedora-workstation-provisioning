@@ -1,0 +1,47 @@
+---
+- name: Install base Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.base }}"
+    state: present
+  become: true
+  tags: base
+
+- name: Install desktop Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.selected.desktop_packages | unique | list }}"
+    state: present
+  when: workstation.features.desktop
+  become: true
+  tags: desktop
+
+- name: Install development Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.development }}"
+    state: present
+  when: workstation.features.development
+  become: true
+  tags: development
+
+- name: Install work Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.work }}"
+    state: present
+  when: workstation.features.work and workstation.packages.work | length > 0
+  become: true
+  tags: work
+
+- name: Install personal Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.personal }}"
+    state: present
+  when: workstation.features.personal and workstation.packages.personal | length > 0
+  become: true
+  tags: personal
+
+- name: Install virtualization Fedora packages
+  ansible.builtin.dnf:
+    name: "{{ workstation.packages.virtualization }}"
+    state: present
+  when: workstation.features.virtualization
+  become: true
+  tags: virtualization

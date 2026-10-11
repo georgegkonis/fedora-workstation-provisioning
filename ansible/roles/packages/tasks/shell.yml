@@ -1,0 +1,8 @@
+---
+- name: Set the selected login shell after installing it
+  ansible.builtin.user:
+    name: "{{ desktop_target_user }}"
+    shell: "/bin/{{ workstation.preferences.shell }}"
+  when: workstation.features.desktop
+  become: true
+  tags: desktop

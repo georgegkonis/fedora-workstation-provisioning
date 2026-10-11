@@ -1,0 +1,8 @@
+---
+- name: Install selected Fedora fonts
+  ansible.builtin.dnf:
+    name: "{{ workstation.fonts }}"
+    state: present
+  when: workstation.fonts | length > 0
+  become: true
+  tags: fonts

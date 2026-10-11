@@ -158,7 +158,7 @@ Direct Ansible applies only machine state; bootstrap applies chezmoi afterward. 
 | `scripts/configuration.py` | Precedence and validation shared by both engines |
 | `scripts/bootstrap.py` | Interactive frontend, dependency checks and orchestration |
 | `ansible/playbook.yml` | Readable machine-state role sequence |
-| `ansible/roles/` | Base, repositories, packages, Flatpak, GNOME, development, work, services, hardware and application installation |
+| `ansible/roles/` | Base, repositories, packages, Flatpak, applications, development, GNOME and services |
 | `ansible/vars/catalog.yml` | Upstream release/checksum pins |
 | `chezmoi/` | Home configuration and selected application preferences |
 | `systemd/system/`, `systemd/user/` | Custom unit files, added only when needed |
@@ -170,7 +170,7 @@ Ansible's explicit user context targets the desktop account and its D-Bus sessio
 
 Add ordinary RPMs to the appropriate `packages` group and Flatpak IDs to `flatpak.applications.<feature>` in `config/defaults.yml`. Add font RPMs to `fonts`. Lists are sufficient for ordinary applications; introduce dedicated options only for meaningful installation choices. Declare additional Flatpak remotes in `flatpak.remotes`; the existing application lists use Flathub.
 
-Declare RPM repositories under `repositories.rpm` with `name`, `description`, `baseurl`, and `gpgkey`, or COPR names under `repositories.copr`. Repository setup precedes dependent installations. Special vendor repositories live in the repositories role. Microsoft PowerShell/Azure CLI retain the vendor RHEL 9 channel, with .NET excluded so SDKs come from Fedora. AI CLI scripts, pinned Typst/Anaconda archives, and Toolbox's vendor API are isolated installation exceptions; they do not run on every reapply once installed. Their updates remain vendor-managed, or require an explicit pin change where supported.
+Declare RPM repositories under `repositories.rpm` with `name`, `description`, `baseurl`, and `gpgkey`, or COPR names under `repositories.copr`. Repository setup precedes dependent installations. Special vendor repositories live in the repositories role. Ordinary application RPMs and hardware packages live in the packages role; applications requiring custom installation or integration (1Password and JetBrains Toolbox) live in the applications role. Feature selections control tasks independently of role boundaries. Microsoft PowerShell/Azure CLI retain the vendor RHEL 9 channel, with .NET excluded so SDKs come from Fedora. AI CLI scripts, pinned Typst/Anaconda archives, and Toolbox's vendor API are isolated installation exceptions; they do not run on every reapply once installed. Their updates remain vendor-managed, or require an explicit pin change where supported.
 
 Declare services under `services.system` or `services.user`:
 

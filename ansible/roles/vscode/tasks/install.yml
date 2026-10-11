@@ -1,6 +1,0 @@
----
-- name: Install VS Code
-  ansible.builtin.dnf:
-    name: code
-    state: present
-  become: true

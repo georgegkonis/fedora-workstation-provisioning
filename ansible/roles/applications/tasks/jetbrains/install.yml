@@ -17,21 +17,21 @@
 - name: Check whether Toolbox is installed
   ansible.builtin.stat:
     path: "{{ desktop_target_home }}/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox"
-  register: jetbrains_toolbox_binary
+  register: applications_jetbrains_toolbox_binary
 
 - name: Fetch latest JetBrains Toolbox release
   ansible.builtin.uri:
     url: "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release"
     return_content: true
-  register: jetbrains_toolbox_api
-  when: not jetbrains_toolbox_binary.stat.exists and not ansible_check_mode
+  register: applications_jetbrains_toolbox_api
+  when: not applications_jetbrains_toolbox_binary.stat.exists and not ansible_check_mode
 
 - name: Download JetBrains Toolbox
   ansible.builtin.get_url:
-    url: "{{ jetbrains_toolbox_api.json.TBA[0].downloads.linux.link }}"
+    url: "{{ applications_jetbrains_toolbox_api.json.TBA[0].downloads.linux.link }}"
     dest: /tmp/jetbrains-toolbox.tar.gz
     mode: '0644'
-  when: not jetbrains_toolbox_binary.stat.exists and not ansible_check_mode
+  when: not applications_jetbrains_toolbox_binary.stat.exists and not ansible_check_mode
 
 - name: Create JetBrains Toolbox directory
   ansible.builtin.file:
@@ -52,4 +52,4 @@
       - --strip-components=1
   become: true
   become_user: "{{ desktop_target_user }}"
-  when: not jetbrains_toolbox_binary.stat.exists and not ansible_check_mode
+  when: not applications_jetbrains_toolbox_binary.stat.exists and not ansible_check_mode

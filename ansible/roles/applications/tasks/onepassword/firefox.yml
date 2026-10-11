@@ -2,7 +2,7 @@
 - name: Read Firefox user Flatpak overrides
   ansible.builtin.command:
     argv: [flatpak, override, --user, --show, org.mozilla.firefox]
-  register: onepassword_firefox_overrides
+  register: applications_onepassword_firefox_overrides
   changed_when: false
   check_mode: false
   become: true
@@ -12,7 +12,7 @@
 - name: Allow Firefox to use the host native-messaging portal
   ansible.builtin.command:
     argv: [flatpak, override, --user, --talk-name=org.freedesktop.Flatpak, org.mozilla.firefox]
-  when: "'org.freedesktop.Flatpak=talk' not in onepassword_firefox_overrides.stdout"
+  when: "'org.freedesktop.Flatpak=talk' not in applications_onepassword_firefox_overrides.stdout"
   changed_when: true
   become: true
   become_user: "{{ desktop_target_user }}"

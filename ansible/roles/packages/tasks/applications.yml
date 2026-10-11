@@ -1,0 +1,16 @@
+---
+- name: Install VS Code
+  ansible.builtin.dnf:
+    name: code
+    state: present
+  become: true
+  when: workstation.features.desktop and workstation.apps.vscode
+  tags: vscode
+
+- name: Install Azure CLI
+  ansible.builtin.dnf:
+    name: azure-cli
+    state: present
+  become: true
+  when: workstation.features.work and workstation.work.azure_cli
+  tags: [work, azure_cli]

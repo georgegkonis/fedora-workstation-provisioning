@@ -25,29 +25,15 @@
     - role: repositories
       tags: [repositories, packages, development, work, vscode, onepassword, docker, terraform, powershell, azure_cli]
     - role: packages
-      tags: packages
     - role: flatpak
       tags: [flatpak, applications]
-    - role: onepassword
-      when: workstation.features.desktop and workstation.apps.onepassword
-      tags: onepassword
-    - role: vscode
-      when: workstation.features.desktop and workstation.apps.vscode
-      tags: vscode
-    - role: jetbrains
-      when: workstation.features.desktop and workstation.features.development and workstation.apps.jetbrains
-      tags: [jetbrains, development]
-    - role: gnome
-      when: workstation.features.desktop
-      tags: gnome
+    - role: applications
     - role: development
       when: workstation.features.development
       tags: development
-    - role: work
-      when: workstation.features.work
-      tags: work
-    - role: hardware
-      tags: hardware
+    - role: gnome
+      when: workstation.features.desktop
+      tags: gnome
     - role: services
       tags: [services, containers, docker, virtualization, hardware]
 
