@@ -9,6 +9,10 @@
       {{ [desktop_personal_projects_path]
          + ([desktop_work_projects_path] if workstation.features.work else [])
          + ([desktop_target_home + '/.local/share/icons/MoreWaita'] if workstation.features.desktop else [])
+         + (workstation.gnome.autostart | map(attribute='name')
+            | map('regex_replace', '^', desktop_target_home + '/.config/autostart/')
+            | map('regex_replace', '$', '.desktop') | list
+            if workstation.features.desktop else [])
          + ([desktop_target_home + '/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox']
             if workstation.features.desktop and workstation.features.development and workstation.apps.jetbrains else [])
          + ([desktop_target_home + '/.local/bin/git-credential-manager']

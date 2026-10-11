@@ -166,6 +166,32 @@ gnome:
   - tilingshell@ferrarodomenico.com
   - wack-lockscreen-clock@rinzler69-wastaken.github.com
   - weatheroclock@CleoMenezesJr.github.io
+  # Desktop entries written to ~/.config/autostart; try_exec skips a missing binary.
+  autostart:
+  - name: 1password
+    title: 1Password
+    command: /usr/share/1password/1password --silent
+    try_exec: /usr/share/1password/1password
+  - name: ckb-next
+    title: ckb-next
+    command: /usr/bin/ckb-next --background
+    try_exec: /usr/bin/ckb-next
+  - name: com.github.IsmaelMartinez.teams_for_linux
+    title: Teams for Linux
+    command: flatpak run com.github.IsmaelMartinez.teams_for_linux
+  - name: io.elementary.mail
+    title: Mail
+    command: io.elementary.mail --background
+    try_exec: io.elementary.mail
+  - name: io.podman_desktop.PodmanDesktop
+    title: Podman Desktop
+    command: flatpak run io.podman_desktop.PodmanDesktop
+  - name: jetbrains-toolbox
+    title: JetBrains Toolbox
+    command: sh -c '"$HOME/.local/bin/jetbrains-toolbox/bin/jetbrains-toolbox" --minimize'
+  - name: org.localsend.localsend_app
+    title: LocalSend
+    command: flatpak run org.localsend.localsend_app
 obsidian_vaults: []
 repositories:
   rpm: []

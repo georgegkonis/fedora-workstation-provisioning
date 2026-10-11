@@ -157,6 +157,14 @@ def validate(config):
             "gnome: extension declared as both system and user or duplicated")
     require(set(gnome["enabled_extensions"]) <= set(declared),
             "gnome.enabled_extensions must be declared in gnome.system_extensions or gnome.user_extensions")
+    records(gnome["autostart"], "gnome.autostart", ("name", "title", "command"), ("try_exec",))
+    names = [x["name"] for x in gnome["autostart"]]
+    require(len(names) == len(set(names)), "gnome.autostart: duplicate names")
+    for item in gnome["autostart"]:
+        require(re.fullmatch(r"[A-Za-z0-9_.-]+", item["name"]) is not None,
+                "gnome.autostart: invalid name")
+        require("\n" not in item["title"] + item["command"] + item.get("try_exec", ""),
+                "gnome.autostart: fields must be single-line")
     patterns = {"dotnet": r"[0-9]+\.[0-9]+", "java": r"[0-9]+", "node": r"[0-9]+",
                 "python": r"system|[0-9]+\.[0-9]+"}
     for key, pattern in patterns.items():

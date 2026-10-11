@@ -62,6 +62,11 @@ class ConfigurationTests(unittest.TestCase):
             {"services": {"system": [{"name": "docker", "state": "restarted"}]}},
             {"services": {"system": [{"name": "example", "unit": "../outside"}]}},
             {"gnome": {"user_extensions": [], "enabled_extensions": ["missing@example"]}},
+            {"gnome": {"autostart": [{"name": "../x", "title": "X", "command": "x"}]}},
+            {"gnome": {"autostart": [{"name": "x", "title": "X"}]}},
+            {"gnome": {"autostart": [{"name": "x", "title": "X", "command": "a\nb"}]}},
+            {"gnome": {"autostart": [{"name": "x", "title": "X", "command": "x"},
+                                     {"name": "x", "title": "Y", "command": "y"}]}},
         ]
         for override in invalid:
             with self.subTest(override=override), self.assertRaises(engine.ConfigurationError):

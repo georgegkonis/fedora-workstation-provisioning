@@ -1,0 +1,27 @@
+---
+- name: Create the autostart directory
+  ansible.builtin.file:
+    path: "{{ desktop_target_home }}/.config/autostart"
+    state: directory
+    mode: "0755"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+
+- name: Write startup application entries
+  ansible.builtin.copy:
+    dest: "{{ desktop_target_home }}/.config/autostart/{{ item.name }}.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name={{ item.title }}
+      Exec={{ item.command }}
+      {% if item.try_exec is defined %}
+      TryExec={{ item.try_exec }}
+      {% endif %}
+      X-GNOME-Autostart-enabled=true
+  loop: "{{ workstation.gnome.autostart }}"
+  loop_control:
+    label: "{{ item.title }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"

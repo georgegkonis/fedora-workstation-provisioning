@@ -81,3 +81,24 @@ gnome_extensions_settings:
 - key: /org/gnome/shell/extensions/rounded-window-corners-reborn/border-width
   value: '1'
   description: Use a one-pixel window border
+- key: /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/blur
+  value: 'true'
+  description: Blur the dock background
+- key: /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/corner-radius
+  value: '18'
+  description: Round the blurred dock with an 18-pixel radius
+- key: /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/override-background
+  value: 'true'
+  description: Let Blur my Shell style the dock background
+- key: /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/pipeline
+  value: '''pipeline_default_rounded'''
+  description: Use the rounded blur pipeline for the dock
+- key: /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/static-blur
+  value: 'false'
+  description: Use dynamic blur on the dock
+- key: /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/unblur-in-overview
+  value: 'true'
+  description: Remove dock blur in the overview
+- key: /org/gnome/shell/extensions/blur-my-shell/popup/pipeline
+  value: '''pipeline_default_rounded'''
+  description: Use the rounded blur pipeline for popups

@@ -17,3 +17,6 @@
 
 - name: Apply captured GNOME preferences
   ansible.builtin.import_tasks: dconf.yml
+
+- name: Deploy startup applications
+  ansible.builtin.import_tasks: autostart.yml
