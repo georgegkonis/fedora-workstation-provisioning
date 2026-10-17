@@ -68,6 +68,12 @@
   when: item.selected
   become: true
 
+- name: Remove Microsoft's unfiltered repository that leaks .NET packages
+  ansible.builtin.dnf:
+    name: packages-microsoft-prod
+    state: absent
+  become: true
+
 - name: Configure Docker repository
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/fedora/docker-ce.repo

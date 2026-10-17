@@ -34,6 +34,16 @@
   check_mode: false
   when: workstation.selected.flatpaks | length > 0
 
+- name: Find .NET packages installed outside Fedora
+  ansible.builtin.shell: |
+    set -o pipefail
+    rpm -qa --qf '%{NAME} %{VENDOR}\n' 'dotnet*' 'aspnetcore*' 'netstandard*' | grep -v ' Fedora Project$' || true
+  args:
+    executable: /bin/bash
+  register: verify_foreign_dotnet
+  changed_when: false
+  check_mode: false
+
 - name: Check declared user installation paths
   ansible.builtin.stat:
     path: "{{ item }}"
@@ -65,6 +75,7 @@
     verify_missing_flatpaks: "{{ workstation.selected.flatpaks | difference(verify_installed_flatpaks.stdout_lines | default([])) }}"
     verify_missing_paths: "{{ verify_user_paths.results | rejectattr('stat.exists') | map(attribute='item') | list }}"
     verify_missing_clis: "{{ verify_cli_tools.results | rejectattr('rc', 'equalto', 0) | map(attribute='item') | list }}"
+    verify_foreign_dotnet_packages: "{{ verify_foreign_dotnet.stdout_lines }}"
 
 - name: Require selected workstation software
   ansible.builtin.assert:
@@ -73,11 +84,13 @@
       - verify_missing_flatpaks | length == 0
       - verify_missing_paths | length == 0
       - verify_missing_clis | length == 0
+      - verify_foreign_dotnet_packages | length == 0
     fail_msg: |
       Missing RPMs: {{ verify_missing_rpms | join(', ') }}
       Missing Flatpaks: {{ verify_missing_flatpaks | join(', ') }}
       Missing paths: {{ verify_missing_paths | join(', ') }}
       Missing CLIs: {{ verify_missing_clis | join(', ') }}
+      Non-Fedora .NET packages (run `sudo dnf swap` from Fedora): {{ verify_foreign_dotnet_packages | join(', ') }}
       User dotfile contents are checked separately by chezmoi verify.
 
 - name: Verify declared system services
