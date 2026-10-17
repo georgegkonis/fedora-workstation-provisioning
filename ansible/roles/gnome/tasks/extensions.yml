@@ -20,14 +20,14 @@
     name: ublue-os/packages
     state: enabled
   become: true
-  when: "'blur-my-shell@aunetx' in workstation.gnome.enabled_extensions"
+  when: "'blur-my-shell@aunetx' in workstation.selected.gnome_enabled_extensions"
 
 - name: Disable ublue-os COPR globally
   ansible.builtin.command: dnf config-manager setopt copr:copr.fedorainfracloud.org:ublue-os:packages.enabled=0
   changed_when: false
   check_mode: false
   become: true
-  when: "'blur-my-shell@aunetx' in workstation.gnome.enabled_extensions"
+  when: "'blur-my-shell@aunetx' in workstation.selected.gnome_enabled_extensions"
 
 - name: Install gnome-rounded-blur for Blur my Shell
   ansible.builtin.dnf:
@@ -35,7 +35,7 @@
     enablerepo: copr:copr.fedorainfracloud.org:ublue-os:packages
     state: present
   become: true
-  when: "'blur-my-shell@aunetx' in workstation.gnome.enabled_extensions"
+  when: "'blur-my-shell@aunetx' in workstation.selected.gnome_enabled_extensions"
 
 - name: Initialize extension installation results
   ansible.builtin.set_fact:
@@ -46,7 +46,7 @@
 
 - name: Install compatible optional user GNOME extensions
   ansible.builtin.include_tasks: extension.yml
-  loop: "{{ workstation.gnome.user_extensions }}"
+  loop: "{{ workstation.selected.gnome_user_extensions }}"
   loop_control:
     loop_var: gnome_extension_uuid
   when: not ansible_check_mode
@@ -71,9 +71,9 @@
     value: >-
       {{ '@as ' + (((gnome_current_extensions.stdout | regex_replace('^@as\s+', '')
                      | default('[]', true) | from_yaml)
-                   | difference((gnome_system_extension_uuids + workstation.gnome.user_extensions)
-                                | difference(workstation.gnome.enabled_extensions))
-                   + (workstation.gnome.enabled_extensions
+                   | difference((gnome_system_extension_uuids + workstation.selected.gnome_user_extensions)
+                                | difference(workstation.selected.gnome_enabled_extensions))
+                   + (workstation.selected.gnome_enabled_extensions
                       | intersect(gnome_system_extension_uuids + gnome_available_extensions)))
                   | unique | sort | to_json) }}
     state: present

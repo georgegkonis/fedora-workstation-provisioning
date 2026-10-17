@@ -25,6 +25,33 @@ class ConfigurationTests(unittest.TestCase):
     def resolve(self, **kwargs):
         return engine.resolve(**kwargs)[0]
 
+    def test_vicinae_selection_controls_copr_service_and_extension(self):
+        for preset in ("", "minimal", "work"):
+            with self.subTest(preset=preset):
+                selected = self.resolve(preset=preset)["selected"]
+                self.assertIn("vicinae", selected["expected_rpms"])
+                self.assertIn("quadratech188/vicinae", selected["coprs"])
+                self.assertIn({"name": "vicinae.service", "enabled": True, "state": "started"},
+                              selected["user_services"])
+                self.assertIn("vicinae@dagimg-dot", selected["gnome_user_extensions"])
+                self.assertIn("vicinae@dagimg-dot", selected["gnome_enabled_extensions"])
+        for override in ({"apps": {"vicinae": {"enabled": False}}}, {"features": {"desktop": False}}):
+            selected = self.resolve(local=override)["selected"]
+            self.assertNotIn("vicinae", selected["expected_rpms"])
+            self.assertNotIn("quadratech188/vicinae", selected["coprs"])
+            self.assertEqual(selected["user_services"], [])
+            self.assertNotIn("vicinae@dagimg-dot", selected["gnome_user_extensions"])
+            self.assertNotIn("vicinae@dagimg-dot", selected["gnome_enabled_extensions"])
+
+    def test_vicinae_explicit_service_and_repository_are_preserved(self):
+        service = {"name": "vicinae.service", "enabled": False, "state": "stopped"}
+        selected = self.resolve(local={"services": {"user": [service]},
+                                      "repositories": {"copr": ["quadratech188/vicinae", "example/tools"]}})["selected"]
+        self.assertEqual(selected["user_services"], [service])
+        self.assertEqual(selected["coprs"], ["quadratech188/vicinae", "example/tools"])
+        with self.assertRaises(engine.ConfigurationError):
+            self.resolve(local={"apps": {"vicinae": {"rpm": {"packages": ["other"]}}}})
+
     def test_precedence_and_lists_replace(self):
         config = self.resolve(preset="work", local={
             "features": {"personal": True}, "hardware": {"packages": ["local-package"]},

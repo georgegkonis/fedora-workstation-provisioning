@@ -24,7 +24,7 @@
       tags: base
     - role: repositories
       tags: [repositories, packages, applications, base, desktop, development, work, personal, virtualization,
-             vscode, onepassword, docker, terraform, powershell, azure_cli]
+             vscode, onepassword, vicinae, docker, terraform, powershell, azure_cli]
     - role: packages
     - role: flatpak
       tags: [flatpak, applications]
@@ -37,7 +37,7 @@
       when: workstation.features.desktop
       tags: gnome
     - role: services
-      tags: [services, containers, docker, virtualization, hardware]
+      tags: [services, containers, docker, virtualization, hardware, vicinae, desktop]
 
   post_tasks:
     - name: Summarize optional components requiring attention

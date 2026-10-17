@@ -13,3 +13,6 @@ firefox-preferences.py
 {{ if not .workstation.features.work }}
 .config/git/work.gitconfig
 {{ end }}
+{{ if not (has "vicinae" .workstation.selected.integrations) }}
+.config/vicinae
+{{ end }}

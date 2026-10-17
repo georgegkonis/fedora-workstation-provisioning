@@ -29,6 +29,7 @@ class DotfileTests(unittest.TestCase):
             ("", {"features": {"desktop": False}, "git": {"signing_key": "ssh-ed25519 example-test-key"}}),
             ("", {"features": {"work": True}}),
             ("", {"preferences": {"browser": "chrome"}}),
+            ("", {"apps": {"vicinae": {"enabled": False}}}),
             ("minimal", {}),
             ("work", {"git": {"work_name": "Work Example", "work_email": "work@example.test"},
                              "preferences": {"shell": "zsh"}, "development": {"anaconda": True}}),
@@ -64,6 +65,12 @@ class DotfileTests(unittest.TestCase):
                     database.commit()
                 user_js = firefox_profile / "user.js"
                 user_js.write_text('// Keep\nuser_pref("custom.example", true);\n')
+                vicinae = home / ".config/vicinae/settings.json"
+                vicinae.parent.mkdir(parents=True)
+                vicinae.write_text(json.dumps({"providers": {"example": {"enabled": False}},
+                                              "favorites": ["keep:command"],
+                                              "font": {"normal": {"family": "Old font"}},
+                                              "theme": {"dark": {"name": "old", "custom": True}}}))
                 command = [shutil.which("chezmoi"), "--config", str(config_file),
                            "--persistent-state", str(base / "state.boltdb")]
 
@@ -114,6 +121,16 @@ class DotfileTests(unittest.TestCase):
                 else:
                     self.assertEqual(user_js.read_text(), '// Keep\nuser_pref("custom.example", true);\n')
                     self.assertFalse((personal_profile / "user.js").exists())
+                vicinae_settings = json.loads(vicinae.read_text())
+                if "vicinae" in config["selected"]["integrations"]:
+                    self.assertEqual(vicinae_settings["font"]["normal"], {"family": "Adwaita Sans", "size": 11})
+                    self.assertEqual(vicinae_settings["theme"]["dark"]["name"], "libadwaita-dark")
+                    self.assertEqual(vicinae_settings["theme"]["dark"]["icon_theme"], "Adwaita")
+                    self.assertTrue(vicinae_settings["theme"]["dark"]["custom"])
+                    self.assertEqual(vicinae_settings["favorites"], ["keep:command"])
+                    self.assertEqual(vicinae_settings["providers"], {"example": {"enabled": False}})
+                else:
+                    self.assertEqual(applied[str(vicinae.relative_to(home))], original[str(vicinae.relative_to(home))])
                 if preset == "minimal":
                     wrapper = home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh"
                     self.assertTrue(wrapper.exists())

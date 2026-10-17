@@ -7,8 +7,8 @@ gnome_interface_settings:
   value: '''Adwaita'''
   description: Use Adwaita
 - key: /org/gnome/desktop/interface/icon-theme
-  value: '''MoreWaita'''
-  description: Use the managed MoreWaita theme
+  value: '''Adwaita'''
+  description: Use Adwaita icons
 - key: /org/gnome/desktop/interface/font-name
   value: '''Adwaita Sans 11'''
   description: Use Adwaita Sans 11

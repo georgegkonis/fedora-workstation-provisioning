@@ -14,7 +14,7 @@
   community.general.copr:
     name: "{{ item }}"
     state: enabled
-  loop: "{{ workstation.repositories.copr }}"
+  loop: "{{ workstation.selected.coprs }}"
   become: true
 
 - name: Import Microsoft signing key for selected vendor tools

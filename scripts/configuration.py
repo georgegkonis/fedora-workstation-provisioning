@@ -175,9 +175,11 @@ def validate_apps(config):
         else:
             require(source == {"task": "jetbrains"}, f"{label}.vendor: supported task is jetbrains")
         if "integration" in app:
-            require(app["integration"] == "onepassword" and installer == "rpm"
-                    and {"1password", "1password-cli"} <= set(source["packages"]),
-                    f"{label}.integration: onepassword requires its native RPMs")
+            integration_packages = {"onepassword": {"1password", "1password-cli"},
+                                    "vicinae": {"vicinae"}}
+            require(app["integration"] in integration_packages and installer == "rpm"
+                    and integration_packages[app["integration"]] <= set(source["packages"]),
+                    f"{label}.integration: supported integrations require their native RPMs")
         requirements = app.get("requires", {})
         require(isinstance(requirements, dict) and not (requirements.keys() -
                 ({"features", "development", "apps"} | set(PREFERENCES))),
@@ -328,6 +330,11 @@ def select(config):
     rpm_apps = [{"key": key, "name": app["name"], "feature": app["feature"], "packages": app["rpm"]["packages"]}
                 for key, app in apps.items() if app["installer"] == "rpm"]
     app_packages = unique([package for app in rpm_apps for package in app["packages"]])
+    vicinae = any(app.get("integration") == "vicinae" for app in apps.values())
+    user_services = list(config["services"]["user"])
+    if vicinae and not any(service["name"] in ("vicinae", "vicinae.service") for service in user_services):
+        user_services.append({"name": "vicinae.service", "enabled": True, "state": "started"})
+    vicinae_extension = when(vicinae, ["vicinae@dagimg-dot"])
     startup_entries = []
     for key, app in config["apps"].items():
         if "autostart" not in app:
@@ -367,6 +374,10 @@ def select(config):
     expected_rpms = unique(selected_packages + app_packages + config["hardware"]["packages"]
                            + when(selected_flatpaks, ["flatpak"]) + when(features["development"], toolchains))
     return {"apps": list(apps), "rpm_apps": rpm_apps,
+            "coprs": unique(config["repositories"]["copr"] + when(vicinae, ["quadratech188/vicinae"])),
+            "user_services": user_services,
+            "gnome_user_extensions": unique(config["gnome"]["user_extensions"] + vicinae_extension),
+            "gnome_enabled_extensions": unique(config["gnome"]["enabled_extensions"] + vicinae_extension),
             "integrations": unique([app["integration"] for app in apps.values() if "integration" in app]),
             "vendor_tasks": unique([app["vendor"]["task"] for app in apps.values() if app["installer"] == "vendor"]),
             "desktop_packages": desktop_packages, "packages": selected_packages,

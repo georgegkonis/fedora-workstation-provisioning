@@ -18,14 +18,14 @@
     mode: '0755'
   become: true
   become_user: "{{ desktop_target_user }}"
-  when: workstation.services.user | selectattr('unit', 'defined') | list | length > 0
+  when: workstation.selected.user_services | selectattr('unit', 'defined') | list | length > 0
 
 - name: Deploy declared user unit files
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../systemd/user/{{ item.unit }}"
     dest: "{{ desktop_target_home }}/.config/systemd/user/{{ item.name }}"
     mode: '0644'
-  loop: "{{ workstation.services.user }}"
+  loop: "{{ workstation.selected.user_services }}"
   when: item.unit is defined
   become: true
   become_user: "{{ desktop_target_user }}"
@@ -48,7 +48,7 @@
     scope: user
     enabled: "{{ item.enabled | default(true) }}"
     state: "{{ item.state | default('started') }}"
-  loop: "{{ workstation.services.user }}"
+  loop: "{{ workstation.selected.user_services }}"
   become: true
   become_user: "{{ desktop_target_user }}"
   environment: "{{ desktop_user_env }}"

@@ -1,0 +1,37 @@
+---
+- name: Load named Vicinae shortcut settings
+  ansible.builtin.include_vars: "{{ role_path }}/files/vicinae.yml"
+
+- name: Apply named Vicinae shortcut settings
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  loop: "{{ gnome_vicinae_settings }}"
+  loop_control:
+    label: "{{ item.description }}"
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Read existing custom shortcuts including schema defaults
+  ansible.builtin.command:
+    argv: [gsettings, get, org.gnome.settings-daemon.plugins.media-keys, custom-keybindings]
+  register: gnome_vicinae_shortcuts
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"
+
+- name: Register Vicinae shortcut and preserve existing shortcuts
+  community.general.dconf:
+    key: /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings
+    value: >-
+      {{ '@as ' + (((gnome_vicinae_shortcuts.stdout | regex_replace('^@as\s+', '') | from_yaml)
+                    + ['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/vicinae/'])
+                   | unique | to_json) }}
+    state: present
+  become: true
+  become_user: "{{ desktop_target_user }}"
+  environment: "{{ desktop_user_env }}"

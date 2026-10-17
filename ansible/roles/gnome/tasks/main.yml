@@ -18,5 +18,10 @@
 - name: Apply captured GNOME preferences
   ansible.builtin.import_tasks: dconf.yml
 
+- name: Configure Vicinae GNOME shortcut
+  ansible.builtin.import_tasks: vicinae.yml
+  when: "'vicinae' in workstation.selected.integrations"
+  tags: vicinae
+
 - name: Deploy startup applications
   ansible.builtin.import_tasks: autostart.yml

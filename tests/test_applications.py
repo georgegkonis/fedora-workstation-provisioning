@@ -44,7 +44,7 @@ class ApplicationTasksTests(unittest.TestCase):
             config = configuration.resolve(preset="work", use_local=False)[0]
             play = {"name": "Exercise app dispatch", "hosts": "localhost", "connection": "local",
                     "gather_facts": False, "vars": {"workstation": config}, "roles": [str(role)]}
-            for tag, expected in (("vscode", ["vscode"]), ("azure_cli", ["azure_cli"]),
+            for tag, expected in (("vicinae", ["vicinae"]), ("vscode", ["vscode"]), ("azure_cli", ["azure_cli"]),
                                   ("applications", [app["key"] for app in config["selected"]["rpm_apps"]]),
                                   ("gnome", [])):
                 with self.subTest(tag=tag):

@@ -90,7 +90,7 @@
 
 - name: Verify declared user services
   ansible.builtin.include_tasks: verify-service.yml
-  loop: "{{ workstation.services.user }}"
+  loop: "{{ workstation.selected.user_services }}"
   loop_control:
     loop_var: verify_service
   vars:

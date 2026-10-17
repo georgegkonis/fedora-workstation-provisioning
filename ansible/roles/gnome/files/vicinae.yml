@@ -1,0 +1,11 @@
+---
+gnome_vicinae_settings:
+  - key: /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/vicinae/name
+    value: "'Vicinae'"
+    description: Name the Vicinae launcher shortcut
+  - key: /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/vicinae/command
+    value: "'vicinae toggle'"
+    description: Toggle the running Vicinae launcher
+  - key: /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/vicinae/binding
+    value: "'<Super><Control>space'"
+    description: Open Vicinae with Super+Ctrl+Space without replacing layout switching

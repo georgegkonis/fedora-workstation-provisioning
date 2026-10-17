@@ -104,6 +104,49 @@ The personal Git identity is the global default. On a work machine, repositories
 
 Podman is the default container engine. Select `preferences.container_engine: docker` when Docker is required. The engine and Podman Desktop are separately selectable. Language lists use Fedora packages; availability depends on the destination Fedora release. An empty version list skips that ecosystem. Anaconda is optional and uses a pinned installer/checksum; batch installation accepts its installer terms.
 
+## Vicinae launcher
+
+Vicinae is enabled by default for desktop configurations, including `minimal` and `work`.
+Ansible enables the upstream-documented [Fedora COPR](https://docs.vicinae.com/install/linux)
+`quadratech188/vicinae`, installs the `vicinae` RPM, and enables/starts its packaged
+`vicinae.service` in the desktop user's systemd manager. The packaged unit starts with
+`graphical-session.target` and stops with the graphical session; no custom unit or duplicate
+autostart entry is deployed. Apply from a logged-in desktop session with a running user bus.
+The service inherits the user manager's session environment, so log out/in if apps launched
+from it have stale environment variables. Verification checks both the RPM and user service.
+Explicit `services.user` entries for `vicinae.service` override its automatic service defaults.
+
+GNOME gets a **Super+Ctrl+Space** shortcut running `vicinae toggle`, preserving other custom
+shortcuts and Super+Space layout switching. The optional upstream
+[Vicinae GNOME extension](https://github.com/vicinaehq/gnome-extension) (`vicinae@dagimg-dot`)
+is selected with the app, queried for a compatible GNOME release, and installed/enabled through
+the existing extension workflow. It provides clipboard/window APIs and launcher positioning.
+Unsupported or failed releases produce warnings; logout/login may be needed before it becomes
+active, followed by `systemctl --user restart vicinae.service`. No global window-centering or
+compositor setting is changed.
+
+GNOME preferences are Adwaita Sans 11, Adwaita Mono 11, dark appearance, and Adwaita icons.
+Chezmoi merges only Vicinae's normal font (Adwaita Sans 11), built-in `libadwaita-light` /
+`libadwaita-dark` themes, and Adwaita icon keys into writable `~/.config/vicinae/settings.json`.
+Vicinae follows the system appearance; the published configuration schema exposes no separate
+monospace font setting. Other settings, providers, favorites and authentication state survive.
+Reapply restores the managed appearance keys; GUI changes to those keys are temporary.
+The existing MoreWaita asset remains installed but is no longer the selected GNOME icon theme.
+
+```bash
+./bootstrap.sh --validate
+./bootstrap.sh --check --diff
+./bootstrap.sh --yes           # apply packages, GNOME, user service and chezmoi preferences
+./bootstrap.sh --verify
+```
+
+To skip Vicinae on a machine, put `apps: {vicinae: {enabled: false}}` in `.local.yml`.
+Disabling the app or desktop feature skips its automatic COPR, service, extension, shortcut and
+preference management. As with other removed selections, previously installed state remains;
+to stop an existing service, explicitly declare `enabled: false` and `state: stopped` under
+`services.user`. Existing managed shortcut/extension state can be disabled in GNOME Settings /
+Extensions. Disabling a selection does not reset personal configuration.
+
 ## Dotfiles
 
 Edit the files under `chezmoi/`, then run `just run --yes --dotfiles`. For chezmoi's own commands, use this repository's generated configuration and state file:
@@ -214,7 +257,8 @@ or preference values such as `browser`, `terminal`, and `container_engine`. Brow
 preferences require their corresponding apps to be active. The resolver produces the RPM,
 Flatpak, integration, startup, and verification selections; roles consume those selections.
 Custom vendor installers currently support `vendor: {task: jetbrains}`. Native 1Password declares
-`integration: onepassword` alongside its RPM packages for desktop integration.
+`integration: onepassword` and Vicinae declares `integration: vicinae` alongside their RPM packages
+for desktop integration.
 
 Flatpak `background: true` allows background execution and `false` denies it through the same
 per-user portal permission store as Flatseal. Omission or `null` leaves the permission unmanaged;

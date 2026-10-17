@@ -32,6 +32,15 @@ development:
   - claude-code
   - codex
 apps:
+  vicinae:
+    name: Vicinae
+    enabled: true
+    feature: desktop
+    installer: rpm
+    rpm:
+      packages:
+      - vicinae
+    integration: vicinae
   onepassword:
     name: 1Password
     enabled: true
@@ -387,12 +396,6 @@ flatpak:
     url: https://dl.flathub.org/repo/flathub.flatpakrepo
 gnome:
   system_extensions:
-  - package: gnome-shell-extension-caffeine
-    uuid: caffeine@patapon.info
-  - package: gnome-shell-extension-dash-to-dock
-    uuid: dash-to-dock@micxgx.gmail.com
-  - package: gnome-shell-extension-appindicator
-    uuid: appindicatorsupport@rgcjonas.gmail.com
   - package: gnome-shell-extension-apps-menu
     uuid: apps-menu@gnome-shell-extensions.gcampax.github.com
   - package: gnome-shell-extension-launch-new-instance
@@ -403,10 +406,12 @@ gnome:
     uuid: window-list@gnome-shell-extensions.gcampax.github.com
   - package: gnome-shell-extension-background-logo
     uuid: background-logo@fedorahosted.org
-  - package: gnome-shell-extension-blur-my-shell
-    uuid: blur-my-shell@aunetx
   user_extensions:
+  - appindicatorsupport@rgcjonas.gmail.com
+  - blur-my-shell@aunetx
+  - caffeine@patapon.info
   - clipboard-indicator@tudmotu.com
+  - dash-to-dock@micxgx.gmail.com
   - tilingshell@ferrarodomenico.com
   - rounded-window-corners@fxgn
   - weatheroclock@CleoMenezesJr.github.io
