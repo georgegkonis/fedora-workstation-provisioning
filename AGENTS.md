@@ -36,8 +36,8 @@ Talk to a senior engineer; keep responses concise. Use the `commit` skill when c
 ./bootstrap.sh --check --diff
 just check                           # validation, syntax, configuration tests
 just lint
-just run --yes --dotfiles
-just run --verify
+just dotfiles
+just verify
 ```
 
 Check mode must not install bootstrap dependencies, save user selections, or execute installers. It may write ignored execution metadata. Syntax/profile checks must run before changing task behavior. In restricted environments, redirect Ansible local/remote temporary paths to `/tmp` through environment variables.

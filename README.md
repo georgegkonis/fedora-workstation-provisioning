@@ -41,8 +41,8 @@ For a minimal setup that ignores saved overrides:
 
 ```bash
 just run --preset minimal --no-local                # apply base setup and dotfiles
-just run --preset minimal --no-local --show-config  # preview the resolved configuration
-just run --preset minimal --no-local --check --diff # dry run (requires bootstrap dependencies)
+just config --preset minimal --no-local             # preview the resolved configuration
+just plan --preset minimal --no-local               # dry run (requires bootstrap dependencies)
 ```
 
 ## Configuration and precedence
@@ -88,13 +88,13 @@ Inspection/validation does not install dependencies or write configuration. Exec
 just run --yes                # reapply saved configuration
 just run --yes --tags gnome
 just run --yes --tags development
-just run --yes --dotfiles
-just run --verify
+just dotfiles
+just verify
 just update                   # upgrade RPMs and system Flatpaks only
 just run --upgrade --yes      # upgrade first, then provision (e.g. a fresh machine)
 ```
 
-`just run` forwards bootstrap arguments; without arguments it opens interactive setup. `just --usage run` summarizes common flags; `just run --help` lists all bootstrap options. `just test` and `just lint` also forward arguments to their underlying tools.
+`just run` forwards bootstrap arguments; without arguments it opens interactive setup. `just --usage run` summarizes common flags; `just run --help` lists all bootstrap options. `just plan`, `just verify`, `just config` and `just dotfiles` forward bootstrap options too (e.g. `--preset`, `--tags`); `just test` and `just lint` forward arguments to their underlying tools.
 
 System upgrades are opt-in: runs never upgrade unlisted packages unless `--upgrade` (or `just update`) is given, which keeps repeat runs fast and repeatable. Use `./bootstrap.sh --upgrade` on a fresh machine so the first provisioning starts from current packages.
 
@@ -149,7 +149,7 @@ Extensions. Disabling a selection does not reset personal configuration.
 
 ## Dotfiles
 
-Edit the files under `chezmoi/`, then run `just run --yes --dotfiles`. For chezmoi's own commands, use this repository's generated configuration and state file:
+Edit the files under `chezmoi/`, then run `just dotfiles`. For chezmoi's own commands, use this repository's generated configuration and state file:
 
 ```bash
 chezmoi --config .workstation/chezmoi.json \
@@ -166,15 +166,14 @@ Ansible installs JetBrains Toolbox when selected, together with the inotify limi
 
 Firefox preferences live in [`personal.js`](chezmoi/.chezmoitemplates/firefox/personal.js) and [`work.js`](chezmoi/.chezmoitemplates/firefox/work.js), curated separately from the current Personal and Work profiles. With desktop enabled and `preferences.browser: firefox`, a chezmoi script discovers installation-default profiles from `profiles.ini` in native, XDG, and Flatpak locations, then reads their profile-group databases to find Personal and Work by name. Personal receives its preferences whenever Firefox configuration is enabled. Work receives its preferences only when `features.work: true`; otherwise it is left untouched, even when it is the installation default. A default without a matching name receives `work.js` when `features.work` is enabled, otherwise `personal.js`. Discovery falls back to the legacy default only when installation defaults are absent, deduplicates symlinked directories, and skips missing profiles. Launch Firefox and create/name profiles before reapplying on a fresh machine; the script does not create profiles or change Firefox's registry/databases.
 
-Edit the curated files, then run `just run --yes --dotfiles` and restart Firefox. The script merges a managed block into each selected profile's `user.js`, preserving unrelated content and avoiding writes when unchanged. It does not deploy profile databases, extension state, or theme assets. Bookmarks, extensions, search engines and other profile state come from Firefox Sync; sign in after creating the profiles. Its outputs are outside chezmoi's normal `diff`/`verify` tracking; dry runs do not execute it. Firefox [reads `user.js` on startup](https://firefox-source-docs.mozilla.org/modules/libpref/index.html), so listed preferences override saved settings each restart. Removing a preference from these files does not reset its previously saved value; reset it in `about:config` when needed.
+Edit the curated files, then run `just dotfiles` and restart Firefox. The script merges a managed block into each selected profile's `user.js`, preserving unrelated content and avoiding writes when unchanged. It does not deploy profile databases, extension state, or theme assets. Bookmarks, extensions, search engines and other profile state come from Firefox Sync; sign in after creating the profiles. Its outputs are outside chezmoi's normal `diff`/`verify` tracking; dry runs do not execute it. Firefox [reads `user.js` on startup](https://firefox-source-docs.mozilla.org/modules/libpref/index.html), so listed preferences override saved settings each restart. Removing a preference from these files does not reset its previously saved value; reset it in `about:config` when needed.
 
 ## Testing changes
 
 ```bash
 just check                     # configuration, syntax, loader tests; no provisioning
 just lint                      # ansible-lint
-just run --check               # Ansible check mode, chezmoi dry run
-just run --check --diff
+just plan                      # Ansible check mode, chezmoi diff
 ```
 
 Check mode never installs bootstrap dependencies or saves `.local.yml`; missing dependencies must be installed separately. It writes only ignored execution metadata. Vendor installers and GNOME extension downloads are skipped in check mode. Fresh-machine checks cannot fully predict repository availability or dependencies installed by earlier tasks. Chezmoi `diff` shows configuration scripts without executing them.
