@@ -11,4 +11,5 @@ fi
 {{ end }}
 {{ if .workstation.features.development }}
 export MSBUILDDISABLENODEREUSE=1
+alias claude='systemd-run --user --scope -q -p CPUQuota=400% -p MemoryHigh=6G -p MemoryMax=8G -p IOWeight=50 claude'
 {{ end }}
