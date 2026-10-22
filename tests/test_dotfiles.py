@@ -95,14 +95,17 @@ class DotfileTests(unittest.TestCase):
                 self.assertEqual(run("--exclude", "scripts", "diff").stdout, "")
                 self.assertIn("CUSTOM=kept", (home / ".bashrc").read_text())
                 self.assertEqual((home / ".bashrc").read_text().count("# BEGIN CHEZMOI MANAGED WORKSTATION"), 1)
+                self.assertEqual("alias claude='systemd-run --user --scope" in
+                                 (home / ".config/shell/workstation.sh").read_text(),
+                                 bool(config["features"]["development"]))
                 self.assertIn("st = status", (home / ".gitconfig").read_text())
-                if config["git"]["signing_key"] and "onepassword" in config["selected"]["integrations"]:
+                if config["git"]["signing_key"] and "onepassword" in config["selected"]["apps"]:
                     self.assertIn("program = /opt/1Password/op-ssh-sign",
                                   (home / ".config/git/workstation.gitconfig").read_text())
                 else:
                     self.assertNotIn("op-ssh-sign", (home / ".config/git/workstation.gitconfig").read_text())
                 wrapper_path = home / ".var/app/org.mozilla.firefox/data/bin/1password-wrapper.sh"
-                self.assertEqual(wrapper_path.exists(), "onepassword" in config["selected"]["integrations"]
+                self.assertEqual(wrapper_path.exists(), "onepassword" in config["selected"]["apps"]
                                  and config["preferences"]["browser"] == "firefox")
                 self.assertTrue(user_js.read_text().startswith('// Keep\nuser_pref("custom.example", true);\n'))
                 if config["features"]["desktop"] and config["preferences"]["browser"] == "firefox":
@@ -122,7 +125,7 @@ class DotfileTests(unittest.TestCase):
                     self.assertEqual(user_js.read_text(), '// Keep\nuser_pref("custom.example", true);\n')
                     self.assertFalse((personal_profile / "user.js").exists())
                 vicinae_settings = json.loads(vicinae.read_text())
-                if "vicinae" in config["selected"]["integrations"]:
+                if "vicinae" in config["selected"]["apps"]:
                     self.assertEqual(vicinae_settings["font"]["normal"], {"family": "Adwaita Sans", "size": 11})
                     self.assertEqual(vicinae_settings["theme"]["dark"]["name"], "libadwaita-dark")
                     self.assertEqual(vicinae_settings["theme"]["dark"]["icon_theme"], "Adwaita")
