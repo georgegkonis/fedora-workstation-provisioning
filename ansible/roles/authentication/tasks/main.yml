@@ -1,0 +1,54 @@
+---
+# Skip fingerprint auth while the lid is closed (docked), so PAM prompts for the password immediately.
+# Implemented as a custom authselect profile based on Fedora's `local`, keeping the current features.
+- name: Install the lid state check
+  ansible.builtin.copy:
+    src: lid-open
+    dest: /usr/local/libexec/lid-open
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Create the lid-aware authselect profile
+  ansible.builtin.command:
+    argv: [authselect, create-profile, lidfp, --base-on=local, --symlink-meta]
+    creates: /etc/authselect/custom/lidfp/system-auth
+  become: true
+
+- name: Gate fingerprint auth on the lid state
+  ansible.builtin.lineinfile:
+    path: "/etc/authselect/custom/lidfp/{{ item.file }}"
+    line: "{{ item.line }}"
+    insertbefore: '^auth\s+\S.*pam_fprintd\.so'
+    firstmatch: true
+  loop:
+    # Lid closed: skip pam_fprintd and fall through to pam_unix.
+    - file: system-auth
+      line: >-
+        auth        [success=ignore default=1]                   pam_exec.so quiet /usr/local/libexec/lid-open
+        {include if "with-fingerprint"}
+    # Lid closed: fail GDM's parallel fingerprint conversation immediately.
+    - file: fingerprint-auth
+      line: auth        requisite                                    pam_exec.so quiet /usr/local/libexec/lid-open
+  loop_control:
+    label: "{{ item.file }}"
+  become: true
+  notify: Apply authselect changes
+
+- name: Read the current authselect selection
+  ansible.builtin.command:
+    argv: [authselect, current, --raw]
+  register: authentication_current
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  become: true
+
+- name: Select the lid-aware profile, keeping current features
+  ansible.builtin.command:
+    argv: "{{ ['authselect', 'select', 'custom/lidfp']
+              + (authentication_current.stdout.split()[1:] + ['with-fingerprint']) | unique }}"
+  when: (authentication_current.stdout.split() | first | default('')) != 'custom/lidfp'
+  changed_when: true
+  become: true

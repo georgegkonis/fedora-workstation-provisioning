@@ -19,6 +19,7 @@
             if workstation.features.development and workstation.development.git_credential_manager else [])
          + ([desktop_target_home + '/.local/bin/typst']
             if workstation.features.development and workstation.development.typst else [])
+         + (['/usr/local/libexec/lid-open'] if workstation.hardware.fingerprint_lid_check else [])
          + ([desktop_target_home + '/anaconda3/bin/conda']
             if workstation.features.development and workstation.development.anaconda else []) }}
     verify_expected_clis: >-

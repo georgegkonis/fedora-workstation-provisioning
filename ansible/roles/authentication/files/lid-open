@@ -1,0 +1,7 @@
+#!/bin/sh
+# Exit 0 if the laptop lid is open (or there is no lid); 1 if closed. PAM gates pam_fprintd on it.
+for f in /proc/acpi/button/lid/*/state; do
+  [ -r "$f" ] || exit 0
+  grep -q closed "$f" && exit 1
+done
+exit 0

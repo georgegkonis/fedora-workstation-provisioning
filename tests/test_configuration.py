@@ -93,6 +93,7 @@ class ConfigurationTests(unittest.TestCase):
             {"gnome": {"autostart": [{"name": "x", "title": "X", "command": "a\nb"}]}},
             {"gnome": {"autostart": [{"name": "x", "title": "X", "command": "x"},
                                      {"name": "x", "title": "Y", "command": "y"}]}},
+            {"hardware": {"fingerprint_lid_check": "yes"}},
         ]
         for override in invalid:
             with self.subTest(override=override), self.assertRaises(engine.ConfigurationError):

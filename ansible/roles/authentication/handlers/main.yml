@@ -1,0 +1,5 @@
+---
+- name: Apply authselect changes
+  ansible.builtin.command: authselect apply-changes
+  become: true
+  changed_when: true

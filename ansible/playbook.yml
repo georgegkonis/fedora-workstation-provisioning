@@ -36,6 +36,9 @@
     - role: gnome
       when: workstation.features.desktop
       tags: gnome
+    - role: authentication
+      when: workstation.hardware.fingerprint_lid_check
+      tags: [authentication, hardware]
     - role: services
       tags: [services, containers, docker, virtualization, hardware, vicinae, desktop]
 

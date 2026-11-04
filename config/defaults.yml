@@ -448,3 +448,5 @@ fonts: []
 hardware:
   packages: []
   services: []
+  # Laptops with a fingerprint reader: skip fingerprint auth while the lid is closed (docked).
+  fingerprint_lid_check: false
